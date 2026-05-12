@@ -1,0 +1,54 @@
+@use '../../../../styles/variables' as *;
+
+.alert {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  border-radius: $radius-md;
+  border: 1px solid transparent;
+  font-size: $font-size-sm;
+
+  &--success {
+    background: $color-success-bg;
+    border-color: rgba(46, 204, 113, 0.3);
+    color: $color-success;
+  }
+
+  &--warning {
+    background: $color-warning-bg;
+    border-color: rgba(243, 156, 18, 0.3);
+    color: $color-warning;
+  }
+
+  &--danger {
+    background: $color-danger-bg;
+    border-color: rgba(231, 76, 60, 0.3);
+    color: $color-danger;
+  }
+
+  &--info {
+    background: $color-info-bg;
+    border-color: rgba(52, 152, 219, 0.3);
+    color: $color-info;
+  }
+
+  &__icon {
+    font-size: $font-size-lg;
+    flex-shrink: 0;
+  }
+
+  &__content {
+    flex: 1;
+  }
+
+  &__title {
+    display: block;
+    font-weight: $font-weight-semibold;
+    margin-bottom: 2px;
+  }
+
+  &__message {
+    margin: 0;
+    opacity: 0.9;
+  }
+}

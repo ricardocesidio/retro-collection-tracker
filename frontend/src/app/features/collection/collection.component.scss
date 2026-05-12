@@ -1,0 +1,63 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.page-header {
+  @include flex-between;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.collection {
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__select {
+    padding: 0.625rem 0.75rem;
+    background: $color-surface-alt;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    color: $color-text;
+    font-size: $font-size-sm;
+    font-family: $font-family;
+    min-width: 160px;
+    cursor: pointer;
+    transition: border-color $transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: $color-highlight;
+    }
+  }
+
+  &__grid {
+    @include responsive-grid;
+  }
+}
+
+.game-card {
+  &__title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-sm;
+    @include text-truncate;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    align-items: center;
+  }
+
+  &__value {
+    font-size: $font-size-xs;
+    color: $color-success;
+    font-weight: $font-weight-semibold;
+    margin-left: auto;
+  }
+}

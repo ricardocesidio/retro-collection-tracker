@@ -1,0 +1,79 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.page-header {
+  @include flex-between;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.form-layout {
+  @include flex-column;
+  gap: $spacing-xl;
+  max-width: 720px;
+}
+
+.form-section {
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+
+  .section-title {
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-md;
+    border-bottom: 1px solid $color-border;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-md;
+
+  @include respond(md) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.input-group {
+  @include flex-column;
+  gap: $spacing-xs;
+
+  &__label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text;
+  }
+}
+
+.form-select {
+  padding: 0.625rem 0.75rem;
+  background: $color-surface-alt;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  color: $color-text;
+  font-size: $font-size-base;
+  font-family: $font-family;
+  cursor: pointer;
+  width: 100%;
+  transition: border-color $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $color-highlight;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $spacing-md;
+
+  &__right {
+    display: flex;
+    gap: $spacing-sm;
+  }
+}

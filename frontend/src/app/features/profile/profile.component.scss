@@ -1,0 +1,108 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.profile {
+  &__header {
+    display: flex;
+    gap: $spacing-xl;
+    margin-bottom: $spacing-xl;
+    flex-wrap: wrap;
+
+    @include respond(md) {
+      flex-wrap: nowrap;
+    }
+  }
+
+  &__avatar {
+    flex-shrink: 0;
+
+    img {
+      width: 120px;
+      height: 120px;
+      border-radius: $radius-full;
+      border: 3px solid $color-border;
+    }
+  }
+
+  &__info {
+    flex: 1;
+  }
+
+  &__name {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__bio {
+    color: $color-text-muted;
+    font-size: $font-size-base;
+    margin-bottom: $spacing-md;
+    max-width: 500px;
+  }
+
+  &__meta {
+    display: flex;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-md;
+
+    span {
+      font-size: $font-size-sm;
+      color: $color-text-muted;
+
+      strong {
+        color: $color-text;
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-sm;
+  }
+
+  &__tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid $color-border;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__tab {
+    padding: $spacing-sm $spacing-lg;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-muted;
+    border-bottom: 2px solid transparent;
+    transition: all $transition-fast;
+
+    &:hover {
+      color: $color-text;
+    }
+
+    &--active {
+      color: $color-highlight;
+      border-bottom-color: $color-highlight;
+    }
+  }
+
+  &__grid {
+    @include responsive-grid;
+  }
+}
+
+.game-card {
+  &__title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-sm;
+    @include text-truncate;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    align-items: center;
+  }
+}

@@ -1,0 +1,38 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.page-header {
+  @include flex-between;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.wishlist {
+  &__grid {
+    @include responsive-grid;
+  }
+}
+
+.game-card {
+  &__title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-sm;
+    @include text-truncate;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    align-items: center;
+  }
+
+  &__price {
+    font-size: $font-size-xs;
+    color: $color-warning;
+    font-weight: $font-weight-medium;
+    margin-left: auto;
+  }
+}

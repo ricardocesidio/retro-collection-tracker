@@ -1,36 +1,37 @@
 @use 'variables' as *;
 
+// ─── Responsive breakpoints ───────────────────────────
 @mixin respond($breakpoint) {
   @if $breakpoint == sm {
-    @media (min-width: $breakpoint-sm) {
-      @content;
-    }
+    @media (min-width: $breakpoint-sm) { @content; }
   } @else if $breakpoint == md {
-    @media (min-width: $breakpoint-md) {
-      @content;
-    }
+    @media (min-width: $breakpoint-md) { @content; }
   } @else if $breakpoint == lg {
-    @media (min-width: $breakpoint-lg) {
-      @content;
-    }
+    @media (min-width: $breakpoint-lg) { @content; }
   } @else if $breakpoint == xl {
-    @media (min-width: $breakpoint-xl) {
-      @content;
-    }
+    @media (min-width: $breakpoint-xl) { @content; }
   }
 }
 
+// ─── Layout ───────────────────────────────────────────
 @mixin container {
   width: 100%;
-  max-width: 1200px;
+  max-width: $max-content-width;
   margin: 0 auto;
-  padding: 0 $spacing-md;
+  padding: 0 $container-padding;
 
   @include respond(md) {
     padding: 0 $spacing-xl;
   }
 }
 
+@mixin page-padding {
+  padding-top: calc($header-height + $spacing-xl);
+  padding-bottom: $spacing-2xl;
+  min-height: calc(100vh - $header-height);
+}
+
+// ─── Flex helpers ─────────────────────────────────────
 @mixin flex-center {
   display: flex;
   align-items: center;
@@ -43,14 +44,82 @@
   justify-content: space-between;
 }
 
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// ─── Card style ───────────────────────────────────────
 @mixin card {
   background: $color-surface;
-  border-radius: $radius-md;
+  border-radius: $radius-lg;
   border: 1px solid $color-border;
   transition: all $transition-base;
 
   &:hover {
     background: $color-surface-hover;
-    border-color: $color-highlight;
+    border-color: $color-border-light;
+  }
+}
+
+// ─── Grid ─────────────────────────────────────────────
+@mixin grid-cols($cols, $gap: $spacing-md) {
+  display: grid;
+  grid-template-columns: repeat($cols, 1fr);
+  gap: $gap;
+}
+
+@mixin responsive-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-md;
+
+  @include respond(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond(md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include respond(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+// ─── Text truncation ──────────────────────────────────
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin line-clamp($lines) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// ─── Focus ring ───────────────────────────────────────
+@mixin focus-ring {
+  outline: none;
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px $color-primary, 0 0 0 4px $color-highlight;
+  }
+}
+
+// ─── Scrollbar ────────────────────────────────────────
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: $color-primary;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $color-border-light;
+    border-radius: 3px;
   }
 }
