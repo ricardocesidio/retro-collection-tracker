@@ -1,17 +1,153 @@
-
 .game-detail {
-  display: grid; gap: $spacing-xl;
-  @include respond(md) { grid-template-columns: 300px 1fr; }
-  &__image img { width: 100%; border-radius: $radius-lg; border: 1px solid $color-border; }
-  &__info { display: flex; flex-direction: column; gap: $spacing-lg; }
-  &__header .page-title { margin-bottom: $spacing-sm; }
-  &__tags { display: flex; gap: $spacing-xs; flex-wrap: wrap; }
-  &__meta { display: flex; gap: $spacing-xl; flex-wrap: wrap; padding: $spacing-md 0; border-top: 1px solid $color-border; border-bottom: 1px solid $color-border;
-    &-item { display: flex; flex-direction: column; gap: 2px; .label { font-size: $font-size-xs; color: $color-text-dim; text-transform: uppercase; letter-spacing: 0.05em; } .value { font-size: $font-size-sm; font-weight: $font-weight-medium; } }
+  &__back {
+    display: inline-block;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    margin-bottom: $spacing-lg;
+    transition: color $transition-fast;
+    &:hover { color: $color-text; }
   }
-  &__description { font-size: $font-size-base; color: $color-text-muted; line-height: 1.7; }
-  &__actions { display: flex; gap: $spacing-sm; flex-wrap: wrap; }
-  &__stats { display: flex; gap: $spacing-xl; flex-wrap: wrap; }
+
+  display: grid;
+  gap: $spacing-2xl;
+  @include respond(md) { grid-template-columns: 340px 1fr; }
+
+  &__image-wrapper {
+    position: relative;
+    border-radius: $radius-xl;
+    overflow: hidden;
+    border: 1px solid $color-border;
+    img { width: 100%; display: block; }
+  }
+
+  &__image-badge {
+    position: absolute;
+    top: $spacing-sm; right: $spacing-sm;
+    background: $color-highlight;
+    color: #fff;
+    padding: 0.25rem 0.75rem;
+    border-radius: $radius-sm;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    letter-spacing: 0.02em;
+  }
+
+  &__info {
+    @include flex-column;
+    gap: $spacing-xl;
+  }
+
+  &__title {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    line-height: 1.15;
+    margin-bottom: $spacing-sm;
+    @include respond(md) { font-size: $font-size-4xl; }
+  }
+
+  &__tags { display: flex; gap: $spacing-xs; flex-wrap: wrap; margin-bottom: $spacing-sm; }
+
+  &__meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-md;
+    padding: $spacing-lg;
+    background: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    @include respond(sm) { grid-template-columns: 1fr 1fr 1fr; }
+  }
+
+  &__description {
+    h3 { font-size: $font-size-lg; margin-bottom: $spacing-sm; }
+    p { color: $color-text-muted; line-height: 1.7; }
+  }
+
+  &__stats-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-sm;
+    @include respond(sm) { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  &__actions {
+    display: flex; gap: $spacing-sm; flex-wrap: wrap;
+    padding: $spacing-md 0;
+  }
+
+  &__section-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $color-border;
+  }
 }
 
-.stat { text-align: center; &__value { display: block; font-size: $font-size-xl; font-weight: $font-weight-bold; color: $color-highlight; } &__label { font-size: $font-size-xs; color: $color-text-muted; } }
+.meta-item {
+  &__label {
+    display: block;
+    font-size: $font-size-xs;
+    color: $color-text-dim;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+  }
+  &__value { font-size: $font-size-sm; font-weight: $font-weight-medium; }
+}
+
+.stat-card {
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  text-align: center;
+  transition: all $transition-fast;
+  &:hover { border-color: $color-border-light; }
+
+  &__number { margin-bottom: $spacing-xs; }
+  &__rating { font-size: $font-size-2xl; font-weight: $font-weight-bold; color: $color-highlight; }
+  &__max { font-size: $font-size-sm; color: $color-text-muted; margin-left: 2px; }
+  &__label { font-size: $font-size-xs; color: $color-text-muted; }
+}
+
+.reviews-list {
+  @include flex-column;
+  gap: $spacing-md;
+}
+
+.review-card {
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+
+  &__header {
+    @include flex-between;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__user { display: flex; align-items: center; gap: $spacing-sm; }
+
+  &__avatar {
+    width: 32px; height: 32px;
+    border-radius: $radius-full;
+    overflow: hidden;
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+
+  &__avatar-placeholder {
+    width: 32px; height: 32px;
+    border-radius: $radius-full;
+    background: $color-accent-light;
+    @include flex-center;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-text;
+  }
+
+  &__username { font-size: $font-size-sm; font-weight: $font-weight-medium; }
+
+  &__title { font-size: $font-size-sm; font-weight: $font-weight-semibold; margin-bottom: $spacing-xs; }
+  &__body { font-size: $font-size-sm; color: $color-text-muted; line-height: 1.6; }
+}

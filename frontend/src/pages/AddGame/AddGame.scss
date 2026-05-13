@@ -21,4 +21,6 @@
   &:focus { outline: none; border-color: $color-highlight; }
 }
 
+.input-error { font-size: $font-size-xs; color: $color-danger; margin-top: 2px; }
+
 .form-actions { display: flex; justify-content: flex-end; gap: $spacing-sm; padding-top: $spacing-md; }

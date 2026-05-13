@@ -1,50 +1,164 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../components/ui/Card/Card';
 import Badge from '../../components/ui/Badge/Badge';
 import Button from '../../components/ui/Button/Button';
 import Input from '../../components/ui/Input/Input';
+import EmptyState from '../../components/ui/EmptyState/EmptyState';
+import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
+import Alert from '../../components/ui/Alert/Alert';
+import { collectionApi } from '../../services/collections';
+import { catalogApi } from '../../services/catalog';
+import type { CollectionEntry, Platform } from '../../services/collections';
 import './Collection.scss';
 
 const Collection: React.FC = () => {
-  const collection = Array.from({ length: 8 }, (_, i) => ({
-    id: i + 1,
-    title: ['Super Metroid', 'Chrono Trigger', 'Zelda: A Link to the Past', 'Final Fantasy VI', 'Super Mario World', 'Donkey Kong Country', 'Mega Man X', 'EarthBound'][i],
-    platform: Array(8).fill('SNES'),
-    condition: ['Mint', 'Near Mint', 'Very Good', 'Good', 'Mint', 'Very Good', 'Good', 'Acceptable'][i],
-    rating: [5, 5, 5, 5, 5, 4, 4, 5][i],
-    value: [250, 200, 150, 180, 90, 85, 120, 400][i],
-    imageUrl: `https://placehold.co/300x400/1a1a30/e0e0e0?text=Game+${i + 1}`,
-  }));
+  const [items, setItems] = useState<CollectionEntry[]>([]);
+  const [total, setTotal] = useState(0);
+  const [totalValue, setTotalValue] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [platformFilter, setPlatformFilter] = useState('');
+  const [conditionFilter, setConditionFilter] = useState('');
+  const [platforms, setPlatforms] = useState<Platform[]>([]);
+
+  const fetchCollection = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const params: Record<string, string> = {};
+      if (search) params.search = search;
+      if (platformFilter) params.platform = platformFilter;
+      if (conditionFilter) params.condition = conditionFilter;
+
+      const res = await collectionApi.list(params);
+      setItems(res.data);
+      setTotal(res.total);
+      setTotalValue(res.totalValue || 0);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load collection');
+    } finally {
+      setLoading(false);
+    }
+  }, [search, platformFilter, conditionFilter]);
+
+  useEffect(() => {
+    fetchCollection();
+  }, [fetchCollection]);
+
+  useEffect(() => {
+    catalogApi.getPlatforms().then(setPlatforms).catch(() => {});
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Remove this game from your collection?')) return;
+    setDeleting(id);
+    try {
+      await collectionApi.delete(id);
+      setItems(items.filter((i) => i.id !== id));
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const conditions = ['MINT', 'NEAR_MINT', 'VERY_GOOD', 'GOOD', 'ACCEPTABLE', 'POOR'];
 
   return (
     <div className="page-container">
       <div className="page-header">
         <div>
           <h1 className="page-title">My Collection</h1>
-          <p className="page-subtitle">47 games · Est. value: $2,450</p>
+          <p className="page-subtitle">
+            {total} {total === 1 ? 'game' : 'games'}
+            {totalValue > 0 && <> · Est. value: ${totalValue.toLocaleString()}</>}
+          </p>
         </div>
         <Link to="/add-game"><Button variant="primary">+ Add Game</Button></Link>
       </div>
 
       <div className="collection__filters">
-        <Input placeholder="Search collection..." type="search" />
-        <select className="collection__select"><option value="">All Platforms</option><option>SNES</option><option>NES</option><option>Genesis</option><option>PlayStation</option><option>Nintendo 64</option></select>
-        <select className="collection__select"><option value="">All Conditions</option><option>Mint</option><option>Near Mint</option><option>Very Good</option><option>Good</option><option>Acceptable</option></select>
+        <Input
+          placeholder="Search collection..."
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <select
+          className="collection__select"
+          value={platformFilter}
+          onChange={(e) => setPlatformFilter(e.target.value)}
+        >
+          <option value="">All Platforms</option>
+          {platforms.map((p) => (
+            <option key={p.id} value={p.id}>{p.name}</option>
+          ))}
+        </select>
+        <select
+          className="collection__select"
+          value={conditionFilter}
+          onChange={(e) => setConditionFilter(e.target.value)}
+        >
+          <option value="">All Conditions</option>
+          {conditions.map((c) => (
+            <option key={c} value={c}>{c.replace('_', ' ')}</option>
+          ))}
+        </select>
       </div>
 
-      <div className="collection__grid">
-        {collection.map((game) => (
-          <Card key={game.id} imageUrl={game.imageUrl} title={game.title} badge={game.condition} clickable>
-            <h3 className="game-card__title">{game.title}</h3>
-            <div className="game-card__meta">
-              <Badge variant="info">{game.platform}</Badge>
-              <Badge variant="highlight">{game.rating}★</Badge>
-              <span className="game-card__value">${game.value}</span>
-            </div>
-          </Card>
-        ))}
-      </div>
+      {error && <Alert variant="danger">{error}</Alert>}
+
+      {loading ? (
+        <LoadingSpinner message="Loading your collection..." />
+      ) : items.length === 0 ? (
+        <EmptyState
+          icon="🎮"
+          title="Your collection is empty"
+          message="Start building your retro game library. Add your first game to get started."
+        >
+          <Link to="/add-game"><Button variant="primary">Add Your First Game</Button></Link>
+          <Link to="/explore"><Button variant="outline">Browse Catalog</Button></Link>
+        </EmptyState>
+      ) : (
+        <div className="collection__grid">
+          {items.map((item) => (
+            <Card
+              key={item.id}
+              imageUrl={item.game.coverImageUrl || `https://placehold.co/300x400/1a1a30/e0e0e0?text=${encodeURIComponent(item.game.title)}`}
+              title={item.game.title}
+              clickable
+            >
+              <h3 className="game-card__title">{item.game.title}</h3>
+              <div className="game-card__meta">
+                <Badge variant="info">{item.game.platform.name}</Badge>
+                <Badge variant="default">{item.condition.replace('_', ' ')}</Badge>
+                {item.personalRating && (
+                  <Badge variant="highlight">{item.personalRating}★</Badge>
+                )}
+                {item.estimatedValue != null && (
+                  <span className="game-card__value">${item.estimatedValue}</span>
+                )}
+              </div>
+              <div className="game-card__actions">
+                <Link to={`/edit-game/${item.id}`}>
+                  <Button variant="ghost" size="sm">Edit</Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDelete(item.id)}
+                  loading={deleting === item.id}
+                >
+                  Remove
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

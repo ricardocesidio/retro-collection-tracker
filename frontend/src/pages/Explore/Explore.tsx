@@ -1,44 +1,170 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import Card from '../../components/ui/Card/Card';
 import Badge from '../../components/ui/Badge/Badge';
 import Input from '../../components/ui/Input/Input';
+import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
+import EmptyState from '../../components/ui/EmptyState/EmptyState';
+import Button from '../../components/ui/Button/Button';
+import { gamesApi } from '../../services/collections';
+import { catalogApi } from '../../services/catalog';
+import type { GameData, Platform } from '../../services/collections';
+import type { Genre } from '../../services/catalog';
 import './Explore.scss';
 
-const placeholderGames = Array.from({ length: 12 }, (_, i) => ({
-  id: i + 1,
-  title: ['Super Metroid', 'Chrono Trigger', 'The Legend of Zelda', 'Sonic the Hedgehog 2', 'Castlevania', 'Final Fantasy VI', 'Mega Man X', 'Donkey Kong Country', 'Street Fighter II', 'Metroid', 'Super Mario World', 'Contra'][i],
-  platform: ['SNES', 'SNES', 'NES', 'Genesis', 'NES', 'SNES', 'SNES', 'SNES', 'SNES', 'NES', 'SNES', 'NES'][i],
-  genre: ['Action', 'RPG', 'Adventure', 'Platformer', 'Action', 'RPG', 'Action', 'Platformer', 'Fighting', 'Action', 'Platformer', 'Action'][i],
-  releaseYear: [1994, 1995, 1986, 1992, 1986, 1994, 1993, 1994, 1991, 1986, 1990, 1987][i],
-  imageUrl: `https://placehold.co/300x400/1a1a30/e0e0e0?text=${encodeURIComponent(['Super Metroid', 'Chrono Trigger', 'Zelda', 'Sonic 2', 'Castlevania', 'FFVI', 'Mega Man X', 'DKC', 'SFII', 'Metroid', 'SMW', 'Contra'][i])}`,
-}));
-
 const Explore: React.FC = () => {
+  const [games, setGames] = useState<GameData[]>([]);
+  const [platforms, setPlatforms] = useState<Platform[]>([]);
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [search, setSearch] = useState('');
+  const [platformId, setPlatformId] = useState('');
+  const [genreId, setGenreId] = useState('');
+  const [sort, setSort] = useState('');
+
+  useEffect(() => {
+    Promise.all([catalogApi.getPlatforms(), catalogApi.getGenres()])
+      .then(([p, g]) => { setPlatforms(p); setGenres(g); })
+      .catch(() => {});
+  }, []);
+
+  const fetchGames = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params: Record<string, string> = { page: String(page), limit: '24' };
+      if (search) params.search = search;
+      if (platformId) params.platform = platformId;
+      if (genreId) params.genre = genreId;
+      if (sort) params.sort = sort;
+
+      const res = await gamesApi.list(params);
+      setGames(res.data);
+      setTotal(res.total);
+      setTotalPages(res.totalPages);
+    } catch {
+      setGames([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, search, platformId, genreId, sort]);
+
+  useEffect(() => {
+    fetchGames();
+  }, [fetchGames]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setPage(1);
+  };
+
+  const handleFilterChange = (setter: (v: string) => void) => (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setter(e.target.value);
+    setPage(1);
+  };
+
   return (
     <div className="page-container">
-      <h1 className="page-title">Explore Catalog</h1>
-      <p className="page-subtitle">Browse the retro gaming database</p>
+      <div className="explore__hero">
+        <h1 className="page-title">Explore Catalog</h1>
+        <p className="page-subtitle">
+          {total.toLocaleString()} retro games across {platforms.length} platforms
+        </p>
+      </div>
 
       <div className="explore__filters">
-        <Input placeholder="Search games..." type="search" />
+        <Input
+          placeholder="Search by title..."
+          type="search"
+          value={search}
+          onChange={handleSearchChange}
+        />
         <div className="explore__filter-group">
-          <select className="explore__select"><option value="">All Platforms</option><option>NES</option><option>SNES</option><option>Sega Genesis</option><option>PlayStation</option><option>Nintendo 64</option><option>Game Boy</option><option>Atari 2600</option></select>
-          <select className="explore__select"><option value="">All Genres</option><option>Action</option><option>RPG</option><option>Platformer</option><option>Shooter</option><option>Puzzle</option><option>Racing</option><option>Fighting</option></select>
+          <select className="explore__select" value={platformId} onChange={handleFilterChange(setPlatformId)}>
+            <option value="">All Platforms</option>
+            {platforms.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+          </select>
+          <select className="explore__select" value={genreId} onChange={handleFilterChange(setGenreId)}>
+            <option value="">All Genres</option>
+            {genres.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+          </select>
+          <select className="explore__select explore__select--sort" value={sort} onChange={handleFilterChange(setSort)}>
+            <option value="">Sort: A-Z</option>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="popular">Most Collected</option>
+          </select>
         </div>
       </div>
 
-      <div className="explore__grid">
-        {placeholderGames.map((game) => (
-          <Card key={game.id} imageUrl={game.imageUrl} title={game.title} badge={game.platform} clickable>
-            <h3 className="game-card__title">{game.title}</h3>
-            <div className="game-card__meta">
-              <Badge variant="info">{game.platform}</Badge>
-              <Badge variant="default">{game.genre}</Badge>
-              <span className="game-card__year">{game.releaseYear}</span>
-            </div>
-          </Card>
-        ))}
+      <div className="explore__results-info">
+        <span className="text-muted">
+          Showing {games.length} of {total} results
+        </span>
       </div>
+
+      {loading ? (
+        <LoadingSpinner message="Discovering retro games..." />
+      ) : games.length === 0 ? (
+        <EmptyState
+          icon="🔍"
+          title="No games found"
+          message={search ? `No results for "${search}". Try a different search term.` : 'No games match your filters. Try broadening your search.'}
+        />
+      ) : (
+        <>
+          <div className="explore__grid">
+            {games.map((game) => (
+              <Link to={`/games/${game.id}`} key={game.id} style={{ textDecoration: 'none' }}>
+                <Card
+                  imageUrl={game.coverImageUrl || `https://placehold.co/300x400/1a1a30/e0e0e0?text=${encodeURIComponent(game.title)}`}
+                  badge={game.platform.name}
+                  clickable
+                >
+                  <h3 className="game-card__title">{game.title}</h3>
+                  <div className="game-card__meta">
+                    <Badge variant="info">{game.platform.name}</Badge>
+                    <Badge variant="default">{game.genre.name}</Badge>
+                  </div>
+                  <div className="game-card__footer-info">
+                    <span className="game-card__year">{game.releaseYear}</span>
+                    {game._count && (
+                      <span className="game-card__count">
+                        {game._count.collections > 0 && `${game._count.collections} in collections`}
+                      </span>
+                    )}
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="explore__pagination">
+              <Button
+                variant="ghost"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                ← Previous
+              </Button>
+              <span className="explore__page-info">
+                Page {page} of {totalPages}
+              </span>
+              <Button
+                variant="ghost"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              >
+                Next →
+              </Button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

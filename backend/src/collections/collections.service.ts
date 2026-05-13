@@ -1,0 +1,92 @@
+import {
+  Injectable, NotFoundException, ConflictException,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateCollectionDto } from './dto/create-collection.dto';
+import { UpdateCollectionDto } from './dto/update-collection.dto';
+
+@Injectable()
+export class CollectionsService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async getUserCollection(
+    userId: string,
+    query: { search?: string; platform?: string; condition?: string; page?: number; limit?: number },
+  ) {
+    const { search, platform, condition, page = 1, limit = 20 } = query;
+    const skip = (page - 1) * limit;
+
+    const where: any = { userId };
+    if (search) where.game = { title: { contains: search, mode: 'insensitive' } };
+    if (platform) where.game = { ...(where.game || {}), platformId: platform };
+    if (condition) where.condition = condition;
+
+    const [items, total] = await Promise.all([
+      this.prisma.collection.findMany({
+        where,
+        include: { game: { include: { platform: true, genre: true } } },
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.collection.count({ where }),
+    ]);
+
+    const totalValue = await this.prisma.collection.aggregate({
+      where: { userId },
+      _sum: { estimatedValue: true },
+    });
+
+    return {
+      data: items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      totalValue: totalValue._sum.estimatedValue || 0,
+    };
+  }
+
+  async findById(userId: string, id: string) {
+    const item = await this.prisma.collection.findFirst({
+      where: { id, userId },
+      include: { game: { include: { platform: true, genre: true } } },
+    });
+    if (!item) throw new NotFoundException('Collection entry not found');
+    return item;
+  }
+
+  async addToCollection(userId: string, dto: CreateCollectionDto) {
+    const existing = await this.prisma.collection.findUnique({
+      where: { userId_gameId: { userId, gameId: dto.gameId } },
+    });
+    if (existing) throw new ConflictException('Game already in your collection');
+
+    return this.prisma.collection.create({
+      data: { ...dto, userId },
+      include: { game: { include: { platform: true, genre: true } } },
+    });
+  }
+
+  async update(userId: string, id: string, dto: UpdateCollectionDto) {
+    const item = await this.prisma.collection.findFirst({
+      where: { id, userId },
+    });
+    if (!item) throw new NotFoundException('Collection entry not found');
+
+    return this.prisma.collection.update({
+      where: { id },
+      data: dto,
+      include: { game: { include: { platform: true, genre: true } } },
+    });
+  }
+
+  async remove(userId: string, id: string) {
+    const item = await this.prisma.collection.findFirst({
+      where: { id, userId },
+    });
+    if (!item) throw new NotFoundException('Collection entry not found');
+
+    return this.prisma.collection.delete({ where: { id } });
+  }
+}

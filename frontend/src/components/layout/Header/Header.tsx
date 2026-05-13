@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 import './Header.scss';
 
 const Header: React.FC = () => {
+  const { state, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { user } = state;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -15,10 +18,19 @@ const Header: React.FC = () => {
   const navItems = [
     { label: 'Home', path: '/' },
     { label: 'Explore', path: '/explore' },
-    { label: 'My Collection', path: '/collection' },
-    { label: 'Wishlist', path: '/wishlist' },
-    { label: 'Dashboard', path: '/dashboard' },
+    ...(user
+      ? [
+          { label: 'My Collection', path: '/collection' },
+          { label: 'Wishlist', path: '/wishlist' },
+          { label: 'Dashboard', path: '/dashboard' },
+        ]
+      : []),
   ];
+
+  const handleLogout = () => {
+    logout();
+    setMobileMenuOpen(false);
+  };
 
   return (
     <header className={`header${scrolled ? ' header--scrolled' : ''}`}>
@@ -34,9 +46,7 @@ const Header: React.FC = () => {
               key={item.path}
               to={item.path}
               end={item.path === '/'}
-              className={({ isActive }) =>
-                `header__link${isActive ? ' active' : ''}`
-              }
+              className={({ isActive }) => `header__link${isActive ? ' active' : ''}`}
               onClick={() => setMobileMenuOpen(false)}
             >
               {item.label}
@@ -45,8 +55,32 @@ const Header: React.FC = () => {
         </nav>
 
         <div className="header__actions">
-          <Link to="/login" className="header__link header__link--auth">Sign In</Link>
-          <Link to="/register" className="header__cta">Sign Up</Link>
+          {user ? (
+            <>
+              <Link
+                to={`/profile/${user.username}`}
+                className="header__link"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {user.displayName || user.username}
+              </Link>
+              <Link to="/settings" className="header__link header__link--auth">
+                Settings
+              </Link>
+              <button onClick={handleLogout} className="header__link header__link--auth">
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="header__link header__link--auth">
+                Sign In
+              </Link>
+              <Link to="/register" className="header__cta">
+                Sign Up
+              </Link>
+            </>
+          )}
           <button
             className={`header__menu-btn${mobileMenuOpen ? ' header__menu-btn--open' : ''}`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

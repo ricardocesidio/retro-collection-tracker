@@ -1,5 +1,8 @@
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import Layout from './components/layout/Layout/Layout';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import Home from './pages/Home/Home';
 import Explore from './pages/Explore/Explore';
 import GameDetails from './pages/GameDetails/GameDetails';
@@ -16,23 +19,46 @@ import NotFound from './pages/NotFound/NotFound';
 
 const App: React.FC = () => {
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/explore" element={<Explore />} />
-        <Route path="/games/:id" element={<GameDetails />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/collection" element={<Collection />} />
-        <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/profile/:username" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/add-game" element={<AddGame />} />
-        <Route path="/edit-game/:id" element={<EditGame />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/games/:id" element={<GameDetails />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/dashboard"
+            element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
+          />
+          <Route
+            path="/collection"
+            element={<ProtectedRoute><Collection /></ProtectedRoute>}
+          />
+          <Route
+            path="/wishlist"
+            element={<ProtectedRoute><Wishlist /></ProtectedRoute>}
+          />
+          <Route
+            path="/profile/:username"
+            element={<Profile />}
+          />
+          <Route
+            path="/settings"
+            element={<ProtectedRoute><Settings /></ProtectedRoute>}
+          />
+          <Route
+            path="/add-game"
+            element={<ProtectedRoute><AddGame /></ProtectedRoute>}
+          />
+          <Route
+            path="/edit-game/:id"
+            element={<ProtectedRoute><EditGame /></ProtectedRoute>}
+          />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </AuthProvider>
   );
 };
 
