@@ -1,5 +1,5 @@
 @use '../../../styles/variables' as *;
-.topbar{position:fixed;top:0;left:0;right:0;height:83px;background:$s1;border-bottom:1px solid $b1;backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);display:flex;align-items:center;gap:1rem;padding:0 1.5rem;z-index:200}@media(min-width:1024px){.topbar{left:$sw}}
+.topbar{position:fixed;top:0;left:0;right:0;height:$th;background:$s1;border-bottom:1px solid $b1;backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);display:flex;align-items:center;gap:1rem;padding:0 1.5rem;z-index:200}@media(min-width:1024px){.topbar{left:$sw}}
 .topbar__search{flex:1;max-width:800px;position:relative;display:flex;align-items:center}
 .topbar__search-icon{position:absolute;left:12px;color:#5a6480;font-size:.8125rem;pointer-events:none;transition:color .14s}
 .topbar__search-input{width:100%;background:#111522;border:none;border-radius:10px;padding:.875rem 1rem .875rem 2.5rem;color:#f0f4ff;font-size:.8125rem;font-family:Outfit,sans-serif;transition:all .14s}.topbar__search-input::placeholder{color:#3d4460}.topbar__search-input:focus{background:#181d30;box-shadow:0 0 0 3px rgba(124,58,237,.15),0 0 20px rgba(124,58,237,.15);outline:none}.topbar__search-input:focus+.topbar__search-icon{color:#a78bfa}
