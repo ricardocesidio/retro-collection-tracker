@@ -7,6 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─── ENUMS ────────────────────────────────────────────
+
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
+}
+
 enum OwnershipStatus {
   OWNED
   WISHLIST
@@ -31,42 +39,104 @@ enum Region {
   REGION_FREE
 }
 
+enum ActivityType {
+  ADDED_GAME
+  REMOVED_GAME
+  UPDATED_GAME
+  ADDED_REVIEW
+  ADDED_WISHLIST
+  REMOVED_WISHLIST
+  FOLLOWED_USER
+  UNFOLLOWED_USER
+  CREATED_ACCOUNT
+  UPDATED_PROFILE
+}
+
+enum NotificationType {
+  NEW_FOLLOWER
+  NEW_REVIEW
+  WISHLIST_AVAILABLE
+  COLLECTION_UPDATE
+  SYSTEM
+}
+
+// ─── MODELS ───────────────────────────────────────────
+
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  username  String   @unique
-  password  String
-  bio       String?
-  avatarUrl String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(uuid())
+  email       String    @unique
+  username    String    @unique
+  displayName String?
+  password    String
+  bio         String?
+  avatarUrl   String?
+  role        UserRole  @default(USER)
+  isActive    Boolean   @default(true)
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  collections Collection[]
-  wishlists   Wishlist[]
-  reviews     Review[]
-  followers   Follow[]   @relation("Following")
-  following   Follow[]   @relation("Follower")
+  collections       Collection[]
+  wishlists         Wishlist[]
+  reviews           Review[]
+  followers         Follow[]       @relation("Following")
+  following         Follow[]       @relation("Follower")
+  activityLogs      ActivityLog[]
+  notifications     Notification[] @relation("NotificationRecipient")
+  sentNotifications Notification[] @relation("NotificationSender")
 
+  @@index([email])
+  @@index([username])
   @@map("users")
 }
 
-model Game {
-  id          String   @id @default(uuid())
-  title       String
-  platform    String
-  genre       String
-  releaseYear Int
-  developer   String?
-  publisher   String?
-  description String?
-  coverImageUrl String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Platform {
+  id           String   @id @default(uuid())
+  name         String   @unique
+  slug         String   @unique
+  manufacturer String?
+  releaseYear  Int?
+  createdAt    DateTime @default(now())
 
+  games Game[]
+
+  @@map("platforms")
+}
+
+model Genre {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  games Game[]
+
+  @@map("genres")
+}
+
+model Game {
+  id            String   @id @default(uuid())
+  title         String
+  platformId    String
+  genreId       String
+  releaseYear   Int
+  developer     String?
+  publisher     String?
+  description   String?
+  coverImageUrl String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  platform    Platform     @relation(fields: [platformId], references: [id])
+  genre       Genre        @relation(fields: [genreId], references: [id])
   collections Collection[]
   wishlists   Wishlist[]
   reviews     Review[]
 
+  @@index([title])
+  @@index([platformId])
+  @@index([genreId])
+  @@index([releaseYear])
   @@map("games")
 }
 
@@ -77,8 +147,8 @@ model Collection {
   condition       Condition       @default(GOOD)
   region          Region          @default(NTSC)
   notes           String?
-  personalRating  Int?
-  estimatedValue  Float?
+  personalRating  Int?            @db.SmallInt
+  estimatedValue  Float?          @db.Real
   ownershipStatus OwnershipStatus @default(OWNED)
   coverImage      String?
   acquiredAt      DateTime?
@@ -89,6 +159,8 @@ model Collection {
   game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
 
   @@unique([userId, gameId])
+  @@index([userId])
+  @@index([gameId])
   @@map("collections")
 }
 
@@ -96,7 +168,7 @@ model Wishlist {
   id       String   @id @default(uuid())
   userId   String
   gameId   String
-  priority Int      @default(0)
+  priority Int      @default(0) @db.SmallInt
   notes    String?
   addedAt  DateTime @default(now())
 
@@ -104,6 +176,7 @@ model Wishlist {
   game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
 
   @@unique([userId, gameId])
+  @@index([userId])
   @@map("wishlists")
 }
 
@@ -111,9 +184,10 @@ model Review {
   id        String   @id @default(uuid())
   userId    String
   gameId    String
-  rating    Int
+  rating    Int      @db.SmallInt
   title     String?
   body      String?
+  likes     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -121,6 +195,8 @@ model Review {
   game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
 
   @@unique([userId, gameId])
+  @@index([gameId])
+  @@index([userId])
   @@map("reviews")
 }
 
@@ -134,5 +210,42 @@ model Follow {
   following User @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
   @@map("follows")
+}
+
+model ActivityLog {
+  id         String       @id @default(uuid())
+  userId     String
+  type       ActivityType
+  targetId   String?
+  targetType String?
+  message    String?
+  metadata   Json?
+  createdAt  DateTime     @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("activity_logs")
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  recipientId String
+  senderId    String?
+  type        NotificationType
+  title       String
+  body        String?
+  isRead      Boolean          @default(false)
+  link        String?
+  metadata    Json?
+  createdAt   DateTime         @default(now())
+
+  recipient User  @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender    User? @relation("NotificationSender", fields: [senderId], references: [id], onDelete: SetNull)
+
+  @@index([recipientId, isRead, createdAt(sort: Desc)])
+  @@map("notifications")
 }

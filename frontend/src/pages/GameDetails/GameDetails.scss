@@ -1,0 +1,17 @@
+
+.game-detail {
+  display: grid; gap: $spacing-xl;
+  @include respond(md) { grid-template-columns: 300px 1fr; }
+  &__image img { width: 100%; border-radius: $radius-lg; border: 1px solid $color-border; }
+  &__info { display: flex; flex-direction: column; gap: $spacing-lg; }
+  &__header .page-title { margin-bottom: $spacing-sm; }
+  &__tags { display: flex; gap: $spacing-xs; flex-wrap: wrap; }
+  &__meta { display: flex; gap: $spacing-xl; flex-wrap: wrap; padding: $spacing-md 0; border-top: 1px solid $color-border; border-bottom: 1px solid $color-border;
+    &-item { display: flex; flex-direction: column; gap: 2px; .label { font-size: $font-size-xs; color: $color-text-dim; text-transform: uppercase; letter-spacing: 0.05em; } .value { font-size: $font-size-sm; font-weight: $font-weight-medium; } }
+  }
+  &__description { font-size: $font-size-base; color: $color-text-muted; line-height: 1.7; }
+  &__actions { display: flex; gap: $spacing-sm; flex-wrap: wrap; }
+  &__stats { display: flex; gap: $spacing-xl; flex-wrap: wrap; }
+}
+
+.stat { text-align: center; &__value { display: block; font-size: $font-size-xl; font-weight: $font-weight-bold; color: $color-highlight; } &__label { font-size: $font-size-xs; color: $color-text-muted; } }

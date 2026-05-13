@@ -1,0 +1,12 @@
+
+.settings {
+  &__layout { display: grid; gap: $spacing-xl; @include respond(md) { grid-template-columns: 200px 1fr; } }
+  &__nav { display: flex; flex-direction: column; gap: $spacing-xs; padding: $spacing-md 0; }
+  &__nav-item { text-align: left; padding: $spacing-sm $spacing-md; border-radius: $radius-sm; font-size: $font-size-sm; font-weight: $font-weight-medium; color: $color-text-muted; transition: all $transition-fast; &:hover { color: $color-text; background: $color-surface-hover; } &--active { color: $color-highlight; background: rgba(233, 69, 96, 0.08); } }
+  &__content { display: flex; flex-direction: column; gap: $spacing-2xl; }
+  &__section { background: $color-surface; border: 1px solid $color-border; border-radius: $radius-lg; padding: $spacing-xl; .section-title { margin-bottom: $spacing-lg; padding-bottom: $spacing-md; border-bottom: 1px solid $color-border; } }
+  &__form { display: flex; flex-direction: column; gap: $spacing-md; max-width: 500px; }
+  &__avatar-section { display: flex; align-items: center; gap: $spacing-md; margin-bottom: $spacing-sm; }
+  &__avatar { width: 80px; height: 80px; border-radius: $radius-full; border: 2px solid $color-border; }
+  &__actions { padding-top: $spacing-sm; }
+}
