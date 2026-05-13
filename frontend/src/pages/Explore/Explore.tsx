@@ -8,7 +8,6 @@ import { gamesApi, catalogApi } from '../../services/collections';
 import { useDebounce } from '../../hooks/useDebounce';
 import type { GameData, Platform } from '../../services/collections';
 import type { Genre } from '../../services/collections';
-import './Explore.scss';
 
 const Explore: React.FC = () => {
   const [games, setGames] = useState<GameData[]>([]);

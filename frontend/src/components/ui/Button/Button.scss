@@ -1,61 +1,13 @@
-@use 'sass:color';
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: $spacing-sm;
-  font-family: $font-family;
-  font-weight: $font-weight-medium;
-  border-radius: $radius-md;
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: all $transition-fast;
-  position: relative;
-  white-space: nowrap;
-  line-height: 1;
-
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  &--sm { padding: 0.375rem 0.75rem; font-size: $font-size-sm; border-radius: $radius-sm; }
-  &--md { padding: 0.625rem 1.25rem; font-size: $font-size-base; }
-  &--lg { padding: 0.75rem 1.75rem; font-size: $font-size-lg; border-radius: $radius-lg; }
-
-  &--primary {
-    background: $color-highlight; color: #fff; border-color: $color-highlight;
-    &:hover:not(:disabled) { background: $color-highlight-hover; border-color: $color-highlight-hover; box-shadow: $shadow-glow; }
-  }
-
-  &--secondary {
-    background: $color-accent-light; color: $color-text; border-color: $color-accent-light;
-    &:hover:not(:disabled) { background: color.adjust($color-accent-light, $lightness: 8%); }
-  }
-
-  &--outline {
-    background: transparent; color: $color-highlight; border-color: $color-highlight;
-    &:hover:not(:disabled) { background: rgba(233, 69, 96, 0.1); }
-  }
-
-  &--danger {
-    background: $color-danger; color: #fff; border-color: $color-danger;
-    &:hover:not(:disabled) { background: color.adjust($color-danger, $lightness: -8%); }
-  }
-
-  &--ghost {
-    background: transparent; color: $color-text-muted; border-color: transparent;
-    &:hover:not(:disabled) { color: $color-text; background: rgba(255, 255, 255, 0.05); }
-  }
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:$space-2;font-family:$font;font-weight:$weight-medium;border-radius:$radius-sm;border:1px solid transparent;cursor:pointer;transition:all $duration-fast;position:relative;white-space:nowrap;line-height:1;&:disabled{opacity:.4;cursor:not-allowed}
+  &--sm{padding:.25rem .625rem;font-size:$text-xs}
+  &--md{padding:.5rem 1rem;font-size:$text-sm}
+  &--lg{padding:.625rem 1.25rem;font-size:$text-base}
+  &--primary{background:$accent;color:#fff;border-color:$accent;&:hover:not(:disabled){background:#6d28d9}}
+  &--secondary{background:$surface-3;color:$text-primary;border-color:$border;&:hover:not(:disabled){background:$surface-4}}
+  &--outline{background:transparent;color:$accent-light;border-color:$accent;&:hover:not(:disabled){background:$accent-dim}}
+  &--danger{background:$red;color:#fff;border-color:$red;&:hover:not(:disabled){background:#b91c1c}}
+  &--ghost{background:transparent;color:$text-secondary;&:hover:not(:disabled){color:$text-primary;background:$surface-hover}}
 }
-
-.btn__content--hidden { visibility: hidden; }
-
-.btn__spinner {
-  position: absolute;
-  width: 18px; height: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
+.btn__content--hidden{visibility:hidden}
+.btn__spinner{position:absolute;width:16px;height:16px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:btn-spin .6s linear infinite}
+@keyframes btn-spin{to{transform:rotate(360deg)}}

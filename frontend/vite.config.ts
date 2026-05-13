@@ -5,11 +5,6 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@styles': path.resolve(__dirname, 'src/styles'),
-    },
-  },
   css: {
     preprocessorOptions: {
       scss: {
@@ -21,6 +16,5 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: [],
   },
 })

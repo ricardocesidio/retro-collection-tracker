@@ -36,7 +36,7 @@
 
 // ─── Panel ─────────────────────────────────────────
 .dash-panel {
-  @include card-base;
+  @include card;
   padding: 1.25rem;
 
   &__header { @include flex-between; margin-bottom: 1rem; }

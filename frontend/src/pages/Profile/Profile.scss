@@ -1,4 +1,4 @@
-@use 'game-card';
+// styles in global.scss via page-shell + panel utilities
 
 .profile {
   &__header { display: flex; gap: $spacing-xl; margin-bottom: $spacing-xl; flex-wrap: wrap; @include respond(md) { flex-wrap: nowrap; } }

@@ -37,6 +37,6 @@ export function validateConfig(configService: ConfigService): void {
 
 export function getCorsOrigin(configService: ConfigService): string[] {
   const origin = configService.get<string>('CORS_ORIGIN');
-  if (!origin) return ['http://localhost:5173'];
+  if (!origin) return ['http://localhost:5173', 'http://localhost:5174'];
   return origin.split(',').map((o) => o.trim());
 }

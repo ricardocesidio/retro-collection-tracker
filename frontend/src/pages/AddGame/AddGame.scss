@@ -1,4 +1,4 @@
-@use 'page-header';
+// styles in global.scss via page-shell + panel utilities
 
 .form-layout { display: flex; flex-direction: column; gap: $spacing-xl; max-width: 720px; }
 

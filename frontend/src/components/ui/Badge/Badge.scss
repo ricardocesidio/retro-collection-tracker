@@ -1,19 +1,7 @@
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-xs;
-  padding: 0.125rem 0.5rem;
-  font-size: $font-size-xs;
-  font-weight: $font-weight-medium;
-  border-radius: $radius-full;
-  line-height: 1.5;
-  white-space: nowrap;
-
-  &--success { background: $color-success-bg; color: $color-success; }
-  &--warning { background: $color-warning-bg; color: $color-warning; }
-  &--danger  { background: $color-danger-bg; color: $color-danger; }
-  &--info    { background: $color-info-bg; color: $color-info; }
-  &--highlight { background: rgba(233, 69, 96, 0.12); color: $color-highlight; }
-  &--default { background: rgba(255, 255, 255, 0.06); color: $color-text-muted; }
-}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;font-size:$text-xs;font-weight:$weight-medium;border-radius:$radius-full;line-height:1.6;white-space:nowrap}
+.badge--success{background:$green-dim;color:$green}
+.badge--warning{background:$amber-dim;color:$amber}
+.badge--danger{background:$red-dim;color:$red}
+.badge--info{background:$blue-dim;color:$blue}
+.badge--highlight{background:$accent-dim;color:$accent-light}
+.badge--default{background:$surface-hover;color:$text-secondary}

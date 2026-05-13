@@ -1,38 +1,45 @@
-*,
-*::before,
-*::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{font-family:$font;font-size:$text-base;line-height:1.5;color:$text-primary;background:$surface-0;min-height:100vh;-webkit-font-smoothing:antialiased;@include scrollbar}
+#root{min-height:100vh}
+a{color:$accent-light;text-decoration:none;&:hover{color:$accent}}
+img{max-width:100%}
+ul,ol{list-style:none}
+button{cursor:pointer;font-family:inherit;border:none;background:none;@include focus-ring}
+input,textarea,select{font-family:inherit;font-size:inherit}
 
-html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+// Typography hierarchy
+h1{font-size:$text-3xl;font-weight:$weight-bold;line-height:1.15;color:$text-primary}
+h2{font-size:$text-2xl;font-weight:$weight-semibold;line-height:1.2;color:$text-primary}
+h3{font-size:$text-xl;font-weight:$weight-semibold;line-height:1.25;color:$text-primary}
+.page-title{font-size:$text-2xl;font-weight:$weight-bold;margin-bottom:$space-3}
+.page-sub{font-size:$text-sm;color:$text-secondary}
 
-body {
-  font-family: $font-family;
-  font-size: $font-size-base;
-  line-height: 1.5;
-  color: $color-text;
-  background: $bg-primary;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  @include custom-scrollbar;
-}
+// Shared layout
+.page-shell{@include container;padding:$space-5 0}
+.page-shell-header{@include flex-between;margin-bottom:$space-5;flex-wrap:wrap;gap:$space-3}
+.page-shell-filters{display:flex;gap:$space-3;margin-bottom:$space-5;flex-wrap:wrap;align-items:flex-end}
+.page-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:$space-4}
 
-#root { min-height: 100vh; }
+// Form elements
+.form-select{padding:.5rem .75rem;background:$surface-3;border:1px solid $border;border-radius:$radius-sm;color:$text-primary;font-size:$text-sm;font-family:$font;min-width:150px;cursor:pointer;@include focus-ring}
 
-a { color: $accent-purple; text-decoration: none; &:hover { color: #a78bfa; } }
-img { max-width: 100%; }
-ul, ol { list-style: none; }
+// Panels
+.panel{@include card;padding:$space-5}
+.panel-header{@include flex-between;margin-bottom:$space-4;& h3{font-size:$text-base;font-weight:$weight-semibold}}
+.panel-link{font-size:$text-sm;color:$accent-light;font-weight:$weight-medium;&:hover{color:$accent}}
 
-button {
-  cursor: pointer; font-family: inherit; border: none; background: none;
-  &:focus-visible { outline: 2px solid $accent-purple; outline-offset: 2px; }
-}
+// Reduced motion
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:0s!important}}
 
-input, textarea, select { font-family: inherit; font-size: inherit; }
+// Auth pages
+.auth-page{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - $topbar-h);padding:$space-5}
+.auth-card{width:100%;max-width:420px;@include card;padding:$space-6}
+.auth-card__title{font-size:$text-2xl;font-weight:$weight-bold;text-align:center;margin-bottom:$space-1}
+.auth-card__subtitle{text-align:center;color:$text-secondary;font-size:$text-sm;margin-bottom:$space-5}
+.auth-card__form{display:flex;flex-direction:column;gap:$space-4}
+.auth-card__footer{text-align:center;font-size:$text-sm;color:$text-secondary;margin-top:$space-5;padding-top:$space-4;border-top:1px solid $border;a{color:$accent-light;font-weight:$weight-medium}}
+.auth-card__link-btn{color:$text-secondary;font-size:$text-sm;text-decoration:underline;transition:color $duration-fast;&:hover{color:$text-primary}}
 
-h1, h2, h3, h4 { font-weight: $font-weight-semibold; color: $color-text; line-height: 1.2; }
-h1 { font-size: $font-size-3xl; }
-h2 { font-size: $font-size-2xl; }
-h3 { font-size: $font-size-xl; }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0s !important; }
-}
+// Legacy page header (AddGame/EditGame)
+.page-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:$space-3;margin-bottom:$space-5}

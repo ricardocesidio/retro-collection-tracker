@@ -1,12 +1,2 @@
-.app-layout {
-  display: flex; min-height: 100vh;
-
-  &__content {
-    flex: 1;
-    margin-left: $sidebar-width;
-    margin-top: $topbar-height;
-    padding: $spacing-2xl;
-    min-height: calc(100vh - $topbar-height);
-    background: $bg-primary;
-  }
-}
+.app-layout{display:flex;min-height:100vh}
+.app-layout__content{flex:1;margin-left:$sidebar-w;margin-top:$topbar-h;padding:$space-5;min-height:calc(100vh - $topbar-h);background:$surface-0;@media(max-width:1023px){margin-left:0}}
