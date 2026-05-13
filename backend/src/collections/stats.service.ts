@@ -6,58 +6,33 @@ export class StatsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getCollectionStats(userId: string) {
-    const collectionFilter = { where: { userId } };
+    const filter = { where: { userId } };
 
     const [
       totalGames,
       totalValueResult,
       platformAgg,
-      genreAgg,
       conditionAgg,
       recentAdditions,
       mostValuable,
       highestRated,
+      recentReviews,
+      recentActivity,
+      wishlistItems,
     ] = await Promise.all([
-      this.prisma.collection.count(collectionFilter),
-      this.prisma.collection.aggregate({
-        ...collectionFilter,
-        _sum: { estimatedValue: true },
-        _avg: { personalRating: true },
-      }),
-      this.prisma.collection.groupBy({
-        by: ['gameId'],
-        ...collectionFilter,
-        _count: { gameId: true },
-      }),
-      this.prisma.collection.groupBy({
-        by: ['gameId'],
-        ...collectionFilter,
-        _count: { gameId: true },
-      }),
-      this.prisma.collection.groupBy({
-        by: ['condition'],
-        ...collectionFilter,
-        _count: { condition: true },
-      }),
-      this.prisma.collection.findMany({
-        ...collectionFilter,
-        include: { game: { include: { platform: true, genre: true } } },
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-      }),
-      this.prisma.collection.findFirst({
-        where: { userId, estimatedValue: { not: null } },
-        include: { game: { include: { platform: true } } },
-        orderBy: { estimatedValue: 'desc' },
-      }),
-      this.prisma.collection.findFirst({
-        where: { userId, personalRating: { not: null } },
-        include: { game: { include: { platform: true } } },
-        orderBy: { personalRating: 'desc' },
-      }),
+      this.prisma.collection.count(filter),
+      this.prisma.collection.aggregate({ ...filter, _sum: { estimatedValue: true }, _avg: { personalRating: true } }),
+      this.prisma.collection.groupBy({ by: ['gameId'], ...filter, _count: { gameId: true } }),
+      this.prisma.collection.groupBy({ by: ['condition'], ...filter, _count: { condition: true } }),
+      this.prisma.collection.findMany({ ...filter, include: { game: { include: { platform: true } } }, orderBy: { createdAt: 'desc' }, take: 6 }),
+      this.prisma.collection.findFirst({ where: { userId, estimatedValue: { not: null } }, include: { game: { include: { platform: true } } }, orderBy: { estimatedValue: 'desc' } }),
+      this.prisma.collection.findFirst({ where: { userId, personalRating: { not: null } }, include: { game: { include: { platform: true } } }, orderBy: { personalRating: 'desc' } }),
+      this.prisma.review.findMany({ where: { userId }, include: { game: { include: { platform: true } } }, orderBy: { createdAt: 'desc' }, take: 5 }),
+      this.prisma.activityLog.findMany({ where: { userId }, orderBy: { createdAt: 'desc' }, take: 8 }),
+      this.prisma.wishlist.findMany({ where: { userId }, include: { game: { include: { platform: true, genre: true } } }, orderBy: { priority: 'asc' }, take: 4 }),
     ]);
 
-    // Resolve platform names for distribution (need one findMany for the game IDs)
+    // Resolve platform/game names
     const gameIds = platformAgg.map((g) => g.gameId);
     const games = await this.prisma.game.findMany({
       where: { id: { in: gameIds } },
@@ -65,21 +40,23 @@ export class StatsService {
     });
     const gameMap = new Map(games.map((g) => [g.id, g]));
 
-    const platformMap = new Map<string, { id: string; name: string; count: number }>();
+    // Platform distribution
+    const platMap = new Map<string, { id: string; name: string; count: number }>();
     for (const item of platformAgg) {
       const game = gameMap.get(item.gameId);
       if (!game) continue;
       const p = game.platform;
-      const existing = platformMap.get(p.id);
+      const existing = platMap.get(p.id);
       if (existing) existing.count += item._count.gameId;
-      else platformMap.set(p.id, { id: p.id, name: p.name, count: item._count.gameId });
+      else platMap.set(p.id, { id: p.id, name: p.name, count: item._count.gameId });
     }
-    const platformDistribution = Array.from(platformMap.values())
+    const platformDistribution = Array.from(platMap.values())
       .map((p) => ({ ...p, percentage: Math.round((p.count / totalGames) * 100) }))
       .sort((a, b) => b.count - a.count);
 
+    // Genre distribution
     const genreMap = new Map<string, { id: string; name: string; count: number }>();
-    for (const item of genreAgg) {
+    for (const item of platformAgg) {
       const game = gameMap.get(item.gameId);
       if (!game) continue;
       const g = game.genre;
@@ -91,24 +68,20 @@ export class StatsService {
       .map((g) => ({ ...g, percentage: Math.round((g.count / totalGames) * 100) }))
       .sort((a, b) => b.count - a.count);
 
-    const conditionDistribution = conditionAgg
-      .map((c) => ({
-        condition: c.condition,
-        count: c._count.condition,
-        percentage: Math.round((c._count.condition / totalGames) * 100),
-      }))
-      .sort((a, b) => b.count - a.count);
+    const conditionDistribution = conditionAgg.map((c) => ({
+      condition: c.condition,
+      count: c._count.condition,
+      percentage: Math.round((c._count.condition / totalGames) * 100),
+    })).sort((a, b) => b.count - a.count);
 
-    const totalValue = totalValueResult._sum.estimatedValue || 0;
-    const avgRating = totalValueResult._avg.personalRating
-      ? parseFloat(totalValueResult._avg.personalRating.toFixed(1))
-      : null;
+    const wishlistCount = await this.prisma.wishlist.count({ where: { userId } });
 
     return {
       summary: {
         totalGames,
-        totalValue: Math.round(totalValue * 100) / 100,
-        avgRating,
+        totalValue: Math.round((totalValueResult._sum.estimatedValue || 0) * 100) / 100,
+        avgRating: totalValueResult._avg.personalRating ? parseFloat(totalValueResult._avg.personalRating.toFixed(1)) : null,
+        wishlistCount,
       },
       platformDistribution,
       genreDistribution,
@@ -124,27 +97,34 @@ export class StatsService {
         estimatedValue: item.estimatedValue,
         addedAt: item.createdAt,
       })),
+      recentReviews: recentReviews.map((r) => ({
+        id: r.id,
+        gameId: r.gameId,
+        gameTitle: r.game.title,
+        platform: r.game.platform.name,
+        rating: r.rating,
+        title: r.title,
+        body: r.body,
+        createdAt: r.createdAt,
+      })),
+      recentActivity: recentActivity.map((a) => ({
+        id: a.id,
+        type: a.type,
+        message: a.message,
+        createdAt: a.createdAt,
+      })),
+      wishlistSpotlight: wishlistItems.map((w) => ({
+        id: w.id,
+        gameId: w.gameId,
+        title: w.game.title,
+        platform: w.game.platform.name,
+        genre: w.game.genre.name,
+        priority: w.priority,
+        coverImageUrl: w.game.coverImageUrl,
+      })),
       highlights: {
-        mostValuable: mostValuable
-          ? {
-              id: mostValuable.id,
-              gameId: mostValuable.gameId,
-              title: mostValuable.game.title,
-              platform: mostValuable.game.platform.name,
-              coverImageUrl: mostValuable.game.coverImageUrl,
-              value: mostValuable.estimatedValue,
-            }
-          : null,
-        highestRated: highestRated
-          ? {
-              id: highestRated.id,
-              gameId: highestRated.gameId,
-              title: highestRated.game.title,
-              platform: highestRated.game.platform.name,
-              coverImageUrl: highestRated.game.coverImageUrl,
-              rating: highestRated.personalRating,
-            }
-          : null,
+        mostValuable: mostValuable ? { id: mostValuable.id, gameId: mostValuable.gameId, title: mostValuable.game.title, platform: mostValuable.game.platform.name, value: mostValuable.estimatedValue } : null,
+        highestRated: highestRated ? { id: highestRated.id, gameId: highestRated.gameId, title: highestRated.game.title, platform: highestRated.game.platform.name, rating: highestRated.personalRating } : null,
       },
     };
   }

@@ -1,0 +1,23 @@
+.stat-card {
+  @include card-base;
+  padding: $spacing-xl;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; border-radius: $radius-lg $radius-lg 0 0;
+  }
+
+  &--purple::before { background: $accent-purple; }
+  &--blue::before { background: $accent-blue; }
+  &--green::before { background: $accent-green; }
+  &--orange::before { background: $accent-orange; }
+  &--pink::before { background: $accent-pink; }
+  &--cyan::before { background: $accent-cyan; }
+
+  &__icon { font-size: 1.75rem; margin-bottom: $spacing-md; }
+  &__value { font-size: $font-size-2xl; font-weight: $font-weight-bold; color: $color-text; margin-bottom: $spacing-xs; }
+  &__label { font-size: $font-size-xs; color: $color-text-muted; text-transform: uppercase; letter-spacing: 0.04em; }
+  &__trend { font-size: $font-size-xs; color: $accent-green; margin-top: $spacing-sm; font-weight: $font-weight-medium; }
+}

@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ErrorBoundary } from './components/auth/ErrorBoundary';
+import AppLayout from './components/layout/AppLayout/AppLayout';
 import Layout from './components/layout/Layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Home from './pages/Home/Home';
@@ -23,41 +24,25 @@ const App: React.FC = () => {
     <ErrorBoundary>
       <AuthProvider>
         <Routes>
+          {/* Public pages — clean layout */}
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/games/:id" element={<GameDetails />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route
-              path="/dashboard"
-              element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
-            />
-            <Route
-              path="/collection"
-              element={<ProtectedRoute><Collection /></ProtectedRoute>}
-            />
-            <Route
-              path="/wishlist"
-              element={<ProtectedRoute><Wishlist /></ProtectedRoute>}
-            />
+          </Route>
+
+          {/* App pages — dashboard layout with sidebar */}
+          <Route element={<AppLayout />}>
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/collection" element={<ProtectedRoute><Collection /></ProtectedRoute>} />
+            <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/games/:id" element={<GameDetails />} />
             <Route path="/profile/:username" element={<Profile />} />
-            <Route
-              path="/settings"
-              element={<ProtectedRoute><Settings /></ProtectedRoute>}
-            />
-            <Route
-              path="/add-game"
-              element={<ProtectedRoute><AddGame /></ProtectedRoute>}
-            />
-            <Route
-              path="/edit-game/:id"
-              element={<ProtectedRoute><EditGame /></ProtectedRoute>}
-            />
-            <Route
-              path="/notifications"
-              element={<ProtectedRoute><Notifications /></ProtectedRoute>}
-            />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path="/add-game" element={<ProtectedRoute><AddGame /></ProtectedRoute>} />
+            <Route path="/edit-game/:id" element={<ProtectedRoute><EditGame /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

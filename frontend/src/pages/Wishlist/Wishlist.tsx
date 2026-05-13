@@ -1,14 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import Card from '../../components/ui/Card/Card';
-import Badge from '../../components/ui/Badge/Badge';
 import Button from '../../components/ui/Button/Button';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import Alert from '../../components/ui/Alert/Alert';
 import { wishlistApi } from '../../services/social';
 import type { WishlistEntry } from '../../services/social';
-import './Wishlist.scss';
 
 const Wishlist: React.FC = () => {
   const [items, setItems] = useState<WishlistEntry[]>([]);
@@ -16,86 +13,46 @@ const Wishlist: React.FC = () => {
   const [error, setError] = useState('');
   const [removing, setRemoving] = useState<string | null>(null);
 
-  const fetchWishlist = useCallback(async () => {
+  const fetch = useCallback(async () => {
     setLoading(true);
-    setError('');
-    try {
-      const res = await wishlistApi.list();
-      setItems(res.data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load wishlist');
-    } finally {
-      setLoading(false);
-    }
+    try { const r = await wishlistApi.list(); setItems(r.data); } catch (e: any) { setError(e.message); }
+    finally { setLoading(false); }
   }, []);
 
-  useEffect(() => { fetchWishlist(); }, [fetchWishlist]);
+  useEffect(() => { fetch(); }, [fetch]);
 
-  const handleRemove = async (id: string) => {
+  const remove = async (id: string) => {
     setRemoving(id);
-    try {
-      await wishlistApi.remove(id);
-      setItems((prev) => prev.filter((i) => i.id !== id));
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setRemoving(null);
-    }
+    try { await wishlistApi.remove(id); setItems((p) => p.filter((i) => i.id !== id)); } catch (e: any) { setError(e.message); }
+    finally { setRemoving(null); }
   };
 
   return (
-    <div className="page-container">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Wishlist</h1>
-          <p className="page-subtitle">{items.length} {items.length === 1 ? 'game' : 'games'} you want to collect</p>
-        </div>
+    <div className="page-shell">
+      <div className="page-shell__header">
+        <div><h1 className="page-shell__title">Wishlist</h1><p className="page-shell__sub">{items.length} games</p></div>
         <Link to="/explore"><Button variant="outline">Browse Catalog</Button></Link>
       </div>
-
-      {error && <Alert variant="danger">{error}</Alert>}
-
-      {loading ? (
-        <LoadingSpinner message="Loading your wishlist..." />
-      ) : items.length === 0 ? (
-        <EmptyState
-          icon="⭐"
-          title="Your wishlist is empty"
-          message="Start adding games you want to collect. Browse the catalog and save games for later."
-        >
-          <Link to="/explore"><Button variant="primary">Explore Catalog</Button></Link>
-        </EmptyState>
+      {error && <div style={{ marginBottom: '1rem' }}><Alert variant="danger">{error}</Alert></div>}
+      {loading ? <LoadingSpinner /> : items.length === 0 ? (
+        <EmptyState icon="⭐" title="Empty wishlist" message="Browse the catalog to find games."><Link to="/explore"><Button variant="primary">Explore</Button></Link></EmptyState>
       ) : (
-        <div className="wishlist__grid">
-          {items.map((item) => (
-            <Card
-              key={item.id}
-              imageUrl={item.game.coverImageUrl || `https://placehold.co/300x400/1a1a30/e0e0e0?text=${encodeURIComponent(item.game.title)}`}
-              clickable
-            >
-              <h3 className="game-card__title">{item.game.title}</h3>
-              <div className="game-card__meta">
-                <Badge variant="info">{item.game.platform.name}</Badge>
-                <Badge variant="default">{item.game.genre.name}</Badge>
-                <Badge variant={item.priority === 1 ? 'highlight' : item.priority === 2 ? 'warning' : 'default'}>
-                  P{item.priority + 1}
-                </Badge>
+        <div className="page-grid">
+          {items.map((w) => (
+            <div key={w.id} className="game-card-new">
+              <div className="game-card-new__img">
+                <img src={w.game.coverImageUrl || `https://placehold.co/300x400/161924/e8eaed?text=${encodeURIComponent(w.game.title.slice(0,4))}`} alt="" />
+                <span className="game-card-new__condition">P{w.priority + 1}</span>
               </div>
-              {item.notes && <p className="game-card__notes">{item.notes}</p>}
-              <div className="game-card__actions">
-                <Link to={`/games/${item.game.id}`}>
-                  <Button variant="ghost" size="sm">View</Button>
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleRemove(item.id)}
-                  loading={removing === item.id}
-                >
-                  Remove
-                </Button>
+              <div className="game-card-new__body">
+                <h3 className="game-card-new__title">{w.game.title}</h3>
+                <p className="game-card-new__meta">{w.game.platform.name} · {w.game.genre.name}</p>
               </div>
-            </Card>
+              <div className="game-card-new__actions">
+                <Link to={`/games/${w.game.id}`}><Button variant="ghost" size="sm">View</Button></Link>
+                <Button variant="ghost" size="sm" onClick={() => remove(w.id)} loading={removing === w.id}>Remove</Button>
+              </div>
+            </div>
           ))}
         </div>
       )}

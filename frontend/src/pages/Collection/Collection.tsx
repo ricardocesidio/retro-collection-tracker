@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import Card from '../../components/ui/Card/Card';
-import Badge from '../../components/ui/Badge/Badge';
 import Button from '../../components/ui/Button/Button';
 import Input from '../../components/ui/Input/Input';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
@@ -26,137 +24,78 @@ const Collection: React.FC = () => {
   const [platforms, setPlatforms] = useState<Platform[]>([]);
 
   const fetchCollection = useCallback(async () => {
-    setLoading(true);
-    setError('');
+    setLoading(true); setError('');
     try {
       const params: Record<string, string> = {};
       if (debouncedSearch) params.search = debouncedSearch;
       if (platformFilter) params.platform = platformFilter;
       if (conditionFilter) params.condition = conditionFilter;
-
       const res = await collectionApi.list(params);
-      setItems(res.data);
-      setTotal(res.total);
-      setTotalValue(res.totalValue || 0);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load collection');
-    } finally {
-      setLoading(false);
-    }
+      setItems(res.data); setTotal(res.total); setTotalValue(res.totalValue || 0);
+    } catch (err: any) { setError(err.message); }
+    finally { setLoading(false); }
   }, [debouncedSearch, platformFilter, conditionFilter]);
 
-  useEffect(() => {
-    fetchCollection();
-  }, [fetchCollection]);
-
-  useEffect(() => {
-    catalogApi.getPlatforms().then(setPlatforms).catch(() => {});
-  }, []);
+  useEffect(() => { fetchCollection(); }, [fetchCollection]);
+  useEffect(() => { catalogApi.getPlatforms().then(setPlatforms).catch(() => {}); }, []);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Remove this game from your collection?')) return;
+    if (!confirm('Remove this game?')) return;
     setDeleting(id);
-    try {
-      await collectionApi.delete(id);
-      setItems(items.filter((i) => i.id !== id));
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setDeleting(null);
-    }
+    try { await collectionApi.delete(id); setItems((i) => i.filter((g) => g.id !== id)); }
+    catch (err: any) { setError(err.message); }
+    finally { setDeleting(null); }
   };
 
-  const conditions = ['MINT', 'NEAR_MINT', 'VERY_GOOD', 'GOOD', 'ACCEPTABLE', 'POOR'];
+  const fmt = (v: number) => '$' + v.toLocaleString();
 
   return (
-    <div className="page-container">
-      <div className="page-header">
+    <div className="page-shell">
+      <div className="page-shell__header">
         <div>
-          <h1 className="page-title">My Collection</h1>
-          <p className="page-subtitle">
-            {total} {total === 1 ? 'game' : 'games'}
-            {totalValue > 0 && <> · Est. value: ${totalValue.toLocaleString()}</>}
-          </p>
+          <h1 className="page-shell__title">My Collection</h1>
+          <p className="page-shell__sub">{total} games · Est. value {fmt(totalValue)}</p>
         </div>
         <Link to="/add-game"><Button variant="primary">+ Add Game</Button></Link>
       </div>
 
-      <div className="collection__filters">
-        <Input
-          placeholder="Search collection..."
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <select
-          className="collection__select"
-          value={platformFilter}
-          onChange={(e) => setPlatformFilter(e.target.value)}
-        >
+      <div className="page-shell__filters">
+        <Input placeholder="Search collection..." value={search} onChange={(e) => setSearch(e.target.value)} />
+        <select className="page-select" value={platformFilter} onChange={(e) => setPlatformFilter(e.target.value)}>
           <option value="">All Platforms</option>
-          {platforms.map((p) => (
-            <option key={p.id} value={p.id}>{p.name}</option>
-          ))}
+          {platforms.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
         </select>
-        <select
-          className="collection__select"
-          value={conditionFilter}
-          onChange={(e) => setConditionFilter(e.target.value)}
-        >
+        <select className="page-select" value={conditionFilter} onChange={(e) => setConditionFilter(e.target.value)}>
           <option value="">All Conditions</option>
-          {conditions.map((c) => (
-            <option key={c} value={c}>{c.replace('_', ' ')}</option>
-          ))}
+          {['MINT','NEAR_MINT','VERY_GOOD','GOOD','ACCEPTABLE','POOR'].map((c) => <option key={c} value={c}>{c.replace('_',' ')}</option>)}
         </select>
       </div>
 
-      {error && <Alert variant="danger">{error}</Alert>}
+      {error && <div style={{ marginBottom: '1rem' }}><Alert variant="danger">{error}</Alert></div>}
 
-      {loading ? (
-        <LoadingSpinner message="Loading your collection..." />
-      ) : items.length === 0 ? (
-        <EmptyState
-          icon="🎮"
-          title="Your collection is empty"
-          message="Start building your retro game library. Add your first game to get started."
-        >
-          <Link to="/add-game"><Button variant="primary">Add Your First Game</Button></Link>
-          <Link to="/explore"><Button variant="outline">Browse Catalog</Button></Link>
+      {loading ? <LoadingSpinner /> : items.length === 0 ? (
+        <EmptyState icon="🎮" title="No games yet" message="Start building your collection.">
+          <Link to="/explore"><Button variant="primary">Browse Catalog</Button></Link>
         </EmptyState>
       ) : (
-        <div className="collection__grid">
+        <div className="page-grid">
           {items.map((item) => (
-            <Card
-              key={item.id}
-              imageUrl={item.game.coverImageUrl || `https://placehold.co/300x400/1a1a30/e0e0e0?text=${encodeURIComponent(item.game.title)}`}
-              title={item.game.title}
-              clickable
-            >
-              <h3 className="game-card__title">{item.game.title}</h3>
-              <div className="game-card__meta">
-                <Badge variant="info">{item.game.platform.name}</Badge>
-                <Badge variant="default">{item.condition.replace('_', ' ')}</Badge>
-                {item.personalRating && (
-                  <Badge variant="highlight">{item.personalRating}★</Badge>
-                )}
-                {item.estimatedValue != null && (
-                  <span className="game-card__value">${item.estimatedValue}</span>
-                )}
+            <div key={item.id} className="game-card-new">
+              <div className="game-card-new__img">
+                <img src={item.game.coverImageUrl || `https://placehold.co/300x400/161924/e8eaed?text=${encodeURIComponent(item.game.title.slice(0,4))}`} alt="" />
+                <span className="game-card-new__condition">{item.condition.replace('_', ' ')}</span>
               </div>
-              <div className="game-card__actions">
-                <Link to={`/edit-game/${item.id}`}>
-                  <Button variant="ghost" size="sm">Edit</Button>
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(item.id)}
-                  loading={deleting === item.id}
-                >
-                  Remove
-                </Button>
+              <div className="game-card-new__body">
+                <h3 className="game-card-new__title">{item.game.title}</h3>
+                <p className="game-card-new__meta">{item.game.platform.name} · {item.game.genre.name}</p>
+                {item.personalRating && <div className="game-card-new__rating">★ {item.personalRating}</div>}
+                {item.estimatedValue != null && <div className="game-card-new__value">{fmt(item.estimatedValue)}</div>}
               </div>
-            </Card>
+              <div className="game-card-new__actions">
+                <Link to={`/edit-game/${item.id}`}><Button variant="ghost" size="sm">Edit</Button></Link>
+                <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)} loading={deleting === item.id}>Remove</Button>
+              </div>
+            </div>
           ))}
         </div>
       )}

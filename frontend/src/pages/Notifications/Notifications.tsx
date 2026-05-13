@@ -1,117 +1,50 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import { notificationsApi } from '../../services/social';
 import type { NotificationEntry } from '../../services/social';
-import './Notifications.scss';
 
 const Notifications: React.FC = () => {
-  const [notifications, setNotifications] = useState<NotificationEntry[]>([]);
+  const [items, setItems] = useState<NotificationEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [unreadCount, setUnreadCount] = useState(0);
 
-  const fetchNotifications = useCallback(async () => {
-    try {
-      const [res, count] = await Promise.all([
-        notificationsApi.list(),
-        notificationsApi.getUnreadCount(),
-      ]);
-      setNotifications(res.data);
-      setUnreadCount(count.count);
-    } catch {
-      // ignore
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    notificationsApi.list().then((r) => setItems(r.data)).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { fetchNotifications(); }, [fetchNotifications]);
-
-  const handleMarkRead = async (id: string) => {
+  const markRead = async (id: string) => {
     await notificationsApi.markAsRead(id);
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
-    );
-    setUnreadCount((c) => Math.max(0, c - 1));
+    setItems((p) => p.map((n) => n.id === id ? { ...n, isRead: true } : n));
   };
 
-  const handleMarkAllRead = async () => {
-    await notificationsApi.markAllAsRead();
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-    setUnreadCount(0);
-  };
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'NEW_FOLLOWER': return '👤';
-      case 'NEW_REVIEW': return '⭐';
-      case 'WISHLIST_AVAILABLE': return '📌';
-      case 'COLLECTION_UPDATE': return '🎮';
-      case 'SYSTEM': return '🔔';
-      default: return '📢';
-    }
-  };
-
-  const getTimeAgo = (date: string) => {
-    const diff = Date.now() - new Date(date).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'just now';
-    if (mins < 60) return `${mins}m ago`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `${days}d ago`;
-    return new Date(date).toLocaleDateString();
-  };
+  const getIcon = (t: string) => ({ NEW_FOLLOWER: '👤', NEW_REVIEW: '⭐', WISHLIST_AVAILABLE: '📌', SYSTEM: '🔔' } as any)[t] || '📢';
 
   return (
-    <div className="page-container">
-      <div className="notif-header">
-        <div>
-          <h1 className="page-title">Notifications</h1>
-          <p className="page-subtitle">
-            {unreadCount > 0 ? `${unreadCount} unread` : 'All caught up!'}
-          </p>
-        </div>
-        {unreadCount > 0 && (
-          <Button variant="ghost" size="sm" onClick={handleMarkAllRead}>
-            Mark all read
-          </Button>
-        )}
+    <div className="page-shell" style={{ maxWidth: 720 }}>
+      <div className="page-shell__header">
+        <div><h1 className="page-shell__title">Notifications</h1><p className="page-shell__sub">{items.filter((n) => !n.isRead).length} unread</p></div>
+        <Button variant="ghost" size="sm" onClick={() => { notificationsApi.markAllAsRead(); setItems((p) => p.map((n) => ({ ...n, isRead: true }))); }}>Mark all read</Button>
       </div>
-
-      {loading ? (
-        <LoadingSpinner message="Loading notifications..." />
-      ) : notifications.length === 0 ? (
-        <EmptyState
-          icon="🔔"
-          title="No notifications yet"
-          message="When someone follows you, reviews a game, or adds to their wishlist, you'll see it here."
-        />
+      {loading ? <LoadingSpinner /> : items.length === 0 ? (
+        <EmptyState icon="🔔" title="No notifications" message="You're all caught up!" />
       ) : (
-        <div className="notif-list">
-          {notifications.map((notif) => (
-            <div
-              key={notif.id}
-              className={`notif-card${!notif.isRead ? ' notif-card--unread' : ''}`}
-              onClick={() => !notif.isRead && handleMarkRead(notif.id)}
-            >
-              <span className="notif-card__icon">{getIcon(notif.type)}</span>
-              <div className="notif-card__content">
-                <div className="notif-card__header">
-                  <strong className="notif-card__title">{notif.title}</strong>
-                  <span className="notif-card__time">{getTimeAgo(notif.createdAt)}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {items.map((n) => (
+            <div key={n.id} className={`dash-panel${!n.isRead ? ' dash-panel--unread' : ''}`} style={{ padding: '0.75rem 1rem', cursor: 'pointer' }} onClick={() => markRead(n.id)}>
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '1.25rem' }}>{getIcon(n.type)}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <strong style={{ fontSize: '0.875rem' }}>{n.title}</strong>
+                    <span style={{ fontSize: '0.6875rem', color: '#6b7280' }}>{new Date(n.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  {n.body && <p style={{ fontSize: '0.8125rem', color: '#9ca3af', marginTop: '0.25rem' }}>{n.body}</p>}
+                  {n.link && <Link to={n.link} style={{ fontSize: '0.75rem', color: '#8b5cf6', marginTop: '0.25rem', display: 'inline-block' }}>View →</Link>}
                 </div>
-                {notif.body && <p className="notif-card__body">{notif.body}</p>}
-                {notif.link && (
-                  <Link to={notif.link} className="notif-card__link">
-                    View →
-                  </Link>
-                )}
+                {!n.isRead && <span style={{ width: 8, height: 8, background: '#8b5cf6', borderRadius: '50%', flexShrink: 0, marginTop: 4 }} />}
               </div>
-              {!notif.isRead && <span className="notif-card__dot" />}
             </div>
           ))}
         </div>

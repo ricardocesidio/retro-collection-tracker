@@ -1,0 +1,87 @@
+.sidebar {
+  position: fixed; left: 0; top: 0; bottom: 0;
+  width: $sidebar-width; background: $bg-sidebar;
+  border-right: 1px solid $border-color;
+  display: flex; flex-direction: column;
+  z-index: $z-sidebar;
+  overflow-y: auto;
+  @include custom-scrollbar;
+
+  &__brand {
+    display: flex; align-items: center; gap: $spacing-md;
+    padding: $spacing-xl $spacing-lg;
+    border-bottom: 1px solid $border-color;
+  }
+
+  &__logo { font-size: 1.5rem; }
+
+  &__title {
+    display: block; font-size: $font-size-base; font-weight: $font-weight-bold;
+    color: $color-text; line-height: 1.2;
+  }
+
+  &__subtitle { font-size: $font-size-xs; color: $color-text-muted; }
+
+  &__nav {
+    flex: 1; padding: $spacing-md 0; overflow-y: auto;
+  }
+
+  &__section {
+    margin-bottom: $spacing-lg;
+
+    &-label {
+      display: block; padding: 0 $spacing-lg; margin-bottom: $spacing-sm;
+      font-size: $font-size-xs; font-weight: $font-weight-semibold;
+      color: $color-text-dim; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+  }
+
+  &__item {
+    display: flex; align-items: center; gap: $spacing-md;
+    padding: 0.5rem $spacing-lg; margin: 0 $spacing-sm;
+    border-radius: $radius-sm;
+    color: $color-text-secondary;
+    font-size: $font-size-sm; font-weight: $font-weight-medium;
+    transition: all $transition-fast;
+    text-decoration: none;
+
+    &:hover { background: $bg-hover; color: $color-text; }
+
+    &--active {
+      background: rgba($accent-purple, 0.1);
+      color: $accent-purple;
+      &:hover { background: rgba($accent-purple, 0.15); color: $accent-purple; }
+    }
+  }
+
+  &__item-icon { font-size: 1.125rem; width: 24px; text-align: center; flex-shrink: 0; }
+  &__item-label { flex: 1; }
+
+  &__badge {
+    background: $accent-purple; color: #fff;
+    font-size: 0.625rem; font-weight: $font-weight-bold;
+    min-width: 18px; height: 18px; border-radius: $radius-full;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  &__user {
+    display: flex; align-items: center; gap: $spacing-md;
+    padding: $spacing-lg; border-top: 1px solid $border-color;
+    margin-top: auto;
+  }
+
+  &__user-avatar {
+    width: 36px; height: 36px; border-radius: $radius-full;
+    background: $accent-purple; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: $font-size-sm; font-weight: $font-weight-bold;
+  }
+
+  &__user-info { display: flex; flex-direction: column; }
+
+  &__user-name {
+    font-size: $font-size-sm; font-weight: $font-weight-semibold; color: $color-text;
+  }
+
+  &__user-role { font-size: $font-size-xs; color: $color-text-muted; }
+}
