@@ -71,10 +71,10 @@ const Dashboard: React.FC = () => {
 
       {/* KPI Row */}
       <div className="dash-kpis">
-        <StatCard icon="⊡" value={String(summary.totalGames)} label="Total Games" accent="purple" />
-        <StatCard icon="◇" value={fmt(summary.totalValue)} label="Est. Value" accent="blue" />
-        <StatCard icon="✓" value={String(summary.totalGames)} label="Completed" accent="green" />
-        <StatCard icon="☆" value={String(summary.wishlistCount)} label="Wishlist" accent="amber" />
+        <StatCard icon="fa-solid fa-gamepad" value={String(summary.totalGames)} label="Total Games" accent="purple" />
+        <StatCard icon="fa-solid fa-dollar-sign" value={fmt(summary.totalValue)} label="Est. Value" accent="blue" />
+        <StatCard icon="fa-solid fa-trophy" value={String(summary.totalGames)} label="Completed" accent="green" />
+        <StatCard icon="fa-solid fa-star" value={String(summary.wishlistCount)} label="Wishlist" accent="amber" />
       </div>
 
       {/* Main Grid */}
