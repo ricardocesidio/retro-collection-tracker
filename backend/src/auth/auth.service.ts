@@ -17,35 +17,33 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const existingUser = await this.prisma.user.findFirst({
-      where: {
-        OR: [{ email: dto.email }, { username: dto.username }],
-      },
-    });
-
-    if (existingUser) {
-      if (existingUser.email === dto.email) {
-        throw new ConflictException('Email already in use');
-      }
-      throw new ConflictException('Username already taken');
-    }
-
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
-    const user = await this.prisma.user.create({
-      data: {
-        email: dto.email,
-        username: dto.username,
-        displayName: dto.displayName || dto.username,
-        password: passwordHash,
-      },
-    });
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          email: dto.email,
+          username: dto.username,
+          displayName: dto.displayName || dto.username,
+          password: passwordHash,
+        },
+      });
 
-    const token = this.generateToken(user.id, user.email);
-    return {
-      user: this.sanitizeUser(user),
-      token,
-    };
+      const token = this.generateToken(user.id, user.email);
+      return {
+        user: this.sanitizeUser(user),
+        token,
+      };
+    } catch (error: any) {
+      if (error.code === 'P2002') {
+        const target = error.meta?.target as string[];
+        if (target?.includes('email')) {
+          throw new ConflictException('Email already in use');
+        }
+        throw new ConflictException('Username already taken');
+      }
+      throw error;
+    }
   }
 
   async login(dto: LoginDto) {
@@ -65,7 +63,7 @@ export class AuthService {
     await this.prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
-    });
+    }).catch(() => {});
 
     const token = this.generateToken(user.id, user.email);
     return {

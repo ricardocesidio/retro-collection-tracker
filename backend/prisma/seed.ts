@@ -96,10 +96,16 @@ async function main() {
 
   const games: Record<string, string> = {};
   for (const g of gameData) {
-    const game = await prisma.game.upsert({
-      where: { id: 'placeholder' },
-      update: {},
-      create: {
+    const slug = g.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const existing = await prisma.game.findFirst({
+      where: { title: g.title, platformId: platforms[g.platform] },
+    });
+    if (existing) {
+      games[slug] = existing.id;
+      continue;
+    }
+    const game = await prisma.game.create({
+      data: {
         title: g.title,
         platformId: platforms[g.platform],
         genreId: genres[g.genre],
@@ -108,21 +114,7 @@ async function main() {
         publisher: g.publisher,
         description: g.description,
       },
-    }).catch(async () => {
-      const created = await prisma.game.create({
-        data: {
-          title: g.title,
-          platformId: platforms[g.platform],
-          genreId: genres[g.genre],
-          releaseYear: g.releaseYear,
-          developer: g.developer,
-          publisher: g.publisher,
-          description: g.description,
-        },
-      });
-      return created;
     });
-    const slug = g.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     games[slug] = game.id;
   }
   console.log(`✓ Created ${Object.keys(games).length} games`);

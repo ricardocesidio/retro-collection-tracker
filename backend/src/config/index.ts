@@ -1,1 +1,1 @@
-export { ConfigModule } from './config.module';
+export { ConfigModule, validateConfig, getCorsOrigin } from './config.module';
