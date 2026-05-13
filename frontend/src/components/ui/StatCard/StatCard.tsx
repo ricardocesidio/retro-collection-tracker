@@ -12,12 +12,10 @@ interface StatCardProps {
 const StatCard: React.FC<StatCardProps> = ({ icon, value, label, accent = 'purple', trend }) => {
   return (
     <div className={`stat-card stat-card--${accent}`}>
+      <span className="stat-card__label">{label}</span>
       <div className="stat-card__icon"><i className={icon} /></div>
-      <div className="stat-card__body">
-        <span className="stat-card__value">{value}</span>
-        <span className="stat-card__label">{label}</span>
-        {trend && <span className="stat-card__trend">{trend}</span>}
-      </div>
+      <span className="stat-card__value">{value}</span>
+      {trend && <span className="stat-card__trend">{trend}</span>}
     </div>
   );
 };
