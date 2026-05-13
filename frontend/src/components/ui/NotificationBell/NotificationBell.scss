@@ -1,0 +1,5 @@
+@use '../../../styles/variables' as *;
+
+.notif-bell{position:relative;width:36px;height:36px;border-radius:$r1;background:$s2;border:1px solid $b1;@include fcc;font-size:1rem;color:$t2;transition:all $fast;cursor:pointer;&:hover{background:$s3;border-color:$b2;color:$t1;box-shadow:0 0 10px $violet-dim}}
+.notif-bell__badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;background:$violet;color:white;font-size:0.625rem;font-weight:$w7;font-family:$mono;border-radius:$r5;@include fcc;padding:0 4px;box-shadow:0 0 8px $violet-glow;animation:badge-pulse 2s ease-in-out infinite}
+@keyframes badge-pulse{0%,100%{box-shadow:0 0 8px $violet-glow}50%{box-shadow:0 0 16px $violet-glow,0 0 4px $violet}}

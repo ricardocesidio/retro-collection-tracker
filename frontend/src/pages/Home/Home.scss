@@ -1,32 +1,9 @@
+@use '../../styles/variables' as *; @use '../../styles/mixins' as *;
 
-.hero {
-  @include container;
-  text-align: center; padding: $spacing-3xl 0 $spacing-2xl;
-  @include respond(md) { padding: 6rem 0 4rem; }
-  &__content { max-width: 700px; margin: 0 auto $spacing-2xl; }
-  &__title { font-size: $font-size-3xl; font-weight: $font-weight-bold; line-height: 1.15; margin-bottom: $spacing-md; @include respond(md) { font-size: $font-size-4xl; } }
-  &__subtitle { font-size: $font-size-lg; color: $color-text-muted; max-width: 500px; margin: 0 auto $spacing-xl; line-height: 1.6; }
-  &__actions { display: flex; gap: $spacing-sm; justify-content: center; flex-wrap: wrap; }
-  &__stats { display: flex; justify-content: center; gap: $spacing-2xl; flex-wrap: wrap; }
-  &__stat { text-align: center;
-    &-value { display: block; font-size: $font-size-2xl; font-weight: $font-weight-bold; color: $color-highlight; @include respond(md) { font-size: $font-size-3xl; } }
-    &-label { font-size: $font-size-sm; color: $color-text-muted; }
-  }
-}
-
-.features { padding: $spacing-3xl 0; .section-title { text-align: center; margin-bottom: $spacing-2xl; } &__grid { @include responsive-grid; } }
-
-.feature-card {
-  background: $color-surface; border: 1px solid $color-border;
-  border-radius: $radius-lg; padding: $spacing-xl; transition: all $transition-base;
-  &:hover { border-color: $color-border-light; transform: translateY(-2px); box-shadow: $shadow-md; }
-  &__icon { font-size: 2rem; display: block; margin-bottom: $spacing-sm; }
-  h3 { font-size: $font-size-lg; font-weight: $font-weight-semibold; margin-bottom: $spacing-xs; }
-  p { font-size: $font-size-sm; color: $color-text-muted; line-height: 1.5; }
-}
-
-.cta { padding: $spacing-3xl 0;
-  &__content { text-align: center; background: $color-surface; border: 1px solid $color-border; border-radius: $radius-xl; padding: $spacing-3xl $spacing-xl; h2 { font-size: $font-size-2xl; margin-bottom: $spacing-sm; } p { color: $color-text-muted; margin-bottom: $spacing-lg; } }
-}
-
-.container { @include container; }
+.home__hero{text-align:center;padding:$s8s 0 $s6s;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(139,92,246,0.12) 0%,transparent 70%);margin-bottom:$s6s}
+.home__eyebrow{display:inline-flex;align-items:center;gap:$s2s;padding:4px 14px;background:$violet-dim;border:1px solid $b3;border-radius:$r5;font-size:$xs;font-weight:$w7;color:$violet-bright;letter-spacing:0.08em;text-transform:uppercase;font-family:$mono;margin-bottom:$s4s}
+.home__title{font-size:$x5;font-weight:$w8;letter-spacing:-0.03em;line-height:1.05;margin-bottom:$s4s;background:linear-gradient(135deg,$t1,$violet-bright);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.home__subtitle{font-size:$lg;color:$t2;max-width:540px;margin:0 auto $s5s;line-height:1.6}
+.home__cta{display:flex;gap:$s3s;justify-content:center;flex-wrap:wrap}
+.home__features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:$s4s;margin-bottom:$s8s}
+.home__feature{@include card;padding:$s5s;transition:all $base-d $ease;&:hover{transform:translateY(-3px);border-color:$b3;box-shadow:0 0 0 1px $b3,$g1,$e2}}.home__feature-icon{font-size:2rem;margin-bottom:$s3s;display:block}.home__feature-title{font-size:$base;font-weight:$w7;margin-bottom:$s1s}.home__feature-desc{font-size:$sm;color:$t2;line-height:1.6}

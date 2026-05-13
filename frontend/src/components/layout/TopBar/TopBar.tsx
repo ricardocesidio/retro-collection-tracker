@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import NotificationBell from '../../ui/NotificationBell/NotificationBell';
+import ProfileChip from '../../ui/ProfileChip/ProfileChip';
+import DropdownMenu from '../../ui/DropdownMenu/DropdownMenu';
 import './TopBar.scss';
 
 const TopBar: React.FC = () => {
@@ -10,27 +13,25 @@ const TopBar: React.FC = () => {
   return (
     <header className="topbar">
       <div className="topbar__search">
-        <span className="topbar__search-icon">🔍</span>
-        <input className="topbar__search-input" type="text" placeholder="Search games, collections, collectors..." />
+        <span className="topbar__search-icon"><i className="fa-solid fa-magnifying-glass" /></span>
+        <input className="topbar__search-input" type="text" placeholder="Search games, platforms, collectors..." />
       </div>
 
       <div className="topbar__actions">
-        <button className="topbar__icon-btn" aria-label="Notifications">
-          🔔
-          <span className="topbar__badge">3</span>
-        </button>
-
         {user ? (
-          <div className="topbar__profile">
-            <div className="topbar__avatar">
-              {(user.displayName || user.username).charAt(0).toUpperCase()}
-            </div>
-            <div className="topbar__profile-info">
-              <span className="topbar__profile-name">{user.displayName || user.username}</span>
-              <span className="topbar__profile-role">Collector</span>
-            </div>
-            <button className="topbar__logout" onClick={logout} title="Logout">⏻</button>
-          </div>
+          <>
+            <Link to="/notifications">
+              <NotificationBell count={3} />
+            </Link>
+            <DropdownMenu
+              trigger={<ProfileChip name={user.displayName || user.username} role="Collector" />}
+              items={[
+                { label: 'Profile', icon: 'fa-solid fa-circle-user', onClick: () => window.location.href = `/profile/${user.username}` },
+                { label: 'Settings', icon: 'fa-solid fa-gear', onClick: () => window.location.href = '/settings' },
+                { label: 'Logout', icon: 'fa-solid fa-right-from-bracket', onClick: logout, danger: true },
+              ]}
+            />
+          </>
         ) : (
           <div className="topbar__auth-links">
             <Link to="/login" className="topbar__auth-btn">Sign In</Link>

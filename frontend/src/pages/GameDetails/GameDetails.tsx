@@ -2,11 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Badge from '../../components/ui/Badge/Badge';
 import Button from '../../components/ui/Button/Button';
-import Modal from '../../components/ui/Modal/Modal';
-import Input from '../../components/ui/Input/Input';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
-import Alert from '../../components/ui/Alert/Alert';
 import { gamesApi, collectionApi } from '../../services/collections';
 import { wishlistApi, reviewsApi } from '../../services/social';
 import { useAuth } from '../../context/AuthContext';
@@ -14,226 +11,105 @@ import type { GameData } from '../../services/collections';
 import type { ReviewEntry } from '../../services/social';
 import './GameDetails.scss';
 
-interface GameWithReviews extends GameData {
-  avgRating?: number | null;
+interface GameFull extends GameData {
+  avgRating?: number|null;
+  related?: GameData[];
   reviews?: ReviewEntry[];
 }
 
 const GameDetails: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{id:string}>();
   const { state: authState } = useAuth();
-  const [game, setGame] = useState<GameWithReviews | null>(null);
+  const [game, setGame] = useState<GameFull|null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [actionError, setActionError] = useState('');
-  const [addingToCollection, setAddingToCollection] = useState(false);
-  const [addingToWishlist, setAddingToWishlist] = useState(false);
-  const [reviewOpen, setReviewOpen] = useState(false);
-  const [reviewForm, setReviewForm] = useState({ rating: 5, title: '', body: '' });
-  const [reviewLoading, setReviewLoading] = useState(false);
-  const [reviews, setReviews] = useState<ReviewEntry[]>([]);
+  const [addingColl, setAddingColl] = useState(false);
+  const [addingWish, setAddingWish] = useState(false);
+  const [actionMsg, setActionMsg] = useState('');
 
   useEffect(() => {
-    if (!id) return;
-    let cancelled = false;
-    setLoading(true);
-    Promise.all([
-      gamesApi.getById(id),
-      reviewsApi.getByGame(id).then((r) => (cancelled ? null : r)).catch(() => null),
-    ]).then(([data, reviewsRes]) => {
-      if (!cancelled) {
-        setGame(data as GameWithReviews);
-        if (reviewsRes) setReviews(reviewsRes.data);
-        setLoading(false);
-      }
-    }).catch((err) => {
-      if (!cancelled) {
-        setError(err.message || 'Game not found');
-        setLoading(false);
-      }
-    });
-    return () => { cancelled = true; };
+    if (!id) return; let c = false; setLoading(true);
+    Promise.all([gamesApi.getById(id), reviewsApi.getByGame(id)]).then(([g,rv])=>{if(!c){setGame(g as GameFull);if(rv) (g as any).reviews = rv.data; setLoading(false);}}).catch((e)=>{if(!c){setError(e.message);setLoading(false);}});
+    return () => { c = true; };
   }, [id]);
 
-  const handleAddToCollection = async () => {
-    if (!id || !authState.user) return;
-    setAddingToCollection(true);
-    setActionError('');
-    try {
-      await collectionApi.create({ gameId: id });
-      setGame((prev) => prev ? { ...prev, _count: { ...prev._count!, collections: (prev._count?.collections || 0) + 1 } } : prev);
-    } catch (err: any) {
-      setActionError(err.message);
-    } finally { setAddingToCollection(false); }
-  };
+  const addColl = async () => { if(!id)return; setAddingColl(true); try{await collectionApi.create({gameId:id});setActionMsg('Added to collection!');}catch(e:any){setActionMsg(e.message);}finally{setAddingColl(false);}};
+  const addWish = async () => { if(!id)return; setAddingWish(true); try{await wishlistApi.add(id);setActionMsg('Added to wishlist!');}catch(e:any){setActionMsg(e.message);}finally{setAddingWish(false);}};
 
-  const handleAddToWishlist = async () => {
-    if (!id || !authState.user) return;
-    setAddingToWishlist(true);
-    setActionError('');
-    try {
-      await wishlistApi.add(id);
-      setGame((prev) => prev ? { ...prev, _count: { ...prev._count!, wishlists: (prev._count?.wishlists || 0) + 1 } } : prev);
-    } catch (err: any) {
-      setActionError(err.message);
-    } finally { setAddingToWishlist(false); }
-  };
+  if (loading) return <LoadingSpinner fullPage/>;
+  if (error||!game) return <div className="page-shell"><EmptyState icon="🎮" title="Game not found" message="This game doesn't exist."><Link to="/explore"><Button variant="primary">Browse Catalog</Button></Link></EmptyState></div>;
 
-  const handleSubmitReview = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!id) return;
-    setReviewLoading(true);
-    try {
-      const review = await reviewsApi.create(id, reviewForm.rating, reviewForm.title || undefined, reviewForm.body || undefined);
-      setReviews([review, ...reviews]);
-      setGame((prev) => prev ? { ...prev, _count: { ...prev._count!, reviews: (prev._count?.reviews || 0) + 1 } } : prev);
-      setReviewOpen(false);
-      setReviewForm({ rating: 5, title: '', body: '' });
-    } catch (err: any) {
-      setActionError(err.message);
-    } finally { setReviewLoading(false); }
-  };
-
-  if (loading) return <LoadingSpinner fullPage message="Loading game details..." />;
-
-  if (error || !game) {
-    return (
-      <div className="page-container">
-        <EmptyState icon="🎮" title="Game not found" message="This game doesn't exist or has been removed.">
-          <Link to="/explore"><Button variant="primary">Browse Catalog</Button></Link>
-        </EmptyState>
-      </div>
-    );
-  }
-
-  const avgRating = game.avgRating ? parseFloat(game.avgRating.toFixed(1)) : null;
+  const avg = game.avgRating ? parseFloat(game.avgRating.toFixed(1)) : null;
+  const fmt = (v:number) => '$'+v.toLocaleString();
 
   return (
-    <div className="page-container">
-      <Link to="/explore" className="game-detail__back">← Back to Catalog</Link>
+    <div className="page-shell">
+      <Link to="/explore" className="gd-back">← Back to Catalog</Link>
 
-      {actionError && <div style={{ marginBottom: '1rem' }}><Alert variant="danger">{actionError}</Alert></div>}
-
-      <div className="game-detail">
-        <div className="game-detail__image">
-          <div className="game-detail__image-wrapper">
-            <img src={game.coverImageUrl || `https://placehold.co/600x800/1a1a30/e0e0e0?text=${encodeURIComponent(game.title)}`} alt={game.title} />
-            <div className="game-detail__image-badge">{game.platform.name}</div>
+      <div className="gd-layout">
+        {/* Cover */}
+        <div className="gd-cover">
+          <div className="gd-cover__img">
+            <img src={game.coverImageUrl||`https://placehold.co/600x800/181c28/f1f5f9?text=${encodeURIComponent(game.title)}`} alt={game.title}/>
           </div>
         </div>
 
-        <div className="game-detail__info">
-          <div className="game-detail__header">
-            <h1 className="game-detail__title">{game.title}</h1>
-            <div className="game-detail__tags">
+        {/* Info */}
+        <div className="gd-info">
+          <div className="gd-header">
+            <h1 className="gd-title">{game.title}</h1>
+            <div className="gd-tags">
               <Badge variant="info">{game.platform.name}</Badge>
               <Badge variant="default">{game.genre.name}</Badge>
               <Badge variant="highlight">{game.releaseYear}</Badge>
             </div>
           </div>
 
-          <div className="game-detail__meta-grid">
-            {[
-              ['Developer', game.developer],
-              ['Publisher', game.publisher],
-              ['Platform', game.platform.name],
-              ['Genre', game.genre.name],
-              ['Release Year', String(game.releaseYear)],
-              game.platform.manufacturer ? ['Manufacturer', game.platform.manufacturer] : null,
-            ].filter(Boolean).map((item) => item && (
-              <div key={item[0]} className="meta-item">
-                <span className="meta-item__label">{item[0]}</span>
-                <span className="meta-item__value">{item[1]}</span>
-              </div>
-            ))}
+          <div className="gd-meta-grid">
+            {[['Developer',game.developer],['Publisher',game.publisher],['Platform',game.platform.name],['Genre',game.genre.name],['Year',String(game.releaseYear)],game.platform.manufacturer?['Manufacturer',game.platform.manufacturer]:null].filter(Boolean).map(([k,v])=>k&&<div key={k} className="gd-meta-item"><span className="gd-meta-item__label">{k}</span><span className="gd-meta-item__value">{v}</span></div>)}
           </div>
 
-          {game.description && (
-            <div className="game-detail__description">
-              <h3>About</h3>
-              <p>{game.description}</p>
-            </div>
-          )}
+          {game.description && <div className="gd-desc"><h3>About</h3><p>{game.description}</p></div>}
 
-          <div className="game-detail__stats-row">
-            <div className="stat-card">
-              <div className="stat-card__number">
-                {avgRating ? <><span className="stat-card__rating">{avgRating}</span><span className="stat-card__max">/5</span></> : <span className="stat-card__rating">—</span>}
-              </div>
-              <span className="stat-card__label">Avg Rating</span>
-            </div>
-            <div className="stat-card"><div className="stat-card__number"><span className="stat-card__rating">{game._count?.collections || 0}</span></div><span className="stat-card__label">In Collections</span></div>
-            <div className="stat-card"><div className="stat-card__number"><span className="stat-card__rating">{game._count?.wishlists || 0}</span></div><span className="stat-card__label">Wishlisted</span></div>
-            <div className="stat-card"><div className="stat-card__number"><span className="stat-card__rating">{game._count?.reviews || 0}</span></div><span className="stat-card__label">Reviews</span></div>
+          <div className="gd-stats-row">
+            <div className="gd-stat"><span className="gd-stat__val">{avg??'—'}</span><span className="gd-stat__lbl">Avg Rating</span></div>
+            <div className="gd-stat"><span className="gd-stat__val">{game._count?.collections||0}</span><span className="gd-stat__lbl">In Collections</span></div>
+            <div className="gd-stat"><span className="gd-stat__val">{game._count?.wishlists||0}</span><span className="gd-stat__lbl">Wishlisted</span></div>
+            <div className="gd-stat"><span className="gd-stat__val">{game._count?.reviews||0}</span><span className="gd-stat__lbl">Reviews</span></div>
           </div>
 
           {authState.user && (
-            <div className="game-detail__actions">
-              <Button variant="primary" onClick={handleAddToCollection} loading={addingToCollection}>Add to Collection</Button>
-              <Button variant="outline" onClick={handleAddToWishlist} loading={addingToWishlist}>Add to Wishlist</Button>
-              <Button variant="ghost" onClick={() => setReviewOpen(true)}>Write Review</Button>
+            <div className="gd-actions">
+              <Button variant="primary" onClick={addColl} loading={addingColl}>Add to Collection</Button>
+              <Button variant="outline" onClick={addWish} loading={addingWish}>Add to Wishlist</Button>
             </div>
           )}
-
-          <div className="game-detail__reviews">
-            <div className="game-detail__review-header">
-              <h3 className="game-detail__section-title">Reviews ({game._count?.reviews || 0})</h3>
-              {authState.user && (
-                <Button variant="outline" size="sm" onClick={() => setReviewOpen(true)}>+ Write Review</Button>
-              )}
-            </div>
-            {reviews.length > 0 ? (
-              <div className="reviews-list">
-                {reviews.map((review) => (
-                  <div key={review.id} className="review-card">
-                    <div className="review-card__header">
-                      <div className="review-card__user">
-                        <span className="review-card__avatar-placeholder">
-                          {(review.user.displayName || review.user.username).charAt(0).toUpperCase()}
-                        </span>
-                        <Link to={`/profile/${review.user.username}`} className="review-card__username">
-                          {review.user.displayName || review.user.username}
-                        </Link>
-                      </div>
-                      <Badge variant="highlight">{review.rating}★</Badge>
-                    </div>
-                    {review.title && <h4 className="review-card__title">{review.title}</h4>}
-                    {review.body && <p className="review-card__body">{review.body}</p>}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted" style={{ fontSize: '0.875rem' }}>No reviews yet. Be the first to review!</p>
-            )}
-          </div>
+          {actionMsg && <p className="gd-action-msg">{actionMsg}</p>}
         </div>
       </div>
 
-      <Modal open={reviewOpen} onClose={() => { setReviewOpen(false); setActionError(''); }} title="Write a Review">
-        <form onSubmit={handleSubmitReview} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {actionError && <Alert variant="danger">{actionError}</Alert>}
-          <div className="input-group">
-            <label className="input-group__label">Rating</label>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              {[1, 2, 3, 4, 5].map((n) => (
-                <button key={n} type="button" onClick={() => setReviewForm({ ...reviewForm, rating: n })}
-                  style={{
-                    fontSize: '1.5rem', background: reviewForm.rating >= n ? '#e94560' : 'transparent',
-                    border: `2px solid ${reviewForm.rating >= n ? '#e94560' : '#3a3a5a'}`, borderRadius: '4px',
-                    padding: '0.25rem 0.5rem', cursor: 'pointer', color: reviewForm.rating >= n ? '#fff' : '#6b6b80',
-                  }}
-                >★</button>
-              ))}
-            </div>
+      {/* Related Games */}
+      {game.related && game.related.length > 0 && (
+        <div className="gd-related">
+          <h2 className="gd-section-title">You Might Also Like</h2>
+          <div className="page-grid">
+            {game.related.map((r) => (
+              <Link to={`/games/${r.id}`} key={r.id} style={{textDecoration:'none',color:'inherit'}}>
+                <div className="game-card-new">
+                  <div className="game-card-new__img">
+                    <img src={r.coverImageUrl||`https://placehold.co/400x300/181c28/f1f5f9?text=${encodeURIComponent(r.title.slice(0,6))}`} alt="" loading="lazy"/>
+                    <span className="game-card-new__condition">{r.platform.name}</span>
+                  </div>
+                  <div className="game-card-new__body">
+                    <h3 className="game-card-new__title">{r.title}</h3>
+                    <p className="game-card-new__meta">{r.platform.name} · {r.genre.name} · {r.releaseYear}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
-          <Input label="Title (optional)" value={reviewForm.title} onChange={(e) => setReviewForm({ ...reviewForm, title: e.target.value })} placeholder="Sum up your thoughts" />
-          <Input label="Review" type="textarea" value={reviewForm.body} onChange={(e) => setReviewForm({ ...reviewForm, body: e.target.value })} placeholder="Share your experience with this game..." rows={4} />
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-            <Button variant="ghost" onClick={() => { setReviewOpen(false); setActionError(''); }}>Cancel</Button>
-            <Button type="submit" variant="primary" loading={reviewLoading}>Submit Review</Button>
-          </div>
-        </form>
-      </Modal>
+        </div>
+      )}
     </div>
   );
 };

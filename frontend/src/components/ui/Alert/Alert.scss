@@ -1,9 +1,1 @@
-.alert{display:flex;gap:$space-3;padding:$space-4;border-radius:$radius-md;border:1px solid transparent;font-size:$text-sm}
-.alert--success{background:$green-dim;border-color:rgba(5,150,105,.25);color:$green}
-.alert--warning{background:$amber-dim;border-color:rgba(217,119,6,.25);color:$amber}
-.alert--danger{background:$red-dim;border-color:rgba(220,38,38,.25);color:$red}
-.alert--info{background:$blue-dim;border-color:rgba(37,99,235,.25);color:$blue}
-.alert__icon{font-size:$text-lg;flex-shrink:0}
-.alert__content{flex:1}
-.alert__title{display:block;font-weight:$weight-semibold;margin-bottom:2px}
-.alert__message{margin:0;opacity:.9}
+@use '../../../styles/variables' as *;

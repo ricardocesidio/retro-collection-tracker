@@ -1,0 +1,5 @@
+@use '../../../styles/variables' as *;
+
+.profile-chip{display:flex;align-items:center;gap:$s2s;padding:4px 10px 4px 4px;border-radius:$r5;background:$s2;border:1px solid $b1;transition:all $fast;cursor:pointer;&:hover{border-color:$b3;background:$s3}}
+.profile-chip__avatar{width:30px;height:30px;border-radius:$r5;background:linear-gradient(135deg,$violet,$violet-bright);@include fcc;font-size:$xs;font-weight:$w7;color:white;box-shadow:0 0 8px $violet-dim;flex-shrink:0;overflow:hidden;img{width:100%;height:100%;object-fit:cover}}
+.profile-chip__info{@include fc;text-align:left}.profile-chip__name{font-size:$sm;font-weight:$w6;white-space:nowrap}.profile-chip__role{font-size:$xs;color:$t3;font-family:$mono}.profile-chip__chevron{font-size:0.625rem;color:$t3;margin-left:$s1s}

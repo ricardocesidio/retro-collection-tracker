@@ -1,9 +1,7 @@
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:$z-overlay;padding:$space-4;animation:modal-fadein $duration-base $ease-out}
-.modal{background:$surface-2;border:1px solid $border;border-radius:$radius-lg;width:100%;max-height:90vh;display:flex;flex-direction:column;z-index:$z-modal;animation:modal-slideup $duration-base $ease-out;&--sm{max-width:400px}&--md{max-width:560px}&--lg{max-width:800px}}
-.modal__header{display:flex;align-items:center;justify-content:space-between;padding:$space-5;border-bottom:1px solid $border}
-.modal__title{font-size:$text-xl;font-weight:$weight-semibold}
-.modal__close{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:$text-secondary;border-radius:$radius-sm;transition:all $duration-fast;&:hover{color:$text-primary;background:$surface-hover}}
-.modal__body{padding:$space-5;overflow-y:auto;flex:1}
-.modal__footer{padding:$space-4 $space-5;border-top:1px solid $border;display:flex;justify-content:flex-end;gap:$space-2}
-@keyframes modal-fadein{from{opacity:0}to{opacity:1}}
-@keyframes modal-slideup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@use '../../../styles/variables' as *;
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(2,4,8,0.8);backdrop-filter:blur(8px);z-index:$z-over;@include fcc;padding:$s4s;animation:modal-in 0.22s $ease}
+.modal{@include glass;width:100%;max-width:520px;box-shadow:$e3,$g1;animation:modal-up 0.22s $ease;&--sm{max-width:400px}&--md{max-width:560px}&--lg{max-width:800px}}
+.modal__header{@include fcb;padding:$s5s $s5s 0;margin-bottom:$s4s}.modal__title{font-size:$lg;font-weight:$w7}.modal__close{width:32px;height:32px;border-radius:$r1;@include fcc;color:$t3;font-size:$lg;transition:all $fast;@include focus;&:hover{background:rgba(255,255,255,0.035);color:$t1}}
+.modal__body{padding:0 $s5s $s5s}.modal__footer{display:flex;justify-content:flex-end;gap:$s3s;padding:$s4s $s5s;border-top:1px solid $b1}
+@keyframes modal-in{from{opacity:0}to{opacity:1}}@keyframes modal-up{from{opacity:0;transform:translateY(16px) scale(0.97)}}

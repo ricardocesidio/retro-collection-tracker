@@ -1,35 +1,24 @@
 @use 'variables' as *;
 
-@mixin flex-center { display:flex;align-items:center;justify-content:center; }
-@mixin flex-between { display:flex;align-items:center;justify-content:space-between; }
-@mixin text-truncate { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+@mixin flex { display:flex; align-items:center; }
+@mixin fcc { display:flex; align-items:center; justify-content:center; }
+@mixin fcb { display:flex; align-items:center; justify-content:space-between; }
+@mixin fc { display:flex; flex-direction:column; }
+@mixin trunc { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-@mixin card { background:$surface-2;border:1px solid $border;border-radius:$radius-md; }
+@mixin card { background:$s2; border:1px solid $b1; border-radius:$r2; transition:all $base-d $ease;
+  &:hover { border-color:$b2; box-shadow:0 0 0 1px $b3,$g1,$e2; } }
 
-@mixin scrollbar {
-  scrollbar-width:thin;scrollbar-color:$border transparent;
-  &::-webkit-scrollbar{width:5px}
-  &::-webkit-scrollbar-track{background:transparent}
-  &::-webkit-scrollbar-thumb{background:$border;border-radius:3px}
-}
+@mixin glass { background:$glass; border:1px solid $b1; border-radius:$r2; backdrop-filter:blur(16px) saturate(160%); }
 
-@mixin focus-ring {
-  &:focus-visible{outline:2px solid $accent;outline-offset:2px}
-}
+@mixin scroll { scrollbar-width:thin; scrollbar-color:rgba(139,92,246,0.2) transparent;
+  &::-webkit-scrollbar{width:4px} &::-webkit-scrollbar-track{background:transparent} &::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.25);border-radius:2px} }
 
-@mixin respond($bp) {
-  @if $bp == sm { @media(min-width:640px){@content} }
-  @else if $bp == md { @media(min-width:768px){@content} }
-  @else if $bp == lg { @media(min-width:1024px){@content} }
-  @else if $bp == xl { @media(min-width:1280px){@content} }
-}
+@mixin focus { &:focus-visible{outline:2px solid $violet-bright;outline-offset:2px;border-radius:$r1} }
 
-@mixin container { width:100%;max-width:$max-content-width;margin:0 auto;padding:0 $space-4;
-  @include respond(md){padding:0 $space-5} }
+@mixin r($bp) { @if $bp==sm{@media(min-width:$bp-sm){@content}}@else if $bp==md{@media(min-width:$bp-md){@content}}@else if $bp==lg{@media(min-width:$bp-lg){@content}}@else if $bp==xl{@media(min-width:$bp-xl){@content}} }
 
-@mixin responsive-grid { display:grid;grid-template-columns:1fr;gap:$space-4;
-  @include respond(sm){grid-template-columns:repeat(2,1fr)}
-  @include respond(md){grid-template-columns:repeat(3,1fr)}
-  @include respond(lg){grid-template-columns:repeat(4,1fr)} }
+@mixin container { width:100%;max-width:$max-w;margin:0 auto;padding:0 $cp; }
 
-@mixin flex-column { display:flex;flex-direction:column }
+@mixin shimmer { background:linear-gradient(90deg,$s2 25%,$s3 37%,$s2 63%);background-size:200% 100%;animation:shim 2s ease-in-out infinite; }
+@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}

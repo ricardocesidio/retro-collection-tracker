@@ -1,9 +1,1 @@
-.input-group{display:flex;flex-direction:column;gap:4px}
-.input-group__label{font-size:$text-sm;font-weight:$weight-medium}
-.input-group__required{color:$accent;margin-left:2px}
-.input-group__wrapper{display:flex;align-items:center;background:$surface-3;border:1px solid $border;border-radius:$radius-sm;transition:border-color $duration-fast;overflow:hidden;&:focus-within{border-color:$accent}}
-.input-group__prefix,.input-group__suffix{padding:0 $space-2;color:$text-tertiary;font-size:$text-sm;background:rgba(255,255,255,.03);display:flex;align-items:center}
-.input-group__control{width:100%;padding:.5rem .75rem;background:transparent;border:none;color:$text-primary;font-size:$text-sm;outline:none;&::placeholder{color:$text-disabled}&:disabled{opacity:.5;cursor:not-allowed}&--textarea{resize:vertical;min-height:80px}}
-.input-group__hint{font-size:$text-xs;color:$text-tertiary}
-.input-group__error{font-size:$text-xs;color:$red}
-.input-group--error .input-group__wrapper{border-color:$red}
+@use '../../../styles/variables' as *;

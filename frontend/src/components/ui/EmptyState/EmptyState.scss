@@ -1,5 +1,5 @@
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:$space-8;border:2px dashed $border;border-radius:$radius-lg;background:transparent}
-.empty-state__icon{font-size:3rem;margin-bottom:$space-4;opacity:.8}
-.empty-state__title{font-size:$text-xl;font-weight:$weight-semibold;margin-bottom:$space-2}
-.empty-state__message{font-size:$text-sm;color:$text-secondary;max-width:400px;margin-bottom:$space-5}
-.empty-state__actions{display:flex;gap:$space-2}
+@use '../../../styles/variables' as *;
+
+.empty-state{@include fcc;flex-direction:column;gap:$s4s;padding:$s8s $s5s;text-align:center;animation:card-in 0.4s $ease both}
+.empty-state__icon{font-size:3.5rem;margin-bottom:$s2s;opacity:0.25}
+.empty-state__title{font-size:$xl;font-weight:$w7}.empty-state__message{font-size:$sm;color:$t3;max-width:400px;line-height:1.7}.empty-state__actions{display:flex;gap:$s3s;flex-wrap:wrap;justify-content:center;margin-top:$s3s}

@@ -1,14 +1,10 @@
-.topbar{position:fixed;left:$sidebar-w;top:0;right:0;height:$topbar-h;background:$surface-1;border-bottom:1px solid $border;display:flex;align-items:center;justify-content:space-between;padding:0 $space-5;z-index:$z-topbar}
-.topbar__search{position:relative;flex:1;max-width:480px}
-.topbar__search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:.875rem;opacity:.5}
-.topbar__search-input{width:100%;padding:.4rem 1rem .4rem 2rem;background:$surface-3;border:1px solid $border;border-radius:$radius-md;color:$text-primary;font-size:$text-sm;&::placeholder{color:$text-disabled}&:focus{outline:none;border-color:$accent}}
-.topbar__actions{display:flex;align-items:center;gap:$space-4}
-.topbar__icon-btn{position:relative;font-size:1.125rem;color:$text-secondary;padding:$space-1;border-radius:$radius-sm;transition:all $duration-fast;&:hover{color:$text-primary;background:$surface-hover}}
-.topbar__badge{position:absolute;top:-2px;right:-4px;background:$accent;color:#fff;font-size:.625rem;font-weight:$weight-bold;min-width:16px;height:16px;border-radius:$radius-full;@include flex-center}
-.topbar__profile{display:flex;align-items:center;gap:$space-3;padding:$space-1 $space-2;border-radius:$radius-md;transition:background $duration-fast;&:hover{background:$surface-hover}}
-.topbar__avatar{width:28px;height:28px;border-radius:$radius-full;background:$accent;color:#fff;@include flex-center;font-size:$text-xs;font-weight:$weight-bold}
-.topbar__profile-info{display:flex;flex-direction:column;&-name{font-size:$text-sm;font-weight:$weight-semibold;color:$text-primary}&-role{font-size:$text-xs;color:$text-tertiary}}
-.topbar__logout{font-size:1.25rem;color:$text-tertiary;padding:$space-1;border-radius:$radius-sm;transition:all $duration-fast;&:hover{color:$red;background:$surface-hover}}
-.topbar__auth-links{display:flex;gap:$space-2}
-.topbar__auth-btn{padding:.375rem .75rem;border-radius:$radius-sm;font-size:$text-sm;font-weight:$weight-medium;color:$text-secondary;transition:all $duration-fast;&:hover{color:$text-primary;background:$surface-hover}}
-.topbar__auth-btn--primary{background:$accent;color:#fff;&:hover{background:#6d28d9;color:#fff}}
+@use '../../../styles/variables' as *; @use '../../../styles/mixins' as *;
+
+.topbar{position:fixed;top:0;left:0;right:0;height:$th;background:rgba($s1,0.9);border-bottom:1px solid $b1;backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);display:flex;align-items:center;gap:$s4s;padding:0 $s5s;z-index:$z-topbar;@include r(lg){left:$sw}}
+.topbar__search{flex:1;max-width:800px;position:relative;display:flex;align-items:center}
+.topbar__search-icon{position:absolute;left:12px;color:$t3;font-size:$sm;pointer-events:none;transition:color $fast}
+.topbar__search-input{width:100%;background:$s2;border:none;border-radius:$r1;padding:0.875rem 1rem 0.875rem 2.5rem;color:$t1;font-size:$sm;font-family:$font;transition:all $fast;@include focus;&::placeholder{color:$t4}&:focus{background:$s3;box-shadow:0 0 0 3px $violet-dim,0 0 20px $violet-dim}&:focus+.topbar__search-icon{color:$violet-bright}}
+.topbar__actions{display:flex;align-items:center;gap:$s3s;margin-left:auto}
+.topbar__auth-links{display:flex;gap:$s2s}
+.topbar__auth-btn{padding:0.4375rem 1rem;border-radius:$r1;font-size:$sm;font-weight:$w6;transition:all $fast;color:$t2;border:1px solid transparent;&:hover{color:$t1;background:$s2;border-color:$b1}}
+.topbar__auth-btn--primary{background:linear-gradient(135deg,$violet,$violet-bright);color:white!important;border-color:$violet;box-shadow:0 0 12px $violet-dim;&:hover{box-shadow:0 0 20px $violet-glow;transform:translateY(-1px)}}

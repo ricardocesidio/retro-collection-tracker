@@ -1,20 +1,19 @@
-.sidebar-hamburger{display:flex;flex-direction:column;gap:4px;position:fixed;top:12px;left:12px;z-index:$z-overlay;padding:8px;border-radius:$radius-sm;background:$surface-2;border:1px solid $border;@include respond(lg){display:none}span{width:20px;height:2px;background:$text-primary;border-radius:1px;transition:all $duration-fast}}
-.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:$z-overlay - 1;@include respond(lg){display:none}}
+@use '../../../styles/variables' as *; @use '../../../styles/mixins' as *;
 
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:$sidebar-w;background:$surface-1;border-right:1px solid $border;display:flex;flex-direction:column;z-index:$z-sidebar;overflow-y:auto;@include scrollbar;transform:translateX(-100%);transition:transform $duration-base $ease-out;
-  @include respond(lg){transform:none}
-  &--open{transform:none}
-  &__brand{display:flex;align-items:center;gap:$space-3;padding:$space-5;border-bottom:1px solid $border}
-  &__logo{font-size:1.5rem}
-  &__title{display:block;font-size:$text-base;font-weight:$weight-bold;color:$text-primary}
-  &__sub{font-size:$text-xs;color:$text-tertiary}
-  &__nav{flex:1;padding:$space-3 0;overflow-y:auto}
-  &__section{margin-bottom:$space-4}
-  &__section-label{display:block;padding:0 $space-5;margin-bottom:$space-2;font-size:$text-xs;font-weight:$weight-semibold;color:$text-disabled;text-transform:uppercase;letter-spacing:.05em}
-  &__item{display:flex;align-items:center;gap:$space-3;padding:.5rem $space-5;margin:0 $space-2;border-radius:$radius-sm;color:$text-secondary;font-size:$text-sm;font-weight:$weight-medium;transition:all $duration-fast;text-decoration:none;&:hover{background:$surface-hover;color:$text-primary}&--active{background:$accent-dim;color:$accent-light;font-weight:$weight-semibold}}
-  &__item-icon{font-size:1rem;width:24px;text-align:center;flex-shrink:0}
-  &__user{display:flex;align-items:center;gap:$space-3;padding:$space-4;border-top:1px solid $border;margin-top:auto}
-  &__avatar{width:32px;height:32px;border-radius:$radius-full;background:$accent;color:#fff;@include flex-center;font-size:$text-sm;font-weight:$weight-bold}
-  &__user-name{display:block;font-size:$text-sm;font-weight:$weight-semibold;color:$text-primary}
-  &__user-role{font-size:$text-xs;color:$text-tertiary}
-}
+.sidebar-hamburger{display:flex;flex-direction:column;gap:5px;position:fixed;top:14px;left:14px;z-index:$z-over;padding:9px;border-radius:$r1;background:$s2;border:1px solid $b1;transition:all $fast;@include r(lg){display:none}span{width:18px;height:2px;background:$t2;border-radius:1px;transition:all $fast}&:hover{border-color:$violet;background:$s3;span{background:$violet-bright}}}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(2,4,8,0.75);backdrop-filter:blur(4px);z-index:$z-over - 1;@include r(lg){display:none}}
+
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:$sw;background:$s1;border-right:1px solid $b1;@include fc;z-index:$z-sidebar;overflow-y:auto;@include scroll;transform:translateX(-100%);transition:transform $slow $ease;@include r(lg){transform:none}&--open{transform:none}
+  &::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 0% 50%,rgba(139,92,246,0.04) 0%,transparent 70%);pointer-events:none;z-index:0}}
+.sidebar__brand{display:flex;align-items:center;gap:$s3s;padding:1.25rem $s5s;border-bottom:1px solid $b1;position:relative;overflow:hidden;&::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,$violet,transparent)}}
+.sidebar__logo{width:36px;height:36px;border-radius:$r1;background:linear-gradient(135deg,$violet,$violet-bright);@include fcc;font-size:1.1rem;flex-shrink:0;box-shadow:0 0 12px $violet-dim}
+.sidebar__title{display:block;font-size:$sm;font-weight:$w7;letter-spacing:-0.01em}
+.sidebar__sub{font-size:$xs;color:$t3;font-family:$mono;letter-spacing:0.03em}
+.sidebar__nav{flex:1;padding:$s4s 0}
+.sidebar__section{margin-bottom:$s3s}.sidebar__section-label{display:block;padding:0 $s4s;margin-bottom:$s1s;font-size:0.625rem;font-weight:$w7;color:$t4;text-transform:uppercase;letter-spacing:0.12em;font-family:$mono}
+.sidebar__item{display:flex;align-items:center;gap:$s3s;padding:0.5625rem $s4s;margin:1px $s2s;border-radius:$r1;color:$t2;font-size:$sm;font-weight:$w5;text-decoration:none;transition:all $fast $ease;position:relative;&:hover{background:rgba(255,255,255,0.035);color:$t1}&--active{background:$violet-dim;color:$violet-bright;font-weight:$w6;&::before{content:'';position:absolute;left:0;top:25%;bottom:25%;width:3px;background:linear-gradient(180deg,$violet,$violet-bright);border-radius:0 2px 2px 0;box-shadow:0 0 8px $violet-glow}}}
+.sidebar__item-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0}
+.sidebar__user{display:flex;align-items:center;gap:$s3s;padding:$s4s $s5s;border-top:1px solid $b1;background:$s2;position:relative;&::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,$violet,transparent)}}
+.sidebar__avatar{width:34px;height:34px;border-radius:$r1;background:linear-gradient(135deg,$violet,$violet-bright);@include fcc;font-size:$sm;font-weight:$w7;color:white;flex-shrink:0;box-shadow:0 0 10px $violet-dim}
+.sidebar__user-name{display:block;font-size:$sm;font-weight:$w6}.sidebar__user-role{font-size:$xs;color:$t3;font-family:$mono}
+.sidebar__progress{padding:$s4s $s5s;border-top:1px solid $b1}.sidebar__progress-header{@include fcb;font-size:$xs;color:$t2;margin-bottom:6px}.sidebar__progress-pct{font-family:$mono;color:$violet-bright}.sidebar__progress-track{height:4px;background:$s3;border-radius:2px;overflow:hidden;margin-bottom:6px}.sidebar__progress-fill{height:100%;width:78%;background:linear-gradient(90deg,$violet,$violet-bright);border-radius:2px;box-shadow:0 0 6px $violet-dim}.sidebar__progress-hint{font-size:0.625rem;color:$t4}

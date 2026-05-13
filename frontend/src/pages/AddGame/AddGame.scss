@@ -1,25 +1,3 @@
-// styles in global.scss via page-shell + panel utilities
+@use '../../styles/variables' as *; @use '../../styles/mixins' as *;
 
-.form-layout { display: flex; flex-direction: column; gap: $spacing-xl; max-width: 720px; }
-
-.form-section {
-  background: $color-surface; border: 1px solid $color-border;
-  border-radius: $radius-lg; padding: $spacing-xl;
-  .section-title { margin-bottom: $spacing-lg; padding-bottom: $spacing-md; border-bottom: 1px solid $color-border; }
-}
-
-.form-grid { display: grid; grid-template-columns: 1fr; gap: $spacing-md; @include respond(md) { grid-template-columns: 1fr 1fr; } }
-
-.input-group { display: flex; flex-direction: column; gap: $spacing-xs; &__label { font-size: $font-size-sm; font-weight: $font-weight-medium; } }
-
-.form-select {
-  padding: 0.625rem 0.75rem; background: $color-surface-alt;
-  border: 1px solid $color-border; border-radius: $radius-md;
-  color: $color-text; font-size: $font-size-base; font-family: $font-family;
-  cursor: pointer; width: 100%; transition: border-color $transition-fast;
-  &:focus { outline: none; border-color: $color-highlight; }
-}
-
-.input-error { font-size: $font-size-xs; color: $color-danger; margin-top: 2px; }
-
-.form-actions { display: flex; justify-content: flex-end; gap: $spacing-sm; padding-top: $spacing-md; }
+.add-game{max-width:640px}.add-game__form{@include card;padding:$s6s;@include fc;gap:$s4s}.add-game__section-title{font-size:$xs;font-weight:$w7;text-transform:uppercase;letter-spacing:0.1em;color:$t3;font-family:$mono;margin-top:$s2s;padding-top:$s3s;border-top:1px solid $b1}.add-game__row{display:grid;grid-template-columns:1fr 1fr;gap:$s4s;@media(max-width:640px){grid-template-columns:1fr}}.add-game__actions{display:flex;gap:$s3s;justify-content:flex-end;padding-top:$s2s}

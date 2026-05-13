@@ -1,2 +1,5 @@
+@use '../../../styles/variables' as *; @use '../../../styles/mixins' as *;
+
 .app-layout{display:flex;min-height:100vh}
-.app-layout__content{flex:1;margin-left:$sidebar-w;margin-top:$topbar-h;padding:$space-5;min-height:calc(100vh - $topbar-h);background:$surface-0;@media(max-width:1023px){margin-left:0}}
+.app-layout__content{flex:1;margin-top:$th;padding:$s6s $s5s;min-height:calc(100vh - $th);background:$s0;opacity:0;transform:translateY(6px);transition:opacity 0.25s ease-out,transform 0.25s ease-out;@include r(lg){margin-left:$sw}}
+.app-layout__content--visible{opacity:1;transform:none}

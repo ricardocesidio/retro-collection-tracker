@@ -1,4 +1,7 @@
-.loading-spinner{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:$space-4;padding:$space-8;&--full{min-height:60vh}}
-.loading-spinner__ring{width:32px;height:32px;border:3px solid $border;border-top-color:$accent;border-radius:50%;animation:spinner-spin .7s linear infinite}
-.loading-spinner__message{font-size:$text-sm;color:$text-secondary}
-@keyframes spinner-spin{to{transform:rotate(360deg)}}
+@use '../../../styles/variables' as *;
+
+.loading-spinner{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;padding:3rem}
+.loading-spinner--full{min-height:60vh}
+.loading-spinner__ring{width:32px;height:32px;border:2px solid rgba(139,92,246,0.1);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.7s linear infinite;box-shadow:0 0 12px rgba(139,92,246,0.14)}
+.loading-spinner__message{font-size:0.8125rem;color:#8892b0;font-family:'DM Mono',monospace}
+@keyframes spin{to{transform:rotate(360deg)}}

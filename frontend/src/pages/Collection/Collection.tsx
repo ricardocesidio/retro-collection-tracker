@@ -8,7 +8,6 @@ import Alert from '../../components/ui/Alert/Alert';
 import { collectionApi, catalogApi } from '../../services/collections';
 import { useDebounce } from '../../hooks/useDebounce';
 import type { CollectionEntry, Platform } from '../../services/collections';
-import './Collection.scss';
 
 const Collection: React.FC = () => {
   const [items, setItems] = useState<CollectionEntry[]>([]);
@@ -16,86 +15,73 @@ const Collection: React.FC = () => {
   const [totalValue, setTotalValue] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [deleting, setDeleting] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string|null>(null);
   const [search, setSearch] = useState('');
-  const debouncedSearch = useDebounce(search, 300);
-  const [platformFilter, setPlatformFilter] = useState('');
-  const [conditionFilter, setConditionFilter] = useState('');
+  const debounce = useDebounce(search, 300);
+  const [plat, setPlat] = useState('');
+  const [cond, setCond] = useState('');
   const [platforms, setPlatforms] = useState<Platform[]>([]);
 
-  const fetchCollection = useCallback(async () => {
-    setLoading(true); setError('');
+  const fetch = useCallback(async () => {
+    setLoading(true);setError('');
     try {
-      const params: Record<string, string> = {};
-      if (debouncedSearch) params.search = debouncedSearch;
-      if (platformFilter) params.platform = platformFilter;
-      if (conditionFilter) params.condition = conditionFilter;
-      const res = await collectionApi.list(params);
-      setItems(res.data); setTotal(res.total); setTotalValue(res.totalValue || 0);
-    } catch (err: any) { setError(err.message); }
-    finally { setLoading(false); }
-  }, [debouncedSearch, platformFilter, conditionFilter]);
+      const p: Record<string,string> = {};
+      if (debounce) p.search = debounce; if (plat) p.platform = plat; if (cond) p.condition = cond;
+      const r = await collectionApi.list(p);
+      setItems(r.data); setTotal(r.total); setTotalValue(r.totalValue||0);
+    } catch (e: any) { setError(e.message); } finally { setLoading(false); }
+  }, [debounce, plat, cond]);
 
-  useEffect(() => { fetchCollection(); }, [fetchCollection]);
-  useEffect(() => { catalogApi.getPlatforms().then(setPlatforms).catch(() => {}); }, []);
+  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => { catalogApi.getPlatforms().then(setPlatforms).catch(()=>{}); }, []);
 
-  const handleDelete = async (id: string) => {
+  const remove = async (id: string) => {
     if (!confirm('Remove this game?')) return;
     setDeleting(id);
-    try { await collectionApi.delete(id); setItems((i) => i.filter((g) => g.id !== id)); }
-    catch (err: any) { setError(err.message); }
-    finally { setDeleting(null); }
+    try { await collectionApi.delete(id); setItems((p) => p.filter((g) => g.id !== id)); } catch (e: any) { setError(e.message); } finally { setDeleting(null); }
   };
 
-  const fmt = (v: number) => '$' + v.toLocaleString();
+  const fmt = (v:number) => '$'+v.toLocaleString();
 
   return (
     <div className="page-shell">
-      <div className="page-shell__header">
-        <div>
-          <h1 className="page-shell__title">My Collection</h1>
-          <p className="page-shell__sub">{total} games · Est. value {fmt(totalValue)}</p>
-        </div>
+      <div className="page-shell-header">
+        <div><h1 className="page-title">My Collection</h1><p className="page-sub">{total} games · Est. {fmt(totalValue)}</p></div>
         <Link to="/add-game"><Button variant="primary">+ Add Game</Button></Link>
       </div>
 
-      <div className="page-shell__filters">
+      <div className="page-shell-filters">
         <Input placeholder="Search collection..." value={search} onChange={(e) => setSearch(e.target.value)} />
-        <select className="page-select" value={platformFilter} onChange={(e) => setPlatformFilter(e.target.value)}>
-          <option value="">All Platforms</option>
-          {platforms.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-        </select>
-        <select className="page-select" value={conditionFilter} onChange={(e) => setConditionFilter(e.target.value)}>
-          <option value="">All Conditions</option>
-          {['MINT','NEAR_MINT','VERY_GOOD','GOOD','ACCEPTABLE','POOR'].map((c) => <option key={c} value={c}>{c.replace('_',' ')}</option>)}
-        </select>
+        <select className="form-select" value={plat} onChange={(e) => setPlat(e.target.value)}><option value="">All Platforms</option>{platforms.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select>
+        <select className="form-select" value={cond} onChange={(e) => setCond(e.target.value)}><option value="">All Conditions</option>{['MINT','NEAR_MINT','VERY_GOOD','GOOD','ACCEPTABLE','POOR'].map((c) => <option key={c} value={c}>{c.replace('_',' ')}</option>)}</select>
       </div>
 
-      {error && <div style={{ marginBottom: '1rem' }}><Alert variant="danger">{error}</Alert></div>}
+      {error && <div style={{marginBottom:'1rem'}}><Alert variant="danger">{error}</Alert></div>}
 
       {loading ? <LoadingSpinner /> : items.length === 0 ? (
-        <EmptyState icon="🎮" title="No games yet" message="Start building your collection.">
-          <Link to="/explore"><Button variant="primary">Browse Catalog</Button></Link>
-        </EmptyState>
+        <EmptyState icon="🎮" title="No games yet" message="Start building your retro collection."><Link to="/explore"><Button variant="primary">Browse Catalog</Button></Link><Link to="/add-game"><Button variant="outline">Add Game</Button></Link></EmptyState>
       ) : (
         <div className="page-grid">
           {items.map((item) => (
-            <div key={item.id} className="game-card-new">
-              <div className="game-card-new__img">
-                <img src={item.game.coverImageUrl || `https://placehold.co/300x400/161924/e8eaed?text=${encodeURIComponent(item.game.title.slice(0,4))}`} alt="" />
-                <span className="game-card-new__condition">{item.condition.replace('_', ' ')}</span>
+            <Link to={`/edit-game/${item.id}`} key={item.id} style={{textDecoration:'none',color:'inherit'}}>
+              <div className="game-card-new">
+                <div className="game-card-new__img">
+                  <img src={item.game.coverImageUrl||`https://placehold.co/400x300/181c28/f1f5f9?text=${encodeURIComponent(item.game.title.slice(0,6))}`} alt="" loading="lazy"/>
+                  <span className="game-card-new__condition">{item.condition.replace('_',' ')}</span>
+                </div>
+                <div className="game-card-new__body">
+                  <h3 className="game-card-new__title">{item.game.title}</h3>
+                  <p className="game-card-new__meta">{item.game.platform.name} · {item.game.genre.name}</p>
+                  <div className="game-card-new__footer">
+                    {item.personalRating && <span className="game-card-new__rating">★ {item.personalRating}</span>}
+                    {item.estimatedValue != null && <span className="game-card-new__value">{fmt(item.estimatedValue)}</span>}
+                  </div>
+                </div>
+                <div className="game-card-new__actions" onClick={(e) => e.preventDefault()}>
+                  <Button variant="ghost" size="sm" onClick={() => remove(item.id)} loading={deleting===item.id}>Remove</Button>
+                </div>
               </div>
-              <div className="game-card-new__body">
-                <h3 className="game-card-new__title">{item.game.title}</h3>
-                <p className="game-card-new__meta">{item.game.platform.name} · {item.game.genre.name}</p>
-                {item.personalRating && <div className="game-card-new__rating">★ {item.personalRating}</div>}
-                {item.estimatedValue != null && <div className="game-card-new__value">{fmt(item.estimatedValue)}</div>}
-              </div>
-              <div className="game-card-new__actions">
-                <Link to={`/edit-game/${item.id}`}><Button variant="ghost" size="sm">Edit</Button></Link>
-                <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)} loading={deleting === item.id}>Remove</Button>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

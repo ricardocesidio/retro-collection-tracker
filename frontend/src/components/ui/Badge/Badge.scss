@@ -1,7 +1,1 @@
-.badge{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;font-size:$text-xs;font-weight:$weight-medium;border-radius:$radius-full;line-height:1.6;white-space:nowrap}
-.badge--success{background:$green-dim;color:$green}
-.badge--warning{background:$amber-dim;color:$amber}
-.badge--danger{background:$red-dim;color:$red}
-.badge--info{background:$blue-dim;color:$blue}
-.badge--highlight{background:$accent-dim;color:$accent-light}
-.badge--default{background:$surface-hover;color:$text-secondary}
+@use '../../../styles/variables' as *;

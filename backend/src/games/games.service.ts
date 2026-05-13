@@ -92,7 +92,33 @@ export class GamesService {
       _avg: { rating: true },
     });
 
-    return { ...game, avgRating: avgRating._avg.rating || null };
+    // Get related games (same platform or genre)
+    const related = await this.prisma.game.findMany({
+      where: {
+        OR: [{ platformId: game.platformId }, { genreId: game.genreId }],
+        id: { not: id },
+      },
+      include: { platform: true, genre: true },
+      take: 6,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return { ...game, avgRating: avgRating._avg.rating || null, related };
+  }
+
+  async getRelated(id: string) {
+    const game = await this.prisma.game.findUnique({ where: { id }, select: { platformId: true, genreId: true } });
+    if (!game) return [];
+
+    return this.prisma.game.findMany({
+      where: {
+        OR: [{ platformId: game.platformId }, { genreId: game.genreId }],
+        id: { not: id },
+      },
+      include: { platform: true, genre: true },
+      take: 6,
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   async create(dto: CreateGameDto) {
