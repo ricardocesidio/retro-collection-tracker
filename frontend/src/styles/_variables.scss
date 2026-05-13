@@ -1,31 +1,17 @@
-// Neon Arcade — Design Tokens (all valid SCSS identifiers)
-// Surfaces
-$s0:#030409;$s1:#0a0d18;$s2:#111522;$s3:#181d30;$s4:#1f2540;$glass:rgba(17,21,34,.78);
-// Accents
-$a1:#7c3aed;$a2:#a78bfa;$a3:#06b6d4;$a4:#10b981;$a5:#f59e0b;$a6:#ef4444;$a7:#ec4899;$a8:#3b82f6;
-// Dim backgrounds
-$ad:rgba(124,58,237,.15);$gd:rgba(16,185,129,.15);$am:rgba(245,158,11,.15);$rd:rgba(239,68,68,.15);$bd:rgba(59,130,246,.15);$cd:rgba(6,182,212,.15);
-// Glows
-$gv:0 0 24px rgba(124,58,237,.3),0 0 60px rgba(124,58,237,.12);$gg:0 0 20px rgba(16,185,129,.25);$gc:0 0 20px rgba(6,182,212,.25);
-// Text
-$t1:#f0f4ff;$t2:#8892b0;$t3:#5a6480;$t4:#3d4460;
-// Borders
-$b1:rgba(124,58,237,.1);$b2:rgba(124,58,237,.2);$b3:rgba(124,58,237,.35);
-// Fonts
-$font:'Outfit',sans-serif;$mono:'DM Mono',monospace;
-// Text sizes
-$txs:.6875rem;$tsm:.8125rem;$tbs:.9375rem;$tlg:1.0625rem;$txl:1.25rem;$t2x:1.5rem;$t3x:1.875rem;$t4x:2.25rem;$t5x:3rem;
-// Weights
+// Arcade Elite — Premium Collector Design Tokens
+$s0:#020617; $s1:#0a1029; $s2:#111c3a; $s3:#1a2a50; $s4:#243666; $glass:rgba(17,28,58,.82);
+$a1:#8b5cf6; $a2:#c4b5fd; $ad:rgba(139,92,246,.18);$gv:0 0 30px rgba(139,92,246,.35),0 0 60px rgba(139,92,246,.15);
+$a3:#22d3ee; $a4:#34d399; $a5:#fbbf24; $a6:#f87171; $a7:#f472b6; $a8:#60a5fa;
+$gd:rgba(52,211,153,.15);$am:rgba(251,191,36,.15);$rd:rgba(248,113,113,.15);$bd:rgba(96,165,250,.15);$cd:rgba(34,211,238,.15);
+$gg:0 0 26px rgba(52,211,153,.3); $gc:0 0 26px rgba(34,211,238,.3);
+$t1:#f8fafc; $t2:#94a3b8; $t3:#64748b; $t4:#475569;
+$b1:rgba(139,92,246,.12); $b2:rgba(139,92,246,.22); $b3:rgba(139,92,246,.4);
+$font:'Outfit',sans-serif; $mono:'DM Mono',monospace;
+$txs:.7rem; $tsm:.825rem; $tbs:.95rem; $tlg:1.1rem; $txl:1.35rem; $t2x:1.6rem; $t3x:2rem; $t4x:2.5rem; $t5x:3.25rem;
 $w3:300;$w4:400;$w5:500;$w6:600;$w7:700;$w8:800;
-// Spacing
-$sp1:.25rem;$sp2:.5rem;$sp3:.75rem;$sp4:1rem;$sp5:1.5rem;$sp6:2rem;$sp8:3rem;
-// Radii
-$r1:10px;$r2:14px;$r3:20px;$r4:28px;$rf:9999px;
-// Shadows
-$es:0 1px 4px rgba(0,0,0,.4);$em:0 4px 20px rgba(0,0,0,.5);$el:0 8px 40px rgba(0,0,0,.6);
-// Layout
-$sw:240px;$th:83px;$mw:1440px;
-// Motion
-$fast:140ms;$med:220ms;$slow:380ms;$e1:cubic-bezier(.16,1,.3,1);$e2:cubic-bezier(.34,1.56,.64,1);
-// Z-index
+$sp1:.25rem;$sp2:.5rem;$sp3:.75rem;$sp4:1rem;$sp5:1.5rem;$sp6:2rem;$sp8:3rem;$sp10:4rem;
+$r1:12px;$r2:16px;$r3:24px;$r4:32px;$rf:9999px;
+$es:0 1px 3px rgba(0,0,0,.5);$em:0 4px 24px rgba(0,0,0,.55);$el:0 8px 48px rgba(0,0,0,.65);
+$sw:260px;$th:88px;$mw:1440px;
+$fast:150ms;$med:240ms;$slow:400ms;$e1:cubic-bezier(.16,1,.3,1);$e2:cubic-bezier(.34,1.56,.64,1);
 $z0:100;$z1:200;$z2:250;$z3:300;$z4:400;
