@@ -1,3 +1,1 @@
-@use '../../styles/variables' as *; @use '../../styles/mixins' as *;
-
-.collection-header{@include fcb;margin-bottom:$s5s;flex-wrap:wrap;gap:$s3s}.collection-count{font-size:$sm;color:$t3;font-family:$mono;strong{color:$t1;font-weight:$w6}}
+@use '../../styles/variables' as *;

@@ -1,48 +1,31 @@
-// ── CYBERPUNK COLLECTOR ELITE — Design Tokens ────────────
-// Surfaces: cosmic void → deep space → orbital panels
-$s0: #020408; $s1: #080c14; $s2: #0e1320; $s3: #151b2c; $s4: #1c2338;
-$glass: rgba(14, 19, 32, 0.72);
-
-// Accents: neon cyberpunk palette
-$violet: #8b5cf6; $violet-bright: #a78bfa; $violet-dim: rgba(139, 92, 246, 0.14); $violet-glow: rgba(139, 92, 246, 0.35);
-$pink: #ec4899; $pink-dim: rgba(236, 72, 153, 0.12); $pink-glow: rgba(236, 72, 153, 0.25);
-$cyan: #06b6d4; $cyan-dim: rgba(6, 182, 212, 0.12);
-$green: #10b981; $green-dim: rgba(16, 185, 129, 0.12);
-$amber: #f59e0b; $amber-dim: rgba(245, 158, 11, 0.12);
-$red: #ef4444; $red-dim: rgba(239, 68, 68, 0.12);
-
+// Neon Arcade — Design Tokens (all valid SCSS identifiers)
+// Surfaces
+$s0:#030409;$s1:#0a0d18;$s2:#111522;$s3:#181d30;$s4:#1f2540;$glass:rgba(17,21,34,.78);
+// Accents
+$a1:#7c3aed;$a2:#a78bfa;$a3:#06b6d4;$a4:#10b981;$a5:#f59e0b;$a6:#ef4444;$a7:#ec4899;$a8:#3b82f6;
+// Dim backgrounds
+$ad:rgba(124,58,237,.15);$gd:rgba(16,185,129,.15);$am:rgba(245,158,11,.15);$rd:rgba(239,68,68,.15);$bd:rgba(59,130,246,.15);$cd:rgba(6,182,212,.15);
+// Glows
+$gv:0 0 24px rgba(124,58,237,.3),0 0 60px rgba(124,58,237,.12);$gg:0 0 20px rgba(16,185,129,.25);$gc:0 0 20px rgba(6,182,212,.25);
 // Text
-$t1: #f0f4ff; $t2: #8892b0; $t3: #5a6480; $t4: #3d4460;
+$t1:#f0f4ff;$t2:#8892b0;$t3:#5a6480;$t4:#3d4460;
 // Borders
-$b1: rgba(139, 92, 246, 0.1); $b2: rgba(139, 92, 246, 0.18); $b3: rgba(139, 92, 246, 0.35);
-
-// Typography
-$font: 'Outfit', -apple-system, sans-serif; $mono: 'DM Mono', monospace;
-$xs:0.6875rem; $sm:0.8125rem; $base:0.9375rem; $lg:1.0625rem; $xl:1.25rem; $x2:1.5rem; $x3:1.875rem; $x4:2.25rem; $x5:3rem;
-$w3:300; $w4:400; $w5:500; $w6:600; $w7:700; $w8:800;
-
+$b1:rgba(124,58,237,.1);$b2:rgba(124,58,237,.2);$b3:rgba(124,58,237,.35);
+// Fonts
+$font:'Outfit',sans-serif;$mono:'DM Mono',monospace;
+// Text sizes
+$txs:.6875rem;$tsm:.8125rem;$tbs:.9375rem;$tlg:1.0625rem;$txl:1.25rem;$t2x:1.5rem;$t3x:1.875rem;$t4x:2.25rem;$t5x:3rem;
+// Weights
+$w3:300;$w4:400;$w5:500;$w6:600;$w7:700;$w8:800;
 // Spacing
-$s1s:0.25rem; $s2s:0.5rem; $s3s:0.75rem; $s4s:1rem; $s5s:1.5rem; $s6s:2rem; $s8s:3rem;
-
+$sp1:.25rem;$sp2:.5rem;$sp3:.75rem;$sp4:1rem;$sp5:1.5rem;$sp6:2rem;$sp8:3rem;
 // Radii
-$r1:10px; $r2:14px; $r3:18px; $r4:24px; $r5:9999px;
-
+$r1:10px;$r2:14px;$r3:20px;$r4:28px;$rf:9999px;
 // Shadows
-$e1:0 1px 3px rgba(0,0,0,0.4); $e2:0 4px 20px rgba(0,0,0,0.5); $e3:0 8px 40px rgba(0,0,0,0.6);
-$g1:0 0 24px rgba(139,92,246,0.25),0 0 48px rgba(139,92,246,0.1);
-$g2:0 0 20px rgba(16,185,129,0.2); $g3:0 0 20px rgba(6,182,212,0.2);
-$gn:0 0 12px rgba(139,92,246,0.5),0 0 30px rgba(139,92,246,0.2),0 0 60px rgba(139,92,246,0.1);
-
+$es:0 1px 4px rgba(0,0,0,.4);$em:0 4px 20px rgba(0,0,0,.5);$el:0 8px 40px rgba(0,0,0,.6);
 // Layout
-$sw:240px; $th:83px;
-
+$sw:240px;$th:83px;$mw:1440px;
 // Motion
-$fast:140ms; $base-d:220ms; $slow:380ms;
-$ease: cubic-bezier(0.16,1,0.3,1); $spring: cubic-bezier(0.34,1.56,0.64,1);
-
-// Z
-$z-sidebar:100; $z-topbar:200; $z-drop:250; $z-over:300; $z-modal:400;
-
-// Breakpoints
-$bp-sm:640px; $bp-md:768px; $bp-lg:1024px; $bp-xl:1280px;
-$max-w:1440px; $cp:1.5rem;
+$fast:140ms;$med:220ms;$slow:380ms;$e1:cubic-bezier(.16,1,.3,1);$e2:cubic-bezier(.34,1.56,.64,1);
+// Z-index
+$z0:100;$z1:200;$z2:250;$z3:300;$z4:400;

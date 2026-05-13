@@ -1,3 +1,1 @@
 @use '../../styles/variables' as *;
-
-.sett-tabs{display:flex;gap:$s1s;margin-bottom:$s5s;border-bottom:1px solid $b1}.sett-tab{display:flex;align-items:center;gap:$s2s;padding:$s3s $s5s;font-size:$sm;font-weight:$w5;color:$t2;border-bottom:2px solid transparent;transition:all $fast;&:hover{color:$t1}&--active{color:$violet-bright;border-bottom-color:$violet}}.sett-tab__icon{font-size:1rem}

@@ -1,3 +1,1 @@
-@use '../../styles/variables' as *; @use '../../styles/mixins' as *;
-
-.edit-game{max-width:640px}.edit-game__form{@include card;padding:$s6s;@include fc;gap:$s4s}.edit-game__section-title{font-size:$xs;font-weight:$w7;text-transform:uppercase;letter-spacing:0.1em;color:$t3;font-family:$mono;margin-top:$s2s;padding-top:$s3s;border-top:1px solid $b1}.edit-game__row{display:grid;grid-template-columns:1fr 1fr;gap:$s4s;@media(max-width:640px){grid-template-columns:1fr}}.edit-game__actions{display:flex;gap:$s3s;justify-content:flex-end;padding-top:$s2s}
+@use '../../styles/variables' as *;
