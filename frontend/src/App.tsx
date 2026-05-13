@@ -15,6 +15,7 @@ import Profile from './pages/Profile/Profile';
 import Settings from './pages/Settings/Settings';
 import AddGame from './pages/AddGame/AddGame';
 import EditGame from './pages/EditGame/EditGame';
+import Notifications from './pages/Notifications/Notifications';
 import NotFound from './pages/NotFound/NotFound';
 
 const App: React.FC = () => {
@@ -54,6 +55,10 @@ const App: React.FC = () => {
           <Route
             path="/edit-game/:id"
             element={<ProtectedRoute><EditGame /></ProtectedRoute>}
+          />
+          <Route
+            path="/notifications"
+            element={<ProtectedRoute><Notifications /></ProtectedRoute>}
           />
           <Route path="*" element={<NotFound />} />
         </Route>

@@ -67,5 +67,32 @@
     }
   }
 
-  &__overlay { display: none; @include respond(md) { display: none; } }
+  &__overlay {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: $z-sticky - 2;
+    @include respond(md) { display: none; }
+  }
+
+  &__notif-bell {
+    position: relative;
+    font-size: 1.125rem;
+    padding: $spacing-xs;
+    color: $color-text-muted;
+    transition: color $transition-fast;
+    &:hover { color: $color-text; }
+  }
+
+  &__notif-badge {
+    position: absolute;
+    top: -2px; right: -4px;
+    background: $color-highlight;
+    color: #fff;
+    font-size: 0.625rem;
+    font-weight: $font-weight-bold;
+    min-width: 16px; height: 16px;
+    border-radius: $radius-full;
+    @include flex-center;
+    line-height: 1;
+  }
 }

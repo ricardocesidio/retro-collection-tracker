@@ -1,0 +1,88 @@
+import {
+  Injectable, NotFoundException, ConflictException,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../social/notifications.service';
+import { CreateReviewDto } from './dto/create-review.dto';
+
+@Injectable()
+export class ReviewsService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
+  ) {}
+
+  async findByGame(gameId: string, params: { page?: number; limit?: number }) {
+    const { page = 1, limit = 20 } = params;
+    const skip = (page - 1) * limit;
+
+    const [reviews, total] = await Promise.all([
+      this.prisma.review.findMany({
+        where: { gameId },
+        include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.review.count({ where: { gameId } }),
+    ]);
+
+    return { data: reviews, total, page, limit, totalPages: Math.ceil(total / limit) };
+  }
+
+  async findByUser(userId: string, params: { page?: number; limit?: number }) {
+    const { page = 1, limit = 20 } = params;
+    const skip = (page - 1) * limit;
+
+    const [reviews, total] = await Promise.all([
+      this.prisma.review.findMany({
+        where: { userId },
+        include: { game: { include: { platform: true, genre: true } } },
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.review.count({ where: { userId } }),
+    ]);
+
+    return { data: reviews, total, page, limit, totalPages: Math.ceil(total / limit) };
+  }
+
+  async create(userId: string, dto: CreateReviewDto) {
+    const existing = await this.prisma.review.findUnique({
+      where: { userId_gameId: { userId, gameId: dto.gameId } },
+    });
+    if (existing) throw new ConflictException('You already reviewed this game');
+
+    const review = await this.prisma.review.create({
+      data: { ...dto, userId },
+      include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
+    });
+
+    this.notifications.notifyNewReview(userId, dto.gameId).catch(() => {});
+
+    return review;
+  }
+
+  async update(userId: string, id: string, dto: Partial<CreateReviewDto>) {
+    const review = await this.prisma.review.findFirst({
+      where: { id, userId },
+    });
+    if (!review) throw new NotFoundException('Review not found');
+
+    return this.prisma.review.update({
+      where: { id },
+      data: dto,
+      include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
+    });
+  }
+
+  async remove(userId: string, id: string) {
+    const review = await this.prisma.review.findFirst({
+      where: { id, userId },
+    });
+    if (!review) throw new NotFoundException('Review not found');
+
+    return this.prisma.review.delete({ where: { id } });
+  }
+}

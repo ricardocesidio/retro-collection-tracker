@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import { notificationsApi } from '../../../services/social';
 import './Header.scss';
 
 const Header: React.FC = () => {
   const { state, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { user } = state;
 
   useEffect(() => {
@@ -14,6 +16,15 @@ const Header: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    notificationsApi.getUnreadCount().then((r) => setUnreadCount(r.count)).catch(() => {});
+    const interval = setInterval(() => {
+      notificationsApi.getUnreadCount().then((r) => setUnreadCount(r.count)).catch(() => {});
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   const navItems = [
     { label: 'Home', path: '/' },
@@ -57,6 +68,10 @@ const Header: React.FC = () => {
         <div className="header__actions">
           {user ? (
             <>
+              <Link to="/notifications" className="header__notif-bell" aria-label="Notifications">
+                🔔
+                {unreadCount > 0 && <span className="header__notif-badge">{unreadCount > 9 ? '9+' : unreadCount}</span>}
+              </Link>
               <Link
                 to={`/profile/${user.username}`}
                 className="header__link"

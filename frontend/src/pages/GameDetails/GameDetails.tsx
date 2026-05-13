@@ -2,38 +2,83 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Badge from '../../components/ui/Badge/Badge';
 import Button from '../../components/ui/Button/Button';
+import Modal from '../../components/ui/Modal/Modal';
+import Input from '../../components/ui/Input/Input';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
-import { gamesApi } from '../../services/collections';
+import Alert from '../../components/ui/Alert/Alert';
+import { gamesApi, collectionApi } from '../../services/collections';
+import { wishlistApi, reviewsApi } from '../../services/social';
+import { useAuth } from '../../context/AuthContext';
 import type { GameData } from '../../services/collections';
+import type { ReviewEntry } from '../../services/social';
 import './GameDetails.scss';
 
 interface GameWithReviews extends GameData {
   avgRating?: number | null;
-  reviews?: Array<{
-    id: string;
-    rating: number;
-    title?: string;
-    body?: string;
-    createdAt: string;
-    user: { id: string; username: string; displayName?: string; avatarUrl?: string };
-  }>;
+  reviews?: ReviewEntry[];
 }
 
 const GameDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { state: authState } = useAuth();
   const [game, setGame] = useState<GameWithReviews | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [actionError, setActionError] = useState('');
+  const [adding, setAdding] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewForm, setReviewForm] = useState({ rating: 5, title: '', body: '' });
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviews, setReviews] = useState<ReviewEntry[]>([]);
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    gamesApi.getById(id)
-      .then((data) => setGame(data as GameWithReviews))
-      .catch((err) => setError(err.message || 'Game not found'))
-      .finally(() => setLoading(false));
+    Promise.all([
+      gamesApi.getById(id).then((data) => setGame(data as GameWithReviews)).catch((err) => setError(err.message || 'Game not found')),
+      reviewsApi.getByGame(id).then((r) => setReviews(r.data)).catch(() => {}),
+    ]).finally(() => setLoading(false));
   }, [id]);
+
+  const handleAddToCollection = async () => {
+    if (!id || !authState.user) return;
+    setAdding(true);
+    setActionError('');
+    try {
+      await collectionApi.create({ gameId: id });
+      setGame((prev) => prev ? { ...prev, _count: { ...prev._count!, collections: (prev._count?.collections || 0) + 1 } } : prev);
+    } catch (err: any) {
+      setActionError(err.message);
+    } finally { setAdding(false); }
+  };
+
+  const handleAddToWishlist = async () => {
+    if (!id || !authState.user) return;
+    setAdding(true);
+    setActionError('');
+    try {
+      await wishlistApi.add(id);
+      setGame((prev) => prev ? { ...prev, _count: { ...prev._count!, wishlists: (prev._count?.wishlists || 0) + 1 } } : prev);
+    } catch (err: any) {
+      setActionError(err.message);
+    } finally { setAdding(false); }
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id) return;
+    setReviewLoading(true);
+    try {
+      const review = await reviewsApi.create(id, reviewForm.rating, reviewForm.title || undefined, reviewForm.body || undefined);
+      setReviews([review, ...reviews]);
+      setGame((prev) => prev ? { ...prev, _count: { ...prev._count!, reviews: (prev._count?.reviews || 0) + 1 } } : prev);
+      setReviewOpen(false);
+      setReviewForm({ rating: 5, title: '', body: '' });
+    } catch (err: any) {
+      setActionError(err.message);
+    } finally { setReviewLoading(false); }
+  };
 
   if (loading) return <LoadingSpinner fullPage message="Loading game details..." />;
 
@@ -51,17 +96,14 @@ const GameDetails: React.FC = () => {
 
   return (
     <div className="page-container">
-      <Link to="/explore" className="game-detail__back">
-        ← Back to Catalog
-      </Link>
+      <Link to="/explore" className="game-detail__back">← Back to Catalog</Link>
+
+      {actionError && <Alert variant="danger" style={{ marginBottom: '1rem' }}>{actionError}</Alert>}
 
       <div className="game-detail">
         <div className="game-detail__image">
           <div className="game-detail__image-wrapper">
-            <img
-              src={game.coverImageUrl || `https://placehold.co/600x800/1a1a30/e0e0e0?text=${encodeURIComponent(game.title)}`}
-              alt={game.title}
-            />
+            <img src={game.coverImageUrl || `https://placehold.co/600x800/1a1a30/e0e0e0?text=${encodeURIComponent(game.title)}`} alt={game.title} />
             <div className="game-detail__image-badge">{game.platform.name}</div>
           </div>
         </div>
@@ -77,32 +119,19 @@ const GameDetails: React.FC = () => {
           </div>
 
           <div className="game-detail__meta-grid">
-            <div className="meta-item">
-              <span className="meta-item__label">Developer</span>
-              <span className="meta-item__value">{game.developer || 'Unknown'}</span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-item__label">Publisher</span>
-              <span className="meta-item__value">{game.publisher || 'Unknown'}</span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-item__label">Platform</span>
-              <span className="meta-item__value">{game.platform.name}</span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-item__label">Genre</span>
-              <span className="meta-item__value">{game.genre.name}</span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-item__label">Release Year</span>
-              <span className="meta-item__value">{game.releaseYear}</span>
-            </div>
-            {game.platform.manufacturer && (
-              <div className="meta-item">
-                <span className="meta-item__label">Manufacturer</span>
-                <span className="meta-item__value">{game.platform.manufacturer}</span>
+            {[
+              ['Developer', game.developer],
+              ['Publisher', game.publisher],
+              ['Platform', game.platform.name],
+              ['Genre', game.genre.name],
+              ['Release Year', String(game.releaseYear)],
+              game.platform.manufacturer ? ['Manufacturer', game.platform.manufacturer] : null,
+            ].filter(Boolean).map((item) => item && (
+              <div key={item[0]} className="meta-item">
+                <span className="meta-item__label">{item[0]}</span>
+                <span className="meta-item__value">{item[1]}</span>
               </div>
-            )}
+            ))}
           </div>
 
           {game.description && (
@@ -115,61 +144,42 @@ const GameDetails: React.FC = () => {
           <div className="game-detail__stats-row">
             <div className="stat-card">
               <div className="stat-card__number">
-                {avgRating ? (
-                  <><span className="stat-card__rating">{avgRating}</span><span className="stat-card__max">/5</span></>
-                ) : (
-                  <span className="stat-card__rating">—</span>
-                )}
+                {avgRating ? <><span className="stat-card__rating">{avgRating}</span><span className="stat-card__max">/5</span></> : <span className="stat-card__rating">—</span>}
               </div>
               <span className="stat-card__label">Avg Rating</span>
             </div>
-            <div className="stat-card">
-              <div className="stat-card__number">
-                <span className="stat-card__rating">{game._count?.collections || 0}</span>
-              </div>
-              <span className="stat-card__label">In Collections</span>
-            </div>
-            <div className="stat-card">
-              <div className="stat-card__number">
-                <span className="stat-card__rating">{game._count?.wishlists || 0}</span>
-              </div>
-              <span className="stat-card__label">Wishlisted</span>
-            </div>
-            <div className="stat-card">
-              <div className="stat-card__number">
-                <span className="stat-card__rating">{game._count?.reviews || 0}</span>
-              </div>
-              <span className="stat-card__label">Reviews</span>
-            </div>
+            <div className="stat-card"><div className="stat-card__number"><span className="stat-card__rating">{game._count?.collections || 0}</span></div><span className="stat-card__label">In Collections</span></div>
+            <div className="stat-card"><div className="stat-card__number"><span className="stat-card__rating">{game._count?.wishlists || 0}</span></div><span className="stat-card__label">Wishlisted</span></div>
+            <div className="stat-card"><div className="stat-card__number"><span className="stat-card__rating">{game._count?.reviews || 0}</span></div><span className="stat-card__label">Reviews</span></div>
           </div>
 
-          <div className="game-detail__actions">
-            <Button variant="primary">Add to Collection</Button>
-            <Button variant="outline">Add to Wishlist</Button>
-          </div>
+          {authState.user && (
+            <div className="game-detail__actions">
+              <Button variant="primary" onClick={handleAddToCollection} loading={adding}>Add to Collection</Button>
+              <Button variant="outline" onClick={handleAddToWishlist} loading={adding}>Add to Wishlist</Button>
+              <Button variant="ghost" onClick={() => setReviewOpen(true)}>Write Review</Button>
+            </div>
+          )}
 
-          {game.reviews && game.reviews.length > 0 && (
-            <div className="game-detail__reviews">
-              <h3 className="game-detail__section-title">
-                Recent Reviews ({game._count?.reviews || 0})
-              </h3>
+          <div className="game-detail__reviews">
+            <div className="game-detail__review-header">
+              <h3 className="game-detail__section-title">Reviews ({game._count?.reviews || 0})</h3>
+              {authState.user && (
+                <Button variant="outline" size="sm" onClick={() => setReviewOpen(true)}>+ Write Review</Button>
+              )}
+            </div>
+            {reviews.length > 0 ? (
               <div className="reviews-list">
-                {game.reviews.map((review) => (
+                {reviews.map((review) => (
                   <div key={review.id} className="review-card">
                     <div className="review-card__header">
                       <div className="review-card__user">
-                        <span className="review-card__avatar">
-                          {review.user.avatarUrl ? (
-                            <img src={review.user.avatarUrl} alt="" />
-                          ) : (
-                            <span className="review-card__avatar-placeholder">
-                              {(review.user.displayName || review.user.username).charAt(0).toUpperCase()}
-                            </span>
-                          )}
+                        <span className="review-card__avatar-placeholder">
+                          {(review.user.displayName || review.user.username).charAt(0).toUpperCase()}
                         </span>
-                        <span className="review-card__username">
+                        <Link to={`/profile/${review.user.username}`} className="review-card__username">
                           {review.user.displayName || review.user.username}
-                        </span>
+                        </Link>
                       </div>
                       <Badge variant="highlight">{review.rating}★</Badge>
                     </div>
@@ -178,10 +188,38 @@ const GameDetails: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-muted" style={{ fontSize: '0.875rem' }}>No reviews yet. Be the first to review!</p>
+            )}
+          </div>
         </div>
       </div>
+
+      <Modal open={reviewOpen} onClose={() => { setReviewOpen(false); setActionError(''); }} title="Write a Review">
+        <form onSubmit={handleSubmitReview} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {actionError && <Alert variant="danger">{actionError}</Alert>}
+          <div className="input-group">
+            <label className="input-group__label">Rating</label>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button key={n} type="button" onClick={() => setReviewForm({ ...reviewForm, rating: n })}
+                  style={{
+                    fontSize: '1.5rem', background: reviewForm.rating >= n ? '#e94560' : 'transparent',
+                    border: `2px solid ${reviewForm.rating >= n ? '#e94560' : '#3a3a5a'}`, borderRadius: '4px',
+                    padding: '0.25rem 0.5rem', cursor: 'pointer', color: reviewForm.rating >= n ? '#fff' : '#6b6b80',
+                  }}
+                >★</button>
+              ))}
+            </div>
+          </div>
+          <Input label="Title (optional)" value={reviewForm.title} onChange={(e) => setReviewForm({ ...reviewForm, title: e.target.value })} placeholder="Sum up your thoughts" />
+          <Input label="Review" type="textarea" value={reviewForm.body} onChange={(e) => setReviewForm({ ...reviewForm, body: e.target.value })} placeholder="Share your experience with this game..." rows={4} />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+            <Button variant="ghost" onClick={() => { setReviewOpen(false); setActionError(''); }}>Cancel</Button>
+            <Button type="submit" variant="primary" loading={reviewLoading}>Submit Review</Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

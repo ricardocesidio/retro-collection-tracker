@@ -75,13 +75,16 @@
     padding: $spacing-md 0;
   }
 
-  &__section-title {
-    font-size: $font-size-lg;
-    font-weight: $font-weight-semibold;
+  &__section-title { font-size: $font-size-lg; font-weight: $font-weight-semibold; }
+
+  &__review-header {
+    @include flex-between;
     margin-bottom: $spacing-md;
     padding-bottom: $spacing-sm;
     border-bottom: 1px solid $color-border;
   }
+
+  &__review-header &__section-title { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
 }
 
 .meta-item {

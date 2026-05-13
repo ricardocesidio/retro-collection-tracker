@@ -68,6 +68,8 @@ async function request(path: string, options: RequestInit = {}) {
 }
 
 export const collectionApi = {
+  getStats: (): Promise<any> => request('/collections/stats'),
+
   list: (params?: Record<string, string>): Promise<PaginatedResponse<CollectionEntry>> => {
     const qs = params ? '?' + new URLSearchParams(params).toString() : '';
     return request(`/collections${qs}`);

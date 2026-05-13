@@ -2,6 +2,7 @@ import {
   Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request,
 } from '@nestjs/common';
 import { CollectionsService } from './collections.service';
+import { StatsService } from './stats.service';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -9,7 +10,15 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @Controller('collections')
 @UseGuards(JwtAuthGuard)
 export class CollectionsController {
-  constructor(private readonly collectionsService: CollectionsService) {}
+  constructor(
+    private readonly collectionsService: CollectionsService,
+    private readonly statsService: StatsService,
+  ) {}
+
+  @Get('stats')
+  async getStats(@Request() req: any) {
+    return this.statsService.getCollectionStats(req.user.id);
+  }
 
   @Get()
   async getUserCollection(

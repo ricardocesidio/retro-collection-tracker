@@ -1,14 +1,18 @@
-
 .profile {
   &__header { display: flex; gap: $spacing-xl; margin-bottom: $spacing-xl; flex-wrap: wrap; @include respond(md) { flex-wrap: nowrap; } }
-  &__avatar { flex-shrink: 0; img { width: 120px; height: 120px; border-radius: $radius-full; border: 3px solid $color-border; } }
+  &__avatar { flex-shrink: 0;
+    img, &-placeholder { width: 120px; height: 120px; border-radius: $radius-full; border: 3px solid $color-border; }
+    &-placeholder { @include flex-center; background: $color-accent-light; font-size: $font-size-3xl; font-weight: $font-weight-bold; color: $color-text; }
+  }
   &__info { flex: 1; }
   &__name { font-size: $font-size-2xl; font-weight: $font-weight-bold; margin-bottom: $spacing-xs; }
-  &__bio { color: $color-text-muted; font-size: $font-size-base; margin-bottom: $spacing-md; max-width: 500px; }
-  &__meta { display: flex; gap: $spacing-lg; margin-bottom: $spacing-md; span { font-size: $font-size-sm; color: $color-text-muted; strong { color: $color-text; } } }
+  &__username { color: $color-text-muted; font-size: $font-size-base; margin-bottom: $spacing-sm; }
+  &__bio { color: $color-text-muted; font-size: $font-size-base; margin-bottom: $spacing-md; max-width: 500px; line-height: 1.6; }
+  &__stats { display: flex; gap: $spacing-lg; margin-bottom: $spacing-md; flex-wrap: wrap; }
+  &__stat { text-align: center; &-value { display: block; font-size: $font-size-xl; font-weight: $font-weight-bold; color: $color-text; } &-label { font-size: $font-size-xs; color: $color-text-muted; } }
   &__actions { display: flex; gap: $spacing-sm; }
-  &__tabs { display: flex; gap: 0; border-bottom: 1px solid $color-border; margin-bottom: $spacing-xl; }
-  &__tab { padding: $spacing-sm $spacing-lg; font-size: $font-size-sm; font-weight: $font-weight-medium; color: $color-text-muted; border-bottom: 2px solid transparent; transition: all $transition-fast; &:hover { color: $color-text; } &--active { color: $color-highlight; border-bottom-color: $color-highlight; } }
+  &__tabs { display: flex; gap: 0; border-bottom: 1px solid $color-border; margin-bottom: $spacing-xl; overflow-x: auto; }
+  &__tab { padding: $spacing-sm $spacing-lg; font-size: $font-size-sm; font-weight: $font-weight-medium; color: $color-text-muted; border-bottom: 2px solid transparent; transition: all $transition-fast; white-space: nowrap; &:hover { color: $color-text; } &--active { color: $color-highlight; border-bottom-color: $color-highlight; } }
   &__grid { @include responsive-grid; }
 }
 
