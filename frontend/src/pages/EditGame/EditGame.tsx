@@ -5,7 +5,7 @@ import Button from '../../components/ui/Button/Button';
 import Alert from '../../components/ui/Alert/Alert';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import { collectionApi, gamesApi } from '../../services/collections';
-import { catalogApi } from '../../services/catalog';
+import { catalogApi } from '../../services/collections';
 import type { Platform, Genre } from '../../services/collections';
 import './EditGame.scss';
 
@@ -60,6 +60,18 @@ const EditGame: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
+
+    const errs: Record<string, string> = {};
+    if (!form.title.trim()) errs.title = 'Title is required';
+    if (!form.releaseYear || isNaN(Number(form.releaseYear)) || Number(form.releaseYear) < 1950 || Number(form.releaseYear) > 2030) {
+      errs.releaseYear = 'Enter a valid year (1950-2030)';
+    }
+    const rating = form.personalRating ? parseInt(form.personalRating) : null;
+    if (rating != null && (isNaN(rating) || rating < 1 || rating > 5)) {
+      errs.personalRating = 'Rating must be 1-5';
+    }
+    if (Object.keys(errs).length > 0) { setError('Please fix the form errors'); return; }
+
     setSaving(true);
     setError('');
 

@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
+import { apiRequest } from '../../services/api-client';
 import './Home.scss';
 
 const Home: React.FC = () => {
+  const [stats, setStats] = useState({ games: 0, platforms: 0, collectors: 0 });
+
+  useEffect(() => {
+    apiRequest('/stats/public').then(setStats).catch(() => {});
+  }, []);
+
+  const formatNum = (n: number) => {
+    if (n >= 1000) return `${Math.floor(n / 1000)},${String(n % 1000).padStart(3, '0')}+`;
+    return `${n}+`;
+  };
+
   return (
     <>
       <section className="hero">
@@ -22,15 +34,15 @@ const Home: React.FC = () => {
         </div>
         <div className="hero__stats">
           <div className="hero__stat">
-            <span className="hero__stat-value">12,000+</span>
+            <span className="hero__stat-value">{formatNum(stats.games)}</span>
             <span className="hero__stat-label">Games Cataloged</span>
           </div>
           <div className="hero__stat">
-            <span className="hero__stat-value">5,500+</span>
+            <span className="hero__stat-value">{formatNum(stats.collectors)}</span>
             <span className="hero__stat-label">Collectors</span>
           </div>
           <div className="hero__stat">
-            <span className="hero__stat-value">850+</span>
+            <span className="hero__stat-value">{stats.platforms}+</span>
             <span className="hero__stat-label">Platforms</span>
           </div>
         </div>

@@ -92,16 +92,18 @@ export class NotificationsService {
       select: { followerId: true },
     });
 
-    for (const f of followers) {
-      await this.create({
+    if (followers.length === 0) return;
+
+    await this.prisma.notification.createMany({
+      data: followers.map((f) => ({
         recipientId: f.followerId,
         senderId: reviewerId,
         type: NotificationType.NEW_REVIEW,
         title: 'New Review',
         body: `${reviewer.displayName || reviewer.username} reviewed ${game.title}`,
         link: `/games/${gameId}`,
-      });
-    }
+      })),
+    });
   }
 
   async notifyWishlistAdded(userId: string, gameId: string) {
@@ -116,15 +118,17 @@ export class NotificationsService {
       select: { followerId: true },
     });
 
-    for (const f of followers) {
-      await this.create({
+    if (followers.length === 0) return;
+
+    await this.prisma.notification.createMany({
+      data: followers.map((f) => ({
         recipientId: f.followerId,
         senderId: userId,
         type: NotificationType.WISHLIST_AVAILABLE,
         title: 'Added to Wishlist',
         body: `${user.displayName || user.username} added ${game.title} to their wishlist`,
         link: `/games/${gameId}`,
-      });
-    }
+      })),
+    });
   }
 }

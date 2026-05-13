@@ -1,82 +1,17 @@
-const API = 'http://localhost:3000/api';
+import { apiRequest } from './api-client';
+import type { Platform, GameData, CollectionEntry, PaginatedResponse } from '../types';
 
-export interface Platform {
-  id: string;
-  name: string;
-  slug: string;
-  manufacturer?: string;
-  releaseYear?: number;
-}
-
-export interface Genre {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-export interface GameData {
-  id: string;
-  title: string;
-  releaseYear: number;
-  developer?: string;
-  publisher?: string;
-  description?: string;
-  coverImageUrl?: string;
-  platform: Platform;
-  genre: Genre;
-  _count?: { collections: number; wishlists: number; reviews: number };
-}
-
-export interface CollectionEntry {
-  id: string;
-  userId: string;
-  gameId: string;
-  condition: string;
-  region: string;
-  notes?: string;
-  personalRating?: number;
-  estimatedValue?: number;
-  ownershipStatus: string;
-  coverImage?: string;
-  acquiredAt?: string;
-  createdAt: string;
-  updatedAt: string;
-  game: GameData;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  totalValue?: number;
-}
-
-async function request(path: string, options: RequestInit = {}) {
-  const token = localStorage.getItem('token');
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...((options.headers as Record<string, string>) || {}),
-  };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-
-  const res = await fetch(`${API}${path}`, { ...options, headers });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Request failed');
-  return data;
-}
+const collectParams = (params?: Record<string, string>) =>
+  params ? '?' + new URLSearchParams(params).toString() : '';
 
 export const collectionApi = {
-  getStats: (): Promise<any> => request('/collections/stats'),
+  getStats: (): Promise<any> => apiRequest('/collections/stats'),
 
-  list: (params?: Record<string, string>): Promise<PaginatedResponse<CollectionEntry>> => {
-    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
-    return request(`/collections${qs}`);
-  },
+  list: (params?: Record<string, string>): Promise<PaginatedResponse<CollectionEntry>> =>
+    apiRequest(`/collections${collectParams(params)}`),
 
   getById: (id: string): Promise<CollectionEntry> =>
-    request(`/collections/${id}`),
+    apiRequest(`/collections/${id}`),
 
   create: (data: {
     gameId: string;
@@ -88,22 +23,20 @@ export const collectionApi = {
     ownershipStatus?: string;
     coverImage?: string;
   }): Promise<CollectionEntry> =>
-    request('/collections', { method: 'POST', body: JSON.stringify(data) }),
+    apiRequest('/collections', { method: 'POST', body: JSON.stringify(data) }),
 
   update: (id: string, data: Record<string, any>): Promise<CollectionEntry> =>
-    request(`/collections/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    apiRequest(`/collections/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
 
   delete: (id: string): Promise<void> =>
-    request(`/collections/${id}`, { method: 'DELETE' }),
+    apiRequest(`/collections/${id}`, { method: 'DELETE' }),
 };
 
 export const gamesApi = {
-  list: (params?: Record<string, string>): Promise<PaginatedResponse<GameData>> => {
-    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
-    return request(`/games${qs}`);
-  },
+  list: (params?: Record<string, string>): Promise<PaginatedResponse<GameData>> =>
+    apiRequest(`/games${collectParams(params)}`),
 
-  getById: (id: string): Promise<GameData> => request(`/games/${id}`),
+  getById: (id: string): Promise<GameData> => apiRequest(`/games/${id}`),
 
   create: (data: {
     title: string;
@@ -115,8 +48,17 @@ export const gamesApi = {
     description?: string;
     coverImageUrl?: string;
   }): Promise<GameData> =>
-    request('/games', { method: 'POST', body: JSON.stringify(data) }),
+    apiRequest('/games', { method: 'POST', body: JSON.stringify(data) }),
 
   update: (id: string, data: Record<string, any>): Promise<GameData> =>
-    request(`/games/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    apiRequest(`/games/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
 };
+
+export type { Genre } from '../types';
+
+export const catalogApi = {
+  getPlatforms: (): Promise<Platform[]> => apiRequest('/games/platforms'),
+  getGenres: (): Promise<Genre[]> => apiRequest('/games/genres'),
+};
+
+export type { Platform, Genre, GameData, CollectionEntry, PaginatedResponse };

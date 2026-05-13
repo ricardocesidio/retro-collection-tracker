@@ -26,7 +26,8 @@ const GameDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [actionError, setActionError] = useState('');
-  const [adding, setAdding] = useState(false);
+  const [addingToCollection, setAddingToCollection] = useState(false);
+  const [addingToWishlist, setAddingToWishlist] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating: 5, title: '', body: '' });
   const [reviewLoading, setReviewLoading] = useState(false);
@@ -34,35 +35,48 @@ const GameDetails: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
+    let cancelled = false;
     setLoading(true);
     Promise.all([
-      gamesApi.getById(id).then((data) => setGame(data as GameWithReviews)).catch((err) => setError(err.message || 'Game not found')),
-      reviewsApi.getByGame(id).then((r) => setReviews(r.data)).catch(() => {}),
-    ]).finally(() => setLoading(false));
+      gamesApi.getById(id),
+      reviewsApi.getByGame(id).then((r) => (cancelled ? null : r)).catch(() => null),
+    ]).then(([data, reviewsRes]) => {
+      if (!cancelled) {
+        setGame(data as GameWithReviews);
+        if (reviewsRes) setReviews(reviewsRes.data);
+        setLoading(false);
+      }
+    }).catch((err) => {
+      if (!cancelled) {
+        setError(err.message || 'Game not found');
+        setLoading(false);
+      }
+    });
+    return () => { cancelled = true; };
   }, [id]);
 
   const handleAddToCollection = async () => {
     if (!id || !authState.user) return;
-    setAdding(true);
+    setAddingToCollection(true);
     setActionError('');
     try {
       await collectionApi.create({ gameId: id });
       setGame((prev) => prev ? { ...prev, _count: { ...prev._count!, collections: (prev._count?.collections || 0) + 1 } } : prev);
     } catch (err: any) {
       setActionError(err.message);
-    } finally { setAdding(false); }
+    } finally { setAddingToCollection(false); }
   };
 
   const handleAddToWishlist = async () => {
     if (!id || !authState.user) return;
-    setAdding(true);
+    setAddingToWishlist(true);
     setActionError('');
     try {
       await wishlistApi.add(id);
       setGame((prev) => prev ? { ...prev, _count: { ...prev._count!, wishlists: (prev._count?.wishlists || 0) + 1 } } : prev);
     } catch (err: any) {
       setActionError(err.message);
-    } finally { setAdding(false); }
+    } finally { setAddingToWishlist(false); }
   };
 
   const handleSubmitReview = async (e: React.FormEvent) => {
@@ -98,7 +112,7 @@ const GameDetails: React.FC = () => {
     <div className="page-container">
       <Link to="/explore" className="game-detail__back">← Back to Catalog</Link>
 
-      {actionError && <Alert variant="danger" style={{ marginBottom: '1rem' }}>{actionError}</Alert>}
+      {actionError && <div style={{ marginBottom: '1rem' }}><Alert variant="danger">{actionError}</Alert></div>}
 
       <div className="game-detail">
         <div className="game-detail__image">
@@ -155,8 +169,8 @@ const GameDetails: React.FC = () => {
 
           {authState.user && (
             <div className="game-detail__actions">
-              <Button variant="primary" onClick={handleAddToCollection} loading={adding}>Add to Collection</Button>
-              <Button variant="outline" onClick={handleAddToWishlist} loading={adding}>Add to Wishlist</Button>
+              <Button variant="primary" onClick={handleAddToCollection} loading={addingToCollection}>Add to Collection</Button>
+              <Button variant="outline" onClick={handleAddToWishlist} loading={addingToWishlist}>Add to Wishlist</Button>
               <Button variant="ghost" onClick={() => setReviewOpen(true)}>Write Review</Button>
             </div>
           )}

@@ -6,6 +6,7 @@ interface CardProps {
   title?: string;
   badge?: string;
   clickable?: boolean;
+  onClick?: () => void;
   footer?: React.ReactNode;
   children: React.ReactNode;
 }
@@ -15,11 +16,26 @@ const Card: React.FC<CardProps> = ({
   title,
   badge,
   clickable = false,
+  onClick,
   footer,
   children,
 }) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (clickable && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      onClick?.();
+    }
+  };
+
   return (
-    <div className={`card${clickable ? ' card--clickable' : ''}`}>
+    <div
+      className={`card${clickable ? ' card--clickable' : ''}`}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onClick={onClick}
+      onKeyDown={clickable ? handleKeyDown : undefined}
+      aria-label={clickable && title ? title : undefined}
+    >
       {imageUrl && (
         <div className="card__image">
           <img src={imageUrl} alt={title || 'Card image'} loading="lazy" />

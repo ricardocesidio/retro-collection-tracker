@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
-import Card from '../../components/ui/Card/Card';
 import Badge from '../../components/ui/Badge/Badge';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
@@ -28,10 +27,21 @@ const Dashboard: React.FC = () => {
   const [activity, setActivity] = useState<any[]>([]);
 
   useEffect(() => {
+    let cancelled = false;
     Promise.all([
-      collectionApi.getStats().then(setStats).catch((err: any) => setError(err.message)),
-      followApi.getActivity({ limit: '5' }).then((r: any) => setActivity(r.data)).catch(() => {}),
-    ]).finally(() => setLoading(false));
+      collectionApi.getStats(),
+      followApi.getActivity({ limit: '5' }),
+    ]).then(([s, a]) => {
+      if (!cancelled) {
+        setStats(s);
+        setActivity(a.data);
+      }
+    }).catch((err: any) => {
+      if (!cancelled) setError(err.message);
+    }).finally(() => {
+      if (!cancelled) setLoading(false);
+    });
+    return () => { cancelled = true; };
   }, []);
 
   if (loading) return <LoadingSpinner fullPage message="Crunching your collection stats..." />;

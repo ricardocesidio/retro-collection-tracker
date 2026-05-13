@@ -17,26 +17,23 @@ export class PrismaExceptionFilter implements ExceptionFilter {
     let message = 'An unexpected database error occurred';
 
     switch (exception.code) {
-      case 'P2002':
+      case 'P2002': {
         status = HttpStatus.CONFLICT;
         const target = (exception.meta?.target as string[]) || [];
-        const fields = target.join(', ');
-        message = `A record with this ${fields} already exists`;
+        message = `A record with this ${target.join(', ')} already exists`;
         break;
-
+      }
       case 'P2025':
         status = HttpStatus.NOT_FOUND;
         message = 'Record not found';
         break;
-
       case 'P2003':
         status = HttpStatus.BAD_REQUEST;
         message = 'Related record not found';
         break;
-
       case 'P2014':
         status = HttpStatus.BAD_REQUEST;
-        message = 'Cannot delete record due to existing references';
+        message = 'Cannot delete due to existing references';
         break;
     }
 

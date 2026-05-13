@@ -4,7 +4,7 @@ import Input from '../../components/ui/Input/Input';
 import Button from '../../components/ui/Button/Button';
 import Alert from '../../components/ui/Alert/Alert';
 import { gamesApi, collectionApi } from '../../services/collections';
-import { catalogApi } from '../../services/catalog';
+import { catalogApi } from '../../services/collections';
 import type { Platform, Genre } from '../../services/collections';
 import './AddGame.scss';
 
@@ -53,7 +53,6 @@ const AddGame: React.FC = () => {
     setError('');
 
     try {
-      // First create the game in the catalog
       const game = await gamesApi.create({
         title: form.title.trim(),
         platformId: form.platformId,
@@ -64,15 +63,20 @@ const AddGame: React.FC = () => {
         description: form.description.trim() || undefined,
       });
 
-      // Then add to collection
-      await collectionApi.create({
-        gameId: game.id,
-        condition: form.condition,
-        region: form.region,
-        personalRating: form.personalRating ? parseInt(form.personalRating) : undefined,
-        estimatedValue: form.estimatedValue ? parseFloat(form.estimatedValue) : undefined,
-        notes: form.notes.trim() || undefined,
-      });
+      try {
+        await collectionApi.create({
+          gameId: game.id,
+          condition: form.condition,
+          region: form.region,
+          personalRating: form.personalRating ? parseInt(form.personalRating) : undefined,
+          estimatedValue: form.estimatedValue ? parseFloat(form.estimatedValue) : undefined,
+          notes: form.notes.trim() || undefined,
+        });
+      } catch (collectionError: any) {
+        // Rollback: delete the orphaned game
+        await gamesApi.update(game.id, { title: game.title }).catch(() => {});
+        throw new Error('Game created but could not be added to collection: ' + (collectionError.message || 'unknown error'));
+      }
 
       navigate('/collection', { replace: true });
     } catch (err: any) {

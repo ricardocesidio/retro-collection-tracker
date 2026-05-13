@@ -1,77 +1,54 @@
-export interface User {
+// ─── Shared Types ─────────────────────────────────────
+
+export interface Platform {
   id: string;
-  email: string;
-  username: string;
-  bio?: string;
-  avatarUrl?: string;
-  createdAt: string;
-  updatedAt: string;
+  name: string;
+  slug: string;
+  manufacturer?: string;
+  releaseYear?: number;
 }
 
-export interface Game {
+export interface Genre {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface GameData {
   id: string;
   title: string;
-  platform: string;
-  genre: string;
   releaseYear: number;
   developer?: string;
   publisher?: string;
   description?: string;
   coverImageUrl?: string;
-  createdAt: string;
-  updatedAt: string;
+  platform: Platform;
+  genre: Genre;
+  _count?: { collections: number; wishlists: number; reviews: number };
 }
 
-export interface Collection {
+export interface CollectionEntry {
   id: string;
   userId: string;
   gameId: string;
-  condition: Condition;
-  region: Region;
+  condition: string;
+  region: string;
   notes?: string;
   personalRating?: number;
   estimatedValue?: number;
-  ownershipStatus: OwnershipStatus;
+  ownershipStatus: string;
   coverImage?: string;
   acquiredAt?: string;
   createdAt: string;
   updatedAt: string;
-  user?: User;
-  game?: Game;
+  game: GameData;
 }
 
-export interface Wishlist {
-  id: string;
-  userId: string;
-  gameId: string;
-  priority: number;
-  notes?: string;
-  addedAt: string;
-  game?: Game;
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  totalValue?: number;
 }
-
-export interface Review {
-  id: string;
-  userId: string;
-  gameId: string;
-  rating: number;
-  title?: string;
-  body?: string;
-  createdAt: string;
-  updatedAt: string;
-  user?: User;
-  game?: Game;
-}
-
-export type OwnershipStatus = 'OWNED' | 'WISHLIST' | 'FOR_SALE' | 'TRADED';
-
-export type Condition =
-  | 'MINT'
-  | 'NEAR_MINT'
-  | 'VERY_GOOD'
-  | 'GOOD'
-  | 'ACCEPTABLE'
-  | 'POOR'
-  | 'MISSING_PARTS';
-
-export type Region = 'NTSC' | 'PAL' | 'NTSC_J' | 'REGION_FREE';

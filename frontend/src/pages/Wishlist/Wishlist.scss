@@ -1,12 +1,3 @@
-.page-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
-.wishlist__grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-@media (min-width: 576px) { .wishlist__grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 768px) { .wishlist__grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 992px) { .wishlist__grid { grid-template-columns: repeat(4, 1fr); } }
+@use 'game-card';
 
-.game-card {
-  &__title { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  &__meta { display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; }
-  &__notes { font-size: 0.75rem; color: #9e9e9e; margin-top: 0.5rem; line-height: 1.4; }
-  &__actions { display: flex; gap: 0.25rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #2a2a4a; }
-}
+.wishlist__grid { @include responsive-grid; }

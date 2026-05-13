@@ -100,6 +100,7 @@ const Header: React.FC = () => {
             className={`header__menu-btn${mobileMenuOpen ? ' header__menu-btn--open' : ''}`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
           >
             <span /><span /><span />
           </button>

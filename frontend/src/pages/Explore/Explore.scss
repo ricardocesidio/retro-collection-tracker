@@ -1,97 +1,14 @@
+@use 'game-card';
+
 .explore {
-  &__hero {
-    text-align: center;
-    padding: $spacing-xl 0 $spacing-lg;
-  }
-
-  &__filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $spacing-md;
-    margin-bottom: $spacing-sm;
-    align-items: flex-end;
-  }
-
-  &__filter-group {
-    display: flex;
-    gap: $spacing-sm;
-    flex-wrap: wrap;
-  }
-
-  &__select {
-    padding: 0.625rem 0.75rem;
-    background: $color-surface-alt;
-    border: 1px solid $color-border;
-    border-radius: $radius-md;
-    color: $color-text;
-    font-size: $font-size-sm;
-    font-family: $font-family;
-    min-width: 150px;
-    cursor: pointer;
-    transition: border-color $transition-fast;
-    &:focus { outline: none; border-color: $color-highlight; }
-
-    &--sort {
-      border-color: $color-border-light;
-      color: $color-highlight;
-      font-weight: $font-weight-medium;
-    }
-  }
-
-  &__results-info {
-    margin-bottom: $spacing-lg;
-    font-size: $font-size-sm;
-  }
-
-  &__grid {
-    @include responsive-grid;
-  }
-
-  &__pagination {
-    @include flex-center;
-    gap: $spacing-lg;
-    padding: $spacing-2xl 0;
-  }
-
-  &__page-info {
-    font-size: $font-size-sm;
-    color: $color-text-muted;
-  }
+  &__hero { text-align: center; padding: $spacing-xl 0 $spacing-lg; }
+  &__filters { display: flex; flex-wrap: wrap; gap: $spacing-md; margin-bottom: $spacing-sm; align-items: flex-end; }
+  &__filter-group { display: flex; gap: $spacing-sm; flex-wrap: wrap; }
+  &__select { padding: 0.625rem 0.75rem; background: $color-surface-alt; border: 1px solid $color-border; border-radius: $radius-md; color: $color-text; font-size: $font-size-sm; font-family: $font-family; min-width: 150px; cursor: pointer; transition: border-color $transition-fast; &:focus { outline: none; border-color: $color-highlight; } &--sort { border-color: $color-border-light; color: $color-highlight; font-weight: $font-weight-medium; } }
+  &__results-info { margin-bottom: $spacing-lg; font-size: $font-size-sm; }
+  &__grid { @include responsive-grid; }
+  &__pagination { @include flex-center; gap: $spacing-lg; padding: $spacing-2xl 0; }
+  &__page-info { font-size: $font-size-sm; color: $color-text-muted; }
 }
 
-.game-card {
-  &__title {
-    font-size: $font-size-base;
-    font-weight: $font-weight-semibold;
-    margin-bottom: $spacing-sm;
-    @include text-truncate;
-    color: $color-text;
-  }
-
-  &__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $spacing-xs;
-    align-items: center;
-  }
-
-  &__footer-info {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: $spacing-sm;
-    padding-top: $spacing-sm;
-    border-top: 1px solid $color-border;
-  }
-
-  &__year {
-    font-size: $font-size-xs;
-    color: $color-text-dim;
-    font-weight: $font-weight-medium;
-  }
-
-  &__count {
-    font-size: $font-size-xs;
-    color: $color-text-muted;
-  }
-}
+.game-card__title { color: $color-text; }

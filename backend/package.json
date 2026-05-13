@@ -83,6 +83,10 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "transformIgnorePatterns": [],
+    "moduleNameMapper": {
+      "^bcryptjs$": "<rootDir>/__mocks__/bcryptjs.js"
+    }
   }
 }

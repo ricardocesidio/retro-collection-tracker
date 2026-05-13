@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+import { apiRequest } from './api-client';
 
 interface AuthResponse {
   user: {
@@ -21,34 +21,9 @@ interface AuthResponse {
   token: string;
 }
 
-async function request(path: string, options: RequestInit = {}) {
-  const token = localStorage.getItem('token');
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...((options.headers as Record<string, string>) || {}),
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers,
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || 'Request failed');
-  }
-
-  return data;
-}
-
 export const authApi = {
   login: (email: string, password: string): Promise<AuthResponse> =>
-    request('/auth/login', {
+    apiRequest('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
@@ -59,15 +34,15 @@ export const authApi = {
     password: string,
     displayName?: string,
   ): Promise<AuthResponse> =>
-    request('/auth/register', {
+    apiRequest('/auth/register', {
       method: 'POST',
       body: JSON.stringify({ email, username, password, displayName }),
     }),
 
-  getProfile: (): Promise<AuthResponse['user']> => request('/auth/me'),
+  getProfile: (): Promise<AuthResponse['user']> => apiRequest('/auth/me'),
 
   getUserByUsername: (username: string): Promise<AuthResponse['user']> =>
-    request(`/users/${username}`),
+    apiRequest(`/users/${username}`),
 };
 
 export type { AuthResponse };

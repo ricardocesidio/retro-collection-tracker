@@ -25,7 +25,15 @@ export class GamesService {
     if (genre) where.genreId = genre;
     if (year) where.releaseYear = year;
 
-    const orderBy: any = this.getOrderBy(sort);
+    const orderBy: any = (() => {
+      switch (sort) {
+        case 'newest': return { releaseYear: 'desc' as const };
+        case 'oldest': return { releaseYear: 'asc' as const };
+        case 'title': return { title: 'asc' as const };
+        case 'popular': return { collections: { _count: 'desc' as const } };
+        default: return { title: 'asc' as const };
+      }
+    })();
 
     const [games, total] = await Promise.all([
       this.prisma.game.findMany({
@@ -51,19 +59,12 @@ export class GamesService {
     };
   }
 
-  private getOrderBy(sort?: string) {
-    switch (sort) {
-      case 'newest':
-        return { releaseYear: 'desc' as const };
-      case 'oldest':
-        return { releaseYear: 'asc' as const };
-      case 'title':
-        return { title: 'asc' as const };
-      case 'popular':
-        return { collections: { _count: 'desc' as const } };
-      default:
-        return { title: 'asc' as const };
-    }
+  async getPlatforms() {
+    return this.prisma.platform.findMany({ orderBy: { name: 'asc' } });
+  }
+
+  async getGenres() {
+    return this.prisma.genre.findMany({ orderBy: { name: 'asc' } });
   }
 
   async findById(id: string) {
@@ -73,7 +74,11 @@ export class GamesService {
         platform: true,
         genre: true,
         reviews: {
-          include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
+          include: {
+            user: {
+              select: { id: true, username: true, displayName: true, avatarUrl: true },
+            },
+          },
           orderBy: { createdAt: 'desc' },
           take: 5,
         },
@@ -98,7 +103,6 @@ export class GamesService {
   }
 
   async update(id: string, dto: UpdateGameDto) {
-    await this.findById(id);
     return this.prisma.game.update({
       where: { id },
       data: dto,
@@ -107,7 +111,6 @@ export class GamesService {
   }
 
   async remove(id: string) {
-    await this.findById(id);
     return this.prisma.game.delete({ where: { id } });
   }
 }

@@ -73,12 +73,14 @@ model User {
   role        UserRole  @default(USER)
   isActive    Boolean   @default(true)
   lastLoginAt DateTime?
+  deletedAt   DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   collections       Collection[]
   wishlists         Wishlist[]
   reviews           Review[]
+  reviewLikes       ReviewLike[]
   followers         Follow[]       @relation("Following")
   following         Follow[]       @relation("Follower")
   activityLogs      ActivityLog[]
@@ -87,6 +89,7 @@ model User {
 
   @@index([email])
   @@index([username])
+  @@index([deletedAt])
   @@map("users")
 }
 
@@ -156,11 +159,12 @@ model Collection {
   updatedAt       DateTime        @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Restrict)
 
   @@unique([userId, gameId])
   @@index([userId])
   @@index([gameId])
+  @@index([estimatedValue])
   @@map("collections")
 }
 
@@ -173,7 +177,7 @@ model Wishlist {
   addedAt  DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Restrict)
 
   @@unique([userId, gameId])
   @@index([userId])
@@ -191,13 +195,29 @@ model Review {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game       Game         @relation(fields: [gameId], references: [id], onDelete: Restrict)
+  reviewLikes ReviewLike[]
 
   @@unique([userId, gameId])
   @@index([gameId])
   @@index([userId])
+  @@index([rating])
   @@map("reviews")
+}
+
+model ReviewLike {
+  id        String   @id @default(uuid())
+  userId    String
+  reviewId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reviewId])
+  @@index([reviewId])
+  @@map("review_likes")
 }
 
 model Follow {
@@ -219,7 +239,9 @@ model ActivityLog {
   id         String       @id @default(uuid())
   userId     String
   type       ActivityType
+  /// ID of the related entity (game, user, etc.). Not a foreign key — targets may be deleted.
   targetId   String?
+  /// Model name of the related entity (e.g. "Game", "User"). Used for polymorphic lookups.
   targetType String?
   message    String?
   metadata   Json?
@@ -228,6 +250,7 @@ model ActivityLog {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt(sort: Desc)])
+  @@index([type])
   @@map("activity_logs")
 }
 

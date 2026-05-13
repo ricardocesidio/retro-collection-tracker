@@ -74,23 +74,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
+    const handleAuthLogout = () => {
+      logout();
+    };
+    window.addEventListener('auth:logout', handleAuthLogout);
+    return () => window.removeEventListener('auth:logout', handleAuthLogout);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
     const loadUser = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
-        dispatch({ type: 'SET_LOADING', payload: false });
+        if (!cancelled) dispatch({ type: 'SET_LOADING', payload: false });
         return;
       }
 
       try {
         const user = await authApi.getProfile();
-        dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
+        if (!cancelled) dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } });
       } catch {
         localStorage.removeItem('token');
-        dispatch({ type: 'LOGOUT' });
+        if (!cancelled) dispatch({ type: 'LOGOUT' });
       }
     };
 
     loadUser();
+    return () => { cancelled = true; };
   }, []);
 
   const login = async (email: string, password: string) => {

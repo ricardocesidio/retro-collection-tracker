@@ -7,8 +7,8 @@ import Input from '../../components/ui/Input/Input';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import Alert from '../../components/ui/Alert/Alert';
-import { collectionApi } from '../../services/collections';
-import { catalogApi } from '../../services/catalog';
+import { collectionApi, catalogApi } from '../../services/collections';
+import { useDebounce } from '../../hooks/useDebounce';
 import type { CollectionEntry, Platform } from '../../services/collections';
 import './Collection.scss';
 
@@ -20,6 +20,7 @@ const Collection: React.FC = () => {
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
   const [platformFilter, setPlatformFilter] = useState('');
   const [conditionFilter, setConditionFilter] = useState('');
   const [platforms, setPlatforms] = useState<Platform[]>([]);
@@ -29,7 +30,7 @@ const Collection: React.FC = () => {
     setError('');
     try {
       const params: Record<string, string> = {};
-      if (search) params.search = search;
+      if (debouncedSearch) params.search = debouncedSearch;
       if (platformFilter) params.platform = platformFilter;
       if (conditionFilter) params.condition = conditionFilter;
 
@@ -42,7 +43,7 @@ const Collection: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [search, platformFilter, conditionFilter]);
+  }, [debouncedSearch, platformFilter, conditionFilter]);
 
   useEffect(() => {
     fetchCollection();

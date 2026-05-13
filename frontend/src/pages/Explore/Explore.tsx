@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../components/ui/Card/Card';
 import Badge from '../../components/ui/Badge/Badge';
@@ -6,10 +6,10 @@ import Input from '../../components/ui/Input/Input';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import Button from '../../components/ui/Button/Button';
-import { gamesApi } from '../../services/collections';
-import { catalogApi } from '../../services/catalog';
+import { gamesApi, catalogApi } from '../../services/collections';
+import { useDebounce } from '../../hooks/useDebounce';
 import type { GameData, Platform } from '../../services/collections';
-import type { Genre } from '../../services/catalog';
+import type { Genre } from '../../services/collections';
 import './Explore.scss';
 
 const Explore: React.FC = () => {
@@ -22,6 +22,7 @@ const Explore: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
   const [platformId, setPlatformId] = useState('');
   const [genreId, setGenreId] = useState('');
   const [sort, setSort] = useState('');
@@ -32,29 +33,30 @@ const Explore: React.FC = () => {
       .catch(() => {});
   }, []);
 
-  const fetchGames = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params: Record<string, string> = { page: String(page), limit: '24' };
-      if (search) params.search = search;
-      if (platformId) params.platform = platformId;
-      if (genreId) params.genre = genreId;
-      if (sort) params.sort = sort;
-
-      const res = await gamesApi.list(params);
-      setGames(res.data);
-      setTotal(res.total);
-      setTotalPages(res.totalPages);
-    } catch {
-      setGames([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search, platformId, genreId, sort]);
-
   useEffect(() => {
-    fetchGames();
-  }, [fetchGames]);
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const params: Record<string, string> = { page: String(page), limit: '24' };
+        if (debouncedSearch) params.search = debouncedSearch;
+        if (platformId) params.platform = platformId;
+        if (genreId) params.genre = genreId;
+        if (sort) params.sort = sort;
+        const res = await gamesApi.list(params);
+        if (!cancelled) {
+          setGames(res.data);
+          setTotal(res.total);
+          setTotalPages(res.totalPages);
+        }
+      } catch {
+        if (!cancelled) setGames([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [page, debouncedSearch, platformId, genreId, sort]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);

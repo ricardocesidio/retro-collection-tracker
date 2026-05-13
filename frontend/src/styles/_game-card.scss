@@ -1,0 +1,14 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.game-card {
+  &__title { font-size: $font-size-base; font-weight: $font-weight-semibold; margin-bottom: $spacing-sm; @include text-truncate; }
+  &__meta { display: flex; flex-wrap: wrap; gap: $spacing-xs; align-items: center; }
+  &__actions { display: flex; gap: $spacing-xs; margin-top: $spacing-sm; padding-top: $spacing-sm; border-top: 1px solid $color-border; }
+  &__value { font-size: $font-size-xs; color: $color-success; font-weight: $font-weight-semibold; margin-left: auto; }
+  &__price { font-size: $font-size-xs; color: $color-warning; font-weight: $font-weight-medium; margin-left: auto; }
+  &__year { font-size: $font-size-xs; color: $color-text-dim; font-weight: $font-weight-medium; }
+  &__count { font-size: $font-size-xs; color: $color-text-muted; }
+  &__notes { font-size: $font-size-xs; color: $color-text-muted; margin-top: $spacing-sm; line-height: 1.4; }
+  &__footer-info { display: flex; align-items: center; justify-content: space-between; margin-top: $spacing-sm; padding-top: $spacing-sm; border-top: 1px solid $color-border; }
+}

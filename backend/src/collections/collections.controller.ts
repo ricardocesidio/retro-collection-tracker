@@ -5,6 +5,7 @@ import { CollectionsService } from './collections.service';
 import { StatsService } from './stats.service';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
+import { CollectionQueryDto } from './dto/collection-query.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('collections')
@@ -23,19 +24,9 @@ export class CollectionsController {
   @Get()
   async getUserCollection(
     @Request() req: any,
-    @Query('search') search?: string,
-    @Query('platform') platform?: string,
-    @Query('condition') condition?: string,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
+    @Query() query: CollectionQueryDto,
   ) {
-    return this.collectionsService.getUserCollection(req.user.id, {
-      search,
-      platform,
-      condition,
-      page: page ? parseInt(page) : 1,
-      limit: limit ? parseInt(limit) : 20,
-    });
+    return this.collectionsService.getUserCollection(req.user.id, query);
   }
 
   @Get(':id')

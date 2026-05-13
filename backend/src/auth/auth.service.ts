@@ -2,12 +2,14 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -108,6 +110,69 @@ export class AuthService {
     }
 
     return this.sanitizeUser(user);
+  }
+
+  async updateProfile(userId: string, dto: UpdateProfileDto) {
+    try {
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          ...(dto.username && { username: dto.username }),
+          ...(dto.displayName !== undefined && { displayName: dto.displayName }),
+          ...(dto.bio !== undefined && { bio: dto.bio }),
+          ...(dto.avatarUrl !== undefined && { avatarUrl: dto.avatarUrl }),
+        },
+      });
+      return this.sanitizeUser(user);
+    } catch (error: any) {
+      if (error.code === 'P2002') {
+        const target = error.meta?.target as string[];
+        if (target?.includes('username')) {
+          throw new ConflictException('Username already taken');
+        }
+      }
+      throw error;
+    }
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+    // Always return success to prevent email enumeration
+    if (!user) return { message: 'If the email exists, a reset link has been sent.' };
+
+    const resetToken = this.jwtService.sign(
+      { sub: user.id, email: user.email, type: 'password-reset' },
+      { expiresIn: '1h' },
+    );
+
+    return {
+      message: 'If the email exists, a reset link has been sent.',
+      resetToken,
+    };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(token);
+    } catch {
+      throw new UnauthorizedException('Invalid or expired reset token');
+    }
+
+    if (payload.type !== 'password-reset') {
+      throw new UnauthorizedException('Invalid reset token');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+
+    await this.prisma.user.update({
+      where: { id: payload.sub },
+      data: { password: passwordHash },
+    });
+
+    return { message: 'Password has been reset successfully.' };
   }
 
   private generateToken(userId: string, email: string): string {

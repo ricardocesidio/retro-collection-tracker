@@ -1,5 +1,4 @@
-
-.page-header { @include flex-between; flex-wrap: wrap; gap: $spacing-md; margin-bottom: $spacing-lg; }
+@use 'page-header';
 
 .form-layout { display: flex; flex-direction: column; gap: $spacing-xl; max-width: 720px; }
 
