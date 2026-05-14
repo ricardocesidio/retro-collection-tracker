@@ -6,6 +6,6 @@
 .stat-card--amber{background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,191,36,.06));border-color:rgba(251,191,36,.25)}.stat-card--amber:hover{border-color:rgba(251,191,36,.4);box-shadow:0 0 0 1px rgba(251,191,36,.3),0 0 24px rgba(251,191,36,.2),$em}.stat-card--amber .stat-card__icon{background:rgba(251,191,36,.2);color:$a5;border-color:rgba(251,191,36,.3)}.stat-card--amber .stat-card__value{color:$a5}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}.stat-card--purple::before{background:$a1}.stat-card--blue::before{background:$a8}.stat-card--green::before{background:$a4}.stat-card--amber::before{background:$a5}
 .stat-card__label{font-size:$txs;font-weight:$w7;color:$t3;text-transform:uppercase;letter-spacing:.1em;order:-1}
-.stat-card__icon{width:52px;height:52px;border-radius:$r1;@include fc;font-size:1.35rem;flex-shrink:0;border:1px solid $b1}
+.stat-card__icon{width:56px;height:56px;border-radius:$r1;@include fc;font-size:1.5rem;flex-shrink:0;border:1px solid $b1}
 .stat-card__value{font-size:$t2x;font-weight:$w8;font-family:$mono;letter-spacing:-.03em;line-height:1.1;margin-top:$sp1}
 .stat-card__trend{font-size:$txs;color:$a4;font-family:$mono;font-weight:$w5}
