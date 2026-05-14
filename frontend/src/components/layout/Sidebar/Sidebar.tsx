@@ -39,7 +39,6 @@ const Sidebar: React.FC = () => {
       {open && <div className="sidebar-overlay" onClick={() => setOpen(false)}/>}
       <aside className={`sidebar${open ? ' sidebar--open' : ''}`}>
         <div className="sidebar__brand">
-          <div><span className="sidebar__title">RetroTracker</span><span className="sidebar__sub">Collector Hub</span></div>
         </div>
         <nav className="sidebar__nav">
           {sections.map((s) => (
