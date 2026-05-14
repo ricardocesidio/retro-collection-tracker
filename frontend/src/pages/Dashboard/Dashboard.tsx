@@ -98,11 +98,6 @@ const Dashboard: React.FC = () => {
           <h1 className="dash-hero__greeting">Welcome back, {authState.user?.displayName || authState.user?.username}</h1>
           <p className="dash-hero__subtitle">Here's your collection overview</p>
         </div>
-        <div className="dash-hero__quick-stats">
-          <div className="dash-hero__stat"><span className="dash-hero__stat-value">{summary.totalGames}</span><span className="dash-hero__stat-label">Games</span></div>
-          <div className="dash-hero__stat"><span className="dash-hero__stat-value">{fmt(summary.totalValue)}</span><span className="dash-hero__stat-label">Value</span></div>
-          <div className="dash-hero__stat"><span className="dash-hero__stat-value">{platformDistribution.length}</span><span className="dash-hero__stat-label">Platforms</span></div>
-        </div>
       </section>
 
       {/* KPI Row */}
