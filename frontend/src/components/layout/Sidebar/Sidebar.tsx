@@ -10,7 +10,7 @@ const Sidebar: React.FC = () => {
 
   const sections = [
     { label: 'Main', items: [
-      { icon:'fa-solid fa-grid-2', label:'Dashboard', path:'/dashboard' },
+      { icon:'fa-solid fa-border-all', label:'Dashboard', path:'/dashboard' },
       { icon:'fa-solid fa-layer-group', label:'Collection', path:'/collection' },
       { icon:'fa-solid fa-bookmark', label:'Wishlist', path:'/wishlist' },
       { icon:'fa-solid fa-compass', label:'Explore', path:'/explore' },
