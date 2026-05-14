@@ -12,9 +12,9 @@ const Sidebar: React.FC = () => {
     { label: 'Main', items: [
       { icon:'fa-solid fa-border-all', label:'Dashboard', path:'/dashboard' },
       { icon:'fa-solid fa-layer-group', label:'Collection', path:'/collection' },
-      { icon:'fa-solid fa-bookmark', label:'Wishlist', path:'/wishlist' },
+      { icon:'fa-solid fa-star', label:'Wishlist', path:'/wishlist' },
       { icon:'fa-solid fa-compass', label:'Explore', path:'/explore' },
-      { icon:'fa-solid fa-star', label:'Reviews', path:'/reviews' },
+      { icon:'fa-solid fa-bookmark', label:'Reviews', path:'/reviews' },
     ]},
     { label: 'Discover', items: [
       { icon:'fa-solid fa-gamepad', label:'Platforms', path:'/platforms' },
