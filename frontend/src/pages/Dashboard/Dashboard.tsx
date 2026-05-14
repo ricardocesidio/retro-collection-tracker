@@ -14,7 +14,7 @@ interface DashboardData {
   platformDistribution: Array<{ name: string; count: number; percentage: number }>;
   genreDistribution: Array<{ name: string; count: number; percentage: number }>;
   conditionDistribution: Array<{ condition: string; count: number; percentage: number }>;
-  recentAdditions: Array<{ id: string; gameId: string; title: string; platform: string; coverImageUrl?: string; condition: string; personalRating?: number; estimatedValue?: number }>;
+  recentAdditions: Array<{ id: string; gameId: string; title: string; platform: string; coverImageUrl?: string; description?: string; condition: string; personalRating?: number; estimatedValue?: number }>;
   recentReviews: Array<{ id: string; gameId: string; gameTitle: string; platform: string; rating: number; title?: string; body?: string }>;
   recentActivity: Array<{ id: string; type: string; message?: string; createdAt: string }>;
   wishlistSpotlight: Array<{ id: string; gameId: string; title: string; platform: string; genre: string; priority: number; coverImageUrl?: string }>;
@@ -83,13 +83,17 @@ const Dashboard: React.FC = () => {
           {/* Recently Added */}
           <div className="panel">
             <div className="panel-header"><h3>Recently Added</h3><Link to="/collection" className="panel-link">View All</Link></div>
-            <div className="dash-additions">
-              {recentAdditions.map((g) => (
-                <Link to={`/games/${g.gameId}`} key={g.id} className="dash-add-item">
-                  <div className="dash-add-item__thumb"><img src={g.coverImageUrl || `https://placehold.co/80x100/141829/f0f4ff?text=${encodeURIComponent(g.title.slice(0,3))}`} alt="" loading="lazy" /></div>
-                  <div className="dash-add-item__info"><span className="dash-add-item__title">{g.title}</span><span className="dash-add-item__meta">{g.platform} · {g.condition.replace('_', ' ')}</span></div>
-                  {g.estimatedValue != null && <span className="dash-add-item__value">{fmt(g.estimatedValue)}</span>}
-                  {g.personalRating && <span className="dash-add-item__rating">★{g.personalRating}</span>}
+            <div className="ra-grid">
+              {recentAdditions.slice(0, 4).map((g) => (
+                <Link to={`/games/${g.gameId}`} key={g.id} className="ra-card">
+                  <div className="ra-card__img">
+                    <img src={g.coverImageUrl || `https://placehold.co/400x240/181d30/f0f4ff?text=${encodeURIComponent(g.title.slice(0,8))}`} alt="" loading="lazy" />
+                  </div>
+                  <div className="ra-card__body">
+                    <span className="ra-card__title">{g.title}</span>
+                    <span className="ra-card__platform">{g.platform}</span>
+                  </div>
+                  <div className="ra-card__score">{g.personalRating || '—'}</div>
                 </Link>
               ))}
             </div>

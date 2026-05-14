@@ -92,6 +92,7 @@ export class StatsService {
         title: item.game.title,
         platform: item.game.platform.name,
         coverImageUrl: item.game.coverImageUrl,
+        description: item.game.description || '',
         condition: item.condition,
         personalRating: item.personalRating,
         estimatedValue: item.estimatedValue,
