@@ -15,7 +15,7 @@
 
 .ra-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
 .ra-card{background:#111522;border:1px solid rgba(124,58,237,.1);border-radius:14px;overflow:hidden;text-decoration:none;color:inherit;transition:all .22s;display:flex;flex-direction:column}.ra-card:hover{transform:translateY(-3px);border-color:rgba(124,58,237,.35);box-shadow:0 0 0 1px rgba(124,58,237,.35),0 0 24px rgba(124,58,237,.25)}
-.ra-card__img{overflow:hidden;background:#181d30}.ra-card__img img{width:100%;aspect-ratio:16/10;object-fit:cover;transition:transform .4s;display:block}.ra-card:hover .ra-card__img img{transform:scale(1.05)}
+.ra-card__img{overflow:hidden;background:#181d30;border-radius:4px 4px 0 0}.ra-card__img img{width:100%;aspect-ratio:10/9;object-fit:cover;transition:transform .4s;display:block}.ra-card:hover .ra-card__img img{transform:scale(1.05)}
 .ra-card__body{padding:.75rem;height:68px;min-height:68px;max-height:68px;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:.5rem;box-sizing:border-box;overflow:hidden}
 .ra-card__text{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column;gap:4px}
 .ra-card__title{font-size:.8125rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;min-width:0}

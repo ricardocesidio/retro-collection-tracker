@@ -14,7 +14,7 @@ interface DashboardData {
   platformDistribution: Array<{ name: string; count: number; percentage: number }>;
   genreDistribution: Array<{ name: string; count: number; percentage: number }>;
   conditionDistribution: Array<{ condition: string; count: number; percentage: number }>;
-  recentAdditions: Array<{ id: string; gameId: string; title: string; platform: string; coverImageUrl?: string; description?: string; condition: string; personalRating?: number; estimatedValue?: number }>;
+  recentAdditions: Array<{ id: string; gameId: string; title: string; platform: string; coverImageUrl?: string; description?: string; condition: string; score?: string | null; estimatedValue?: number }>;
   recentReviews: Array<{ id: string; gameId: string; gameTitle: string; platform: string; rating: number; title?: string; body?: string }>;
   recentActivity: Array<{ id: string; type: string; message?: string; createdAt: string }>;
   wishlistSpotlight: Array<{ id: string; gameId: string; title: string; platform: string; genre: string; priority: number; coverImageUrl?: string }>;
@@ -94,7 +94,7 @@ const Dashboard: React.FC = () => {
                       <span className="ra-card__title">{g.title}</span>
                       <span className="ra-card__platform">{g.platform}</span>
                     </div>
-                    <div className="ra-card__score">{g.personalRating || '—'}</div>
+                    <div className="ra-card__score">{g.score || '—'}</div>
                   </div>
                 </Link>
               ))}
