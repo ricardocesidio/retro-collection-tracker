@@ -24,7 +24,7 @@ export class StatsService {
       this.prisma.collection.aggregate({ ...filter, _sum: { estimatedValue: true }, _avg: { personalRating: true } }),
       this.prisma.collection.groupBy({ by: ['gameId'], ...filter, _count: { gameId: true } }),
       this.prisma.collection.groupBy({ by: ['condition'], ...filter, _count: { condition: true } }),
-      this.prisma.collection.findMany({ ...filter, include: { game: { include: { platform: true, reviews: { select: { rating: true } } } } }, orderBy: { createdAt: 'desc' }, take: 6 }),
+      this.prisma.collection.findMany({ ...filter, include: { game: { include: { platform: true } } }, orderBy: { createdAt: 'desc' }, take: 6 }),
       this.prisma.collection.findFirst({ where: { userId, estimatedValue: { not: null } }, include: { game: { include: { platform: true } } }, orderBy: { estimatedValue: 'desc' } }),
       this.prisma.collection.findFirst({ where: { userId, personalRating: { not: null } }, include: { game: { include: { platform: true } } }, orderBy: { personalRating: 'desc' } }),
       this.prisma.review.findMany({ where: { userId }, include: { game: { include: { platform: true } } }, orderBy: { createdAt: 'desc' }, take: 5 }),
@@ -86,10 +86,7 @@ export class StatsService {
       platformDistribution,
       genreDistribution,
       conditionDistribution,
-      recentAdditions: recentAdditions.map((item) => {
-        const ratings = item.game.reviews.map((r: any) => r.rating);
-        const avg = ratings.length > 0 ? (ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length).toFixed(1) : null;
-        return {
+      recentAdditions: recentAdditions.map((item) => ({
         id: item.id,
         gameId: item.gameId,
         title: item.game.title,
@@ -97,10 +94,10 @@ export class StatsService {
         coverImageUrl: item.game.coverImageUrl,
         description: item.game.description || '',
         condition: item.condition,
-        score: avg,
+        score: item.personalRating != null ? item.personalRating + '.0' : null,
         estimatedValue: item.estimatedValue,
         addedAt: item.createdAt,
-      };}),
+      })),
       recentReviews: recentReviews.map((r) => ({
         id: r.id,
         gameId: r.gameId,
