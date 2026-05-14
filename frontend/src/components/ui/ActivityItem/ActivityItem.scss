@@ -1,1 +1,75 @@
 @use '../../../styles/variables' as *;
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: $sp4;
+  padding: $sp4 $sp3;
+  border-radius: $r1;
+  transition: background $fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, .03);
+  }
+
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    background: $s3;
+    border: 1px solid $b1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .85rem;
+
+    i {
+      color: $t1;
+    }
+  }
+
+  &__msg {
+    flex: 1;
+    color: $t2;
+    font-size: $tsm;
+    line-height: 1.4;
+    min-width: 0;
+  }
+
+  &__highlight {
+    color: $a2;
+    font-weight: $w6;
+  }
+
+  &__time {
+    font-size: $txs;
+    color: $t4;
+    white-space: nowrap;
+    font-family: $mono;
+  }
+}
+
+.activity-btn {
+  display: block;
+  width: 100%;
+  margin-top: $sp4;
+  padding: .5rem .875rem;
+  background: transparent;
+  border: 1px solid $t4;
+  border-radius: 6px;
+  color: $a2;
+  font-size: $txs;
+  font-weight: $w6;
+  font-family: $font;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  transition: border-color $fast, color $fast;
+
+  &:hover {
+    border-color: $a2;
+    color: $a1;
+  }
+}

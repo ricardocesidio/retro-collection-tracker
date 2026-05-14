@@ -2,23 +2,25 @@ import React from 'react';
 import './ReviewCard.scss';
 
 interface ReviewCardProps {
-  rating: number;
-  title: string;
-  body?: string;
-  platform?: string;
+  coverImageUrl?: string | null;
   gameTitle: string;
-  onClick?: () => void;
+  platform: string;
+  rating: number;
 }
 
-const ReviewCard: React.FC<ReviewCardProps> = ({ rating, title, body, platform, gameTitle, onClick }) => {
+const ReviewCard: React.FC<ReviewCardProps> = ({ coverImageUrl, gameTitle, platform, rating }) => {
+  const score = ((rating / 5) * 10).toFixed(1);
   return (
-    <div className="review-card" onClick={onClick} role={onClick ? 'button' : undefined} tabIndex={onClick ? 0 : undefined}>
-      <div className="review-card__stars">{'★'.repeat(rating)}{'☆'.repeat(5 - rating)}</div>
-      <div className="review-card__content">
-        <span className="review-card__title">{title}</span>
-        <span className="review-card__game">{gameTitle}{platform ? ` · ${platform}` : ''}</span>
-        {body && <p className="review-card__body">{body}</p>}
+    <div className="review-card">
+      <div className="review-card__img">
+        <img src={coverImageUrl || `https://placehold.co/80x56/141829/f0f4ff?text=${encodeURIComponent(gameTitle.slice(0, 4))}`} alt="" loading="lazy" />
       </div>
+      <div className="review-card__info">
+        <span className="review-card__title">{gameTitle}</span>
+        <span className="review-card__meta">{platform}</span>
+        <span className="review-card__stars">{'★'.repeat(rating)}{'☆'.repeat(5 - rating)}</span>
+      </div>
+      <div className="review-card__badge">{score}</div>
     </div>
   );
 };

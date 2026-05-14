@@ -229,10 +229,17 @@ async function main() {
   const wishlistData = [
     { username: 'retro_alice', gameTitle: 'EarthBound', priority: 1, notes: 'Must have for the collection' },
     { username: 'retro_alice', gameTitle: 'Panzer Dragoon Saga', priority: 2 },
+    { username: 'retro_alice', gameTitle: 'Snatcher', priority: 2, notes: 'Love Hideo Kojima' },
+    { username: 'retro_alice', gameTitle: 'Shenmue', priority: 3 },
+    { username: 'retro_alice', gameTitle: 'Final Fantasy X', priority: 3 },
+    { username: 'retro_alice', gameTitle: 'Jet Set Radio', priority: 4 },
     { username: 'bob_collector', gameTitle: 'Radiant Silvergun', priority: 1 },
     { username: 'bob_collector', gameTitle: 'Shining Force III', priority: 2 },
+    { username: 'bob_collector', gameTitle: 'Chrono Trigger', priority: 3 },
     { username: 'retro_charlie', gameTitle: 'Castlevania: Aria of Sorrow', priority: 1 },
+    { username: 'retro_charlie', gameTitle: 'MUSHA', priority: 2 },
     { username: 'diana_gamer', gameTitle: 'The Legend of Zelda', priority: 1 },
+    { username: 'diana_gamer', gameTitle: 'EarthBound', priority: 2 },
   ];
 
   let wishlistCount = 0;
@@ -322,7 +329,9 @@ async function main() {
   const activityLogs = [
     { username: 'retro_alice', type: ActivityType.ADDED_GAME, message: 'Added Super Metroid to collection' },
     { username: 'retro_alice', type: ActivityType.ADDED_REVIEW, message: 'Reviewed Super Metroid — 5 stars' },
+    { username: 'retro_alice', type: ActivityType.FOLLOWED_USER, message: 'bob_collector started following you' },
     { username: 'bob_collector', type: ActivityType.ADDED_GAME, message: 'Added Sonic the Hedgehog 2 to collection' },
+    { username: 'bob_collector', type: ActivityType.FOLLOWED_USER, message: 'retro_charlie started following you' },
     { username: 'retro_charlie', type: ActivityType.CREATED_ACCOUNT, message: 'Joined Retro Collection Tracker' },
   ];
 

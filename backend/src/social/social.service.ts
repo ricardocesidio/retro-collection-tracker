@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { ActivityType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from './notifications.service';
 
@@ -27,6 +28,15 @@ export class SocialService {
     });
 
     await this.notificationsService.notifyNewFollower(followerId, followingId);
+
+    const follower = await this.prisma.user.findUnique({ where: { id: followerId } });
+    await this.prisma.activityLog.create({
+      data: {
+        userId: followingId,
+        type: ActivityType.FOLLOWED_USER,
+        message: `${follower?.displayName || follower?.username || 'Someone'} started following you`,
+      },
+    });
 
     return follow;
   }

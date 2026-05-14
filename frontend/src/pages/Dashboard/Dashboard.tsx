@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import StatCard from '../../components/ui/StatCard/StatCard';
 import ActivityItem from '../../components/ui/ActivityItem/ActivityItem';
-import ReviewCard from '../../components/ui/ReviewCard/ReviewCard';
 import ProgressCard from '../../components/ui/ProgressCard/ProgressCard';
 import { collectionApi } from '../../services/collections';
 import { useAuth } from '../../context/AuthContext';
@@ -15,7 +14,7 @@ interface DashboardData {
   genreDistribution: Array<{ name: string; count: number; percentage: number }>;
   conditionDistribution: Array<{ condition: string; count: number; percentage: number }>;
   recentAdditions: Array<{ id: string; gameId: string; title: string; platform: string; coverImageUrl?: string; description?: string; condition: string; score?: string | null; estimatedValue?: number }>;
-  recentReviews: Array<{ id: string; gameId: string; gameTitle: string; platform: string; rating: number; title?: string; body?: string }>;
+  recentReviews: Array<{ id: string; gameId: string; gameTitle: string; platform: string; coverImageUrl?: string | null; rating: number; title?: string; body?: string }>;
   recentActivity: Array<{ id: string; type: string; message?: string; createdAt: string }>;
   wishlistSpotlight: Array<{ id: string; gameId: string; title: string; platform: string; genre: string; priority: number; coverImageUrl?: string }>;
   highlights: { mostValuable: any; highestRated: any };
@@ -57,8 +56,39 @@ const Dashboard: React.FC = () => {
   const otherPct = platformDistribution.slice(5).reduce((s, p) => s + p.percentage, 0);
   const otherCount = platformDistribution.slice(5).reduce((s, p) => s + p.count, 0);
   const platformSlices = otherPct > 0 ? [...platformTop5, { name: 'Other', count: otherCount, percentage: otherPct }] : platformTop5;
+  const genreColors: Record<string, string> = {
+    'RPG': 'linear-gradient(90deg, #f59e0b, #d97706)',
+    'Action': 'linear-gradient(90deg, #ec4899, #f472b6)',
+    'Platformer': 'linear-gradient(90deg, #60a5fa, #93c5fd)',
+    'Adventure': 'linear-gradient(90deg, #f87171, #fca5a5)',
+    'Fighting': 'linear-gradient(90deg, #3b82f6, #60a5fa)',
+    'Shooter': 'linear-gradient(90deg, #6366f1, #818cf8)',
+    'Puzzle': 'linear-gradient(90deg, #34d399, #6ee7b7)',
+    'Sports': 'linear-gradient(90deg, #fb923c, #fdba74)',
+    'Strategy': 'linear-gradient(90deg, #a78bfa, #c4b5fd)',
+    'Horror': 'linear-gradient(90deg, #ef4444, #f87171)',
+    "Beat 'em Up": 'linear-gradient(90deg, #84cc16, #a3e635)',
+    'Other': 'linear-gradient(90deg, #7c3aed, #a78bfa)',
+  };
+  const genreTop5 = genreDistribution.slice(0, 5);
+  const genreOtherPct = genreDistribution.slice(5).reduce((s, g) => s + g.percentage, 0);
+  const genreSlices = genreOtherPct > 0 ? [...genreTop5, { name: 'Other', percentage: genreOtherPct }] : genreTop5;
   const getPColor = (name: string, i: number): string => pColorMap[name] || pColors[i % 8];
-  const aIcons: Record<string, string> = { ADDED_GAME: 'fa-solid fa-plus', ADDED_REVIEW: 'fa-solid fa-star', ADDED_WISHLIST: 'fa-solid fa-bookmark', CREATED_ACCOUNT: 'fa-solid fa-user-plus' };
+  const aIcons: Record<string, string> = { ADDED_GAME: 'fa-solid fa-plus', ADDED_REVIEW: 'fa-solid fa-star', ADDED_WISHLIST: 'fa-solid fa-bookmark', CREATED_ACCOUNT: 'fa-solid fa-user-plus', FOLLOWED_USER: 'fa-solid fa-user-plus' };
+  const aBg: Record<string, string> = { ADDED_GAME: '#059669', ADDED_REVIEW: '#d97706', ADDED_WISHLIST: '#3b82f6', CREATED_ACCOUNT: '#7c3aed', FOLLOWED_USER: '#ec4899' };
+  const parseActivity = (type: string, msg: string): { highlight: string; text: string } => {
+    if (type === 'ADDED_GAME') { const m = msg.match(/^Added (.+?) to collection$/); return m ? { highlight: m[1], text: 'added to collection' } : { highlight: '', text: msg }; }
+    if (type === 'ADDED_REVIEW') { const m = msg.match(/^Reviewed (.+?) — (.+)$/); return m ? { highlight: m[1], text: `reviewed — ${m[2]}` } : { highlight: '', text: msg }; }
+    if (type === 'ADDED_WISHLIST') { const m = msg.match(/^Added (.+?) to wishlist$/); return m ? { highlight: m[1], text: 'added to wishlist' } : { highlight: '', text: msg }; }
+    if (type === 'FOLLOWED_USER') { const m = msg.match(/^(.+?) started following you$/); return m ? { highlight: m[1], text: 'started following you' } : { highlight: '', text: msg }; }
+    if (type === 'CREATED_ACCOUNT') return { highlight: '', text: msg };
+    return { highlight: '', text: msg };
+  };
+  const relTime = (dateStr: string): string => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000); const hrs = Math.floor(diff / 3600000); const days = Math.floor(diff / 86400000);
+    if (mins < 1) return 'just now'; if (mins < 60) return `${mins}m ago`; if (hrs < 24) return `${hrs}h ago`; if (days < 30) return `${days}d ago`; return new Date(dateStr).toLocaleDateString();
+  };
 
   return (
     <div className={`dash${visible ? ' dash--visible' : ''}`}>
@@ -116,18 +146,30 @@ const Dashboard: React.FC = () => {
               </select>
             </div>
             <div className="dash-value-chart">
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', height: '120px', padding: '0.5rem 0' }}>
-                {['Jan','Feb','Mar','Apr','May','Jun'].map((m, i) => {
-                  const h = 20 + Math.random() * 80;
-                  return (
-                    <div key={m} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                      <span style={{ fontSize: '0.625rem', fontFamily: 'DM Mono', color: '#5a6480' }}>{fmt(Math.round(summary.totalValue * (0.7 + i * 0.06)))}</span>
-                      <div style={{ width: '100%', height: `${h}px`, background: 'linear-gradient(180deg, #7c3aed, rgba(124,58,237,0.1))', borderRadius: '4px 4px 0 0', minWidth: '20px' }} />
-                      <span style={{ fontSize: '0.625rem', color: '#5a6480', fontFamily: 'DM Mono' }}>{m}</span>
-                    </div>
-                  );
+              <svg viewBox="0 0 600 200" className="dash-value-svg" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                  <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#d946ef" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#d946ef" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                {[0, 5000, 10000, 15000].map(v => {
+                  const gy = 170 - (v * 160 / 15000);
+                  return <line key={v} x1="60" y1={gy} x2="580" y2={gy} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />;
                 })}
-              </div>
+                {[0, 5000, 10000, 15000].map(v => (
+                  <text key={v} x="50" y={170 - (v * 160 / 15000) + 4} textAnchor="end" fill="#5a6480" fontSize="10" fontFamily="DM Mono, monospace">${v >= 1000 ? (v / 1000) + 'k' : v}</text>
+                ))}
+                <polygon fill="url(#areaGrad)" points="60,170 60,157.2 164,108.1 268,114.5 372,70.8 476,54.8 580,31.3 580,170" />
+                <polyline points="60,157.2 164,108.1 268,114.5 372,70.8 476,54.8 580,31.3" fill="none" stroke="#d946ef" strokeWidth="2" strokeLinejoin="round" />
+                {[[60,157.2],[164,108.1],[268,114.5],[372,70.8],[476,54.8],[580,31.3]].map(([cx,cy],i) => (
+                  <circle key={i} cx={cx} cy={cy} r="4" fill="#d946ef" stroke="#0f111a" strokeWidth="1.5" />
+                ))}
+                {['Dec','Jan','Feb','Mar','Apr','May'].map((m,i) => {
+                  const tx = 60 + i * 104;
+                  return <g key={m}><line x1={tx} y1={170} x2={tx} y2={175} stroke="#5a6480" strokeWidth="1" /><text x={tx} y={190} textAnchor="middle" fill="#5a6480" fontSize="10" fontFamily="DM Mono, monospace">{m}</text></g>;
+                })}
+              </svg>
             </div>
           </div>
 
@@ -135,7 +177,21 @@ const Dashboard: React.FC = () => {
           <div className="panel">
             <div className="panel-header"><h3>Recent Reviews</h3><Link to="/reviews" className="panel-link">View All</Link></div>
             {recentReviews.length === 0 ? <p style={{ fontSize: '0.8125rem', color: '#5a6480' }}>No reviews yet.</p> : (
-              recentReviews.map((r) => <ReviewCard key={r.id} rating={r.rating} title={r.title || 'Untitled'} body={r.body} gameTitle={r.gameTitle} platform={r.platform} />)
+              <>
+                {recentReviews.slice(0, 3).map((r) => (
+                  <Link to={`/games/${r.gameId}`} key={r.id} className="rev-card">
+                    <div className="rev-card__img">
+                      <img src={r.coverImageUrl || `https://placehold.co/80x56/141829/f0f4ff?text=${encodeURIComponent(r.gameTitle.slice(0, 4))}`} alt="" loading="lazy" />
+                    </div>
+                    <div className="rev-card__info">
+                      <span className="rev-card__title">{r.gameTitle}</span>
+                      <span className="rev-card__platform">{r.platform}</span>
+                      <span className="rev-card__stars">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>
+                    </div>
+                    <div className="rev-card__badge">{(r.rating / 5 * 10).toFixed(1)}</div>
+                  </Link>
+                ))}
+              </>
             )}
           </div>
         </div>
@@ -169,7 +225,22 @@ const Dashboard: React.FC = () => {
           <div className="panel">
             <div className="panel-header"><h3>Recent Activity</h3></div>
             {recentActivity.length === 0 ? <p style={{ fontSize: '0.8125rem', color: '#5a6480' }}>No activity yet.</p> : (
-              recentActivity.map((a) => <ActivityItem key={a.id} icon={aIcons[a.type] || "fa-solid fa-bookmark"} message={a.message || a.type.replace('_', ' ')} timestamp={new Date(a.createdAt).toLocaleDateString()} />)
+              <>
+                {recentActivity.slice(0, 4).map((a) => {
+                  const parsed = parseActivity(a.type, a.message || a.type.replace('_', ' '));
+                  return (
+                    <ActivityItem
+                      key={a.id}
+                      icon={aIcons[a.type] || 'fa-solid fa-bookmark'}
+                      iconBg={aBg[a.type] || '#6366f1'}
+                      message={parsed.text}
+                      highlight={parsed.highlight || undefined}
+                      timestamp={relTime(a.createdAt)}
+                    />
+                  );
+                })}
+                <Link to="/activity" className="activity-btn">View All Activity</Link>
+              </>
             )}
           </div>
 
@@ -177,8 +248,8 @@ const Dashboard: React.FC = () => {
           <div className="panel">
             <div className="panel-header"><h3>Top Genres</h3></div>
             <div className="dash-bars">
-              {genreDistribution.slice(0, 5).map((g) => (
-                <ProgressCard key={g.name} label={g.name} value={g.count} max={summary.totalGames} color={pColors[genreDistribution.indexOf(g) % 8]} />
+              {genreSlices.map((g) => (
+                <ProgressCard key={g.name} label={g.name} percentage={g.percentage} color={genreColors[g.name] || genreColors.Other} />
               ))}
             </div>
           </div>

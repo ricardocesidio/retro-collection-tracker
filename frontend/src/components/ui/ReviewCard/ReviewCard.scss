@@ -1,1 +1,75 @@
 @use '../../../styles/variables' as *;
+
+.review-card {
+  display: flex;
+  align-items: center;
+  gap: $sp4;
+  padding: $sp4 0;
+  border-bottom: 1px solid $b1;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &__img {
+    width: 80px;
+    height: 56px;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: $s3;
+    border: 1px solid $b1;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  &__title {
+    font-size: $tsm;
+    font-weight: $w7;
+    color: $t1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__meta {
+    font-size: $txs;
+    color: $t3;
+    font-family: $mono;
+  }
+
+  &__stars {
+    font-size: .65rem;
+    color: $a5;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  &__badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: $a1;
+    color: #fff;
+    font-family: $mono;
+    font-size: $txs;
+    font-weight: $w8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 16px $ad;
+  }
+}

@@ -103,6 +103,7 @@ export class StatsService {
         gameId: r.gameId,
         gameTitle: r.game.title,
         platform: r.game.platform.name,
+        coverImageUrl: r.game.coverImageUrl,
         rating: r.rating,
         title: r.title,
         body: r.body,
