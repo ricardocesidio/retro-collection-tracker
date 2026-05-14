@@ -90,10 +90,12 @@ const Dashboard: React.FC = () => {
                     <img src={g.coverImageUrl || `https://placehold.co/400x240/181d30/f0f4ff?text=${encodeURIComponent(g.title.slice(0,8))}`} alt="" loading="lazy" />
                   </div>
                   <div className="ra-card__body">
-                    <span className="ra-card__title">{g.title}</span>
-                    <span className="ra-card__platform">{g.platform}</span>
+                    <div className="ra-card__text">
+                      <span className="ra-card__title">{g.title}</span>
+                      <span className="ra-card__platform">{g.platform}</span>
+                    </div>
+                    <div className="ra-card__score">{g.personalRating || '—'}</div>
                   </div>
-                  <div className="ra-card__score">{g.personalRating || '—'}</div>
                 </Link>
               ))}
             </div>
