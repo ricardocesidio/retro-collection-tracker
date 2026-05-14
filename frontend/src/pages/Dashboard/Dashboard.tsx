@@ -51,7 +51,13 @@ const Dashboard: React.FC = () => {
 
   const { summary, platformDistribution, genreDistribution, recentAdditions, recentReviews, recentActivity, wishlistSpotlight, highlights } = data;
   const fmt = (v: number) => '$' + v.toLocaleString();
-  const pColors = ['#7c3aed', '#3b82f6', '#059669', '#d97706', '#ec4899', '#06b6d4', '#ef4444', '#6366f1'];
+  const pColors = ['#7c3aed', '#a78bfa', '#3b82f6', '#d97706', '#f59e0b', '#06b6d4', '#ec4899', '#6366f1'];
+  const pColorMap: Record<string, string> = { 'PlayStation': '#7c3aed', 'SNES': '#ec4899', 'NES': '#3b82f6', 'Sega Genesis': '#d97706', 'Nintendo 64': '#f59e0b', 'Game Boy': '#06b6d4', 'Game Boy Advance': '#6366f1', 'Sega Saturn': '#a78bfa', 'Atari 2600': '#f87171', 'PC Engine': '#84cc16', 'Other': '#059669' };
+  const platformTop5 = platformDistribution.slice(0, 5);
+  const otherPct = platformDistribution.slice(5).reduce((s, p) => s + p.percentage, 0);
+  const otherCount = platformDistribution.slice(5).reduce((s, p) => s + p.count, 0);
+  const platformSlices = otherPct > 0 ? [...platformTop5, { name: 'Other', count: otherCount, percentage: otherPct }] : platformTop5;
+  const getPColor = (name: string, i: number): string => pColorMap[name] || pColors[i % 8];
   const aIcons: Record<string, string> = { ADDED_GAME: 'fa-solid fa-plus', ADDED_REVIEW: 'fa-solid fa-star', ADDED_WISHLIST: 'fa-solid fa-bookmark', CREATED_ACCOUNT: 'fa-solid fa-user-plus' };
 
   return (
@@ -136,15 +142,24 @@ const Dashboard: React.FC = () => {
 
         <div className="dash-col">
           {/* Collection by Platform */}
-          <div className="panel">
+          <div className="panel panel--platform">
             <div className="panel-header"><h3>Collection by Platform</h3></div>
-            <div className="dash-donut-wrap">
-              <div className="dash-donut" style={{ background: `conic-gradient(${platformDistribution.map((p, i) => `${pColors[i % 8]} ${i === 0 ? 0 : platformDistribution.slice(0, i).reduce((a, b) => a + b.percentage, 0)}% ${platformDistribution.slice(0, i + 1).reduce((a, b) => a + b.percentage, 0)}%`).join(',')})` }}>
-                <div className="dash-donut__center"><span className="dash-donut__center-value">{summary.totalGames}</span><span className="dash-donut__center-label">Games</span></div>
+            <div className="dash-platform-body">
+              <div className="dash-platform-chart">
+                <div className="dash-donut" style={{ background: `conic-gradient(${platformSlices.map((p, i) => `${getPColor(p.name, i)} ${i === 0 ? 0 : platformSlices.slice(0, i).reduce((a, b) => a + b.percentage, 0)}% ${platformSlices.slice(0, i + 1).reduce((a, b) => a + b.percentage, 0)}%`).join(',')})` }}>
+                  <div className="dash-donut__center">
+                    <span className="dash-donut__center-value">{summary.totalGames}</span>
+                    <span className="dash-donut__center-label">Total</span>
+                  </div>
+                </div>
               </div>
-              <div className="dash-legend">
-                {platformDistribution.slice(0, 6).map((p, i) => (
-                  <div key={p.name} className="dash-legend__item"><span className="dash-legend__dot" style={{ background: pColors[i % 8] }} /><span className="dash-legend__name">{p.name}</span><span className="dash-legend__pct">{p.percentage}%</span></div>
+              <div className="dash-platform-legend">
+                {platformSlices.map((p, i) => (
+                  <Link to={p.name === 'Other' ? '/collection' : `/explore?platform=${encodeURIComponent(p.name)}`} key={p.name} className="dash-platform-legend__row">
+                    <span className="dash-platform-legend__dot" style={{ background: getPColor(p.name, i) }} />
+                    <span className="dash-platform-legend__name">{p.name}</span>
+                    <span className="dash-platform-legend__pct">{p.percentage}%</span>
+                  </Link>
                 ))}
               </div>
             </div>

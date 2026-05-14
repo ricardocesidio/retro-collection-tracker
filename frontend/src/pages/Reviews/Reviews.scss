@@ -1,0 +1,40 @@
+@use '../../styles/variables' as *;
+
+.revs-list {
+  display: flex;
+  flex-direction: column;
+  gap: $sp2;
+}
+
+.revs-item {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  padding: $sp4 $sp5;
+  transition: background $fast;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  &__user {
+    font-weight: $w6;
+    font-size: $tsm;
+    color: $t1;
+  }
+
+  &__title {
+    font-size: $tsm;
+    font-weight: $w5;
+    margin-bottom: 4px;
+    color: $t1;
+  }
+
+  &__body {
+    font-size: $tsm;
+    color: $t2;
+    line-height: 1.5;
+  }
+}

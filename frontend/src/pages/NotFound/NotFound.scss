@@ -1,0 +1,44 @@
+@use '../../styles/variables' as *;
+
+.notfound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: $sp6;
+
+  &__code {
+    font-size: 6rem;
+    font-weight: $w8;
+    color: $a1;
+    line-height: 1;
+    font-family: $mono;
+    letter-spacing: -.04em;
+    margin-bottom: $sp2;
+  }
+
+  &__title {
+    font-size: $t2x;
+    font-weight: $w7;
+    margin-bottom: $sp2;
+    letter-spacing: -.01em;
+    color: $t1;
+  }
+
+  &__text {
+    color: $t2;
+    margin-bottom: $sp6;
+    max-width: 400px;
+    line-height: 1.6;
+    font-size: $tbs;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $sp3;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

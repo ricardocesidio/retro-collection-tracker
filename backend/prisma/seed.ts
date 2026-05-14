@@ -92,6 +92,10 @@ async function main() {
     { title: 'Gran Turismo', platform: 'playstation', genre: 'racing', releaseYear: 1997, developer: 'Polyphony Digital', publisher: 'Sony', description: 'A revolutionary racing simulator.' },
     { title: 'Adventure', platform: 'atari-2600', genre: 'adventure', releaseYear: 1980, developer: 'Atari', publisher: 'Atari', description: 'One of the earliest action-adventure games.' },
     { title: 'Bonk\'s Adventure', platform: 'pc-engine', genre: 'platformer', releaseYear: 1990, developer: 'Red Company', publisher: 'NEC', description: 'A caveman-themed platformer starring Bonk.' },
+    { title: 'Shenmue', platform: 'sega-dreamcast', genre: 'adventure', releaseYear: 1999, developer: 'Sega AM2', publisher: 'Sega', description: 'Ryo Hazuki seeks revenge in this groundbreaking open-world adventure.' },
+    { title: 'Jet Set Radio', platform: 'sega-dreamcast', genre: 'action', releaseYear: 2000, developer: 'Smilebit', publisher: 'Sega', description: 'Cel-shaded skating graffiti action in Tokyo-to.' },
+    { title: 'Shadow of the Colossus', platform: 'playstation-2', genre: 'adventure', releaseYear: 2005, developer: 'Team Ico', publisher: 'Sony', description: 'A lone warrior battles colossal beings to revive a fallen maiden.' },
+    { title: 'Final Fantasy X', platform: 'playstation-2', genre: 'rpg', releaseYear: 2001, developer: 'Square', publisher: 'Square', description: 'Tidus and Yuna\'s pilgrimage to defeat Sin in the first PS2 Final Fantasy.' },
   ];
 
   const games: Record<string, string> = {};
@@ -157,23 +161,44 @@ async function main() {
     { username: 'retro_alice', gameTitle: 'Donkey Kong Country', condition: Condition.VERY_GOOD, region: Region.NTSC, personalRating: 4, estimatedValue: 85.00 },
     { username: 'retro_alice', gameTitle: 'Mega Man X', condition: Condition.GOOD, region: Region.NTSC, personalRating: 4, estimatedValue: 120.00 },
     { username: 'retro_alice', gameTitle: 'EarthBound', condition: Condition.GOOD, region: Region.NTSC, personalRating: 5, estimatedValue: 400.00 },
+    { username: 'retro_alice', gameTitle: 'The Legend of Zelda', condition: Condition.MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 150.00 },
+    { username: 'retro_alice', gameTitle: 'Metroid', condition: Condition.VERY_GOOD, region: Region.NTSC, personalRating: 4, estimatedValue: 95.00 },
+    { username: 'retro_alice', gameTitle: 'Super Mario 64', condition: Condition.NEAR_MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 130.00 },
+    { username: 'retro_alice', gameTitle: 'Castlevania: Aria of Sorrow', condition: Condition.MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 110.00 },
+    { username: 'retro_alice', gameTitle: 'Tetris', condition: Condition.VERY_GOOD, region: Region.NTSC, personalRating: 3, estimatedValue: 15.00 },
+    { username: 'retro_alice', gameTitle: 'Panzer Dragoon Saga', condition: Condition.MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 800.00 },
+    { username: 'retro_alice', gameTitle: 'Gran Turismo', condition: Condition.VERY_GOOD, region: Region.NTSC, personalRating: 4, estimatedValue: 30.00 },
+    { username: 'retro_alice', gameTitle: 'Adventure', condition: Condition.GOOD, region: Region.NTSC, personalRating: 3, estimatedValue: 120.00 },
+    { username: 'retro_alice', gameTitle: "Bonk's Adventure", condition: Condition.NEAR_MINT, region: Region.NTSC, personalRating: 4, estimatedValue: 90.00 },
+    { username: 'retro_alice', gameTitle: 'Shenmue', condition: Condition.MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 120.00 },
+    { username: 'retro_alice', gameTitle: 'Shadow of the Colossus', condition: Condition.MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 45.00 },
+    { username: 'retro_alice', gameTitle: 'Sonic the Hedgehog 2', condition: Condition.VERY_GOOD, region: Region.NTSC, personalRating: 4, estimatedValue: 45.00 },
 
     { username: 'bob_collector', gameTitle: 'Sonic the Hedgehog 2', condition: Condition.MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 45.00 },
     { username: 'bob_collector', gameTitle: 'Snatcher', condition: Condition.NEAR_MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 500.00 },
     { username: 'bob_collector', gameTitle: 'MUSHA', condition: Condition.VERY_GOOD, region: Region.NTSC, personalRating: 4, estimatedValue: 300.00 },
     { username: 'bob_collector', gameTitle: 'Street Fighter II', condition: Condition.GOOD, region: Region.NTSC, personalRating: 4, estimatedValue: 40.00 },
     { username: 'bob_collector', gameTitle: 'Contra', condition: Condition.VERY_GOOD, region: Region.NTSC, personalRating: 4, estimatedValue: 60.00 },
+    { username: 'bob_collector', gameTitle: 'Adventure', condition: Condition.GOOD, region: Region.NTSC, personalRating: 3, estimatedValue: 120.00 },
+    { username: 'bob_collector', gameTitle: 'Panzer Dragoon Saga', condition: Condition.MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 800.00 },
+    { username: 'bob_collector', gameTitle: "Bonk's Adventure", condition: Condition.VERY_GOOD, region: Region.NTSC, personalRating: 4, estimatedValue: 90.00 },
 
     { username: 'retro_charlie', gameTitle: 'Castlevania: Symphony of the Night', condition: Condition.MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 180.00 },
     { username: 'retro_charlie', gameTitle: 'Final Fantasy VII', condition: Condition.NEAR_MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 80.00 },
     { username: 'retro_charlie', gameTitle: 'Suikoden II', condition: Condition.VERY_GOOD, region: Region.NTSC, personalRating: 5, estimatedValue: 280.00 },
     { username: 'retro_charlie', gameTitle: 'Metal Gear Solid', condition: Condition.MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 50.00 },
     { username: 'retro_charlie', gameTitle: 'Resident Evil 2', condition: Condition.GOOD, region: Region.NTSC, personalRating: 4, estimatedValue: 60.00 },
+    { username: 'retro_charlie', gameTitle: 'Radiant Silvergun', condition: Condition.MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 350.00 },
+    { username: 'retro_charlie', gameTitle: 'Street Fighter II', condition: Condition.VERY_GOOD, region: Region.NTSC, personalRating: 4, estimatedValue: 40.00 },
+    { username: 'retro_charlie', gameTitle: 'Pokemon Red', condition: Condition.NEAR_MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 100.00 },
 
     { username: 'diana_gamer', gameTitle: 'Super Mario 64', condition: Condition.MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 80.00 },
     { username: 'diana_gamer', gameTitle: 'The Legend of Zelda: Ocarina of Time', condition: Condition.NEAR_MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 120.00 },
     { username: 'diana_gamer', gameTitle: 'Pokemon Red', condition: Condition.VERY_GOOD, region: Region.NTSC, personalRating: 5, estimatedValue: 100.00 },
     { username: 'diana_gamer', gameTitle: 'Tetris', condition: Condition.GOOD, region: Region.NTSC, personalRating: 3, estimatedValue: 15.00 },
+    { username: 'diana_gamer', gameTitle: 'Shining Force III', condition: Condition.MINT, region: Region.NTSC, personalRating: 5, estimatedValue: 350.00 },
+    { username: 'diana_gamer', gameTitle: 'Gran Turismo', condition: Condition.VERY_GOOD, region: Region.NTSC, personalRating: 4, estimatedValue: 30.00 },
+    { username: 'diana_gamer', gameTitle: "Bonk's Adventure", condition: Condition.NEAR_MINT, region: Region.NTSC, personalRating: 4, estimatedValue: 90.00 },
   ];
 
   let collectionCount = 0;

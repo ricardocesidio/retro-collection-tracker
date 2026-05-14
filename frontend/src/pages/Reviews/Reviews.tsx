@@ -5,6 +5,7 @@ import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import Badge from '../../components/ui/Badge/Badge';
 import { reviewsApi } from '../../services/social';
 import type { ReviewEntry } from '../../services/social';
+import './Reviews.scss';
 
 const Reviews: React.FC = () => {
   const [reviews, setReviews] = useState<ReviewEntry[]>([]);
@@ -24,15 +25,15 @@ const Reviews: React.FC = () => {
       {reviews.length === 0 ? (
         <EmptyState icon="⭐" title="No reviews yet" message="Reviews appear here when games are rated." />
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div className="revs-list">
           {reviews.map((r) => (
-            <Link to={`/games/${r.gameId}`} key={r.id} className="panel" style={{ color: 'inherit', textDecoration: 'none', padding: '1rem 1.25rem', transition: 'background 0.15s' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{r.user.displayName || r.user.username}</span>
+            <Link to={`/games/${r.gameId}`} key={r.id} className="panel revs-item">
+              <div className="revs-item__header">
+                <span className="revs-item__user">{r.user.displayName || r.user.username}</span>
                 <Badge variant="highlight">{r.rating} ★</Badge>
               </div>
-              {r.title && <p style={{ fontSize: '0.8125rem', fontWeight: 500, marginBottom: '0.25rem' }}>{r.title}</p>}
-              {r.body && <p style={{ fontSize: '0.8125rem', color: '#94a3b8', lineHeight: 1.5 }}>{r.body}</p>}
+              {r.title && <p className="revs-item__title">{r.title}</p>}
+              {r.body && <p className="revs-item__body">{r.body}</p>}
             </Link>
           ))}
         </div>

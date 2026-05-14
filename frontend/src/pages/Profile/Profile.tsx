@@ -83,15 +83,14 @@ const Profile: React.FC = () => {
             </Button>
           )}
 
-          {/* Collector Level Card */}
-          <div style={{ marginTop: '1rem', background: 'linear-gradient(135deg, rgba(124,58,237,0.1), rgba(6,182,212,0.06))', border: '1px solid rgba(124,58,237,0.2)', borderRadius: '12px', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: 42, height: 42, borderRadius: '10px', background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.875rem', fontFamily: "'DM Mono', monospace", color: '#fff', flexShrink: 0 }}>{Math.min(99, user._count.collections * 2)}</div>
-            <div style={{ flex: 1 }}>
-              <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, fontFamily: "'DM Mono', monospace", color: '#a78bfa', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Collector Level</span>
-              <div style={{ height: 4, background: '#1a1f33', borderRadius: 2, marginTop: '4px', overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${Math.min(100, user._count.collections * 2)}%`, background: 'linear-gradient(90deg, #7c3aed, #06b6d4)', borderRadius: 2 }} />
+          <div className="prof-level-card">
+            <div className="prof-level-card__badge">{Math.min(99, user._count.collections * 2)}</div>
+            <div className="prof-level-card__info">
+              <span className="prof-level-card__label">Collector Level</span>
+              <div className="prof-level-card__bar">
+                <div className="prof-level-card__fill" style={{ width: `${Math.min(100, user._count.collections * 2)}%` }} />
               </div>
-              <span style={{ fontSize: '0.625rem', color: '#5a6480', fontFamily: "'DM Mono', monospace", marginTop: '2px', display: 'block' }}>{user._count.collections} games collected · {user._count.collections * 2}/100 XP</span>
+              <span className="prof-level-card__sub">{user._count.collections} games collected · {user._count.collections * 2}/100 XP</span>
             </div>
           </div>
         </div>

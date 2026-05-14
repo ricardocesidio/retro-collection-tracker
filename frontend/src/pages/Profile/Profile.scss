@@ -1,3 +1,287 @@
 @use '../../styles/variables' as *;
 
-.profile__hero{background:#111522;border:1px solid rgba(124,58,237,.1);border-radius:14px;padding:2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;background:linear-gradient(135deg,#111522,#181d30);border-color:rgba(124,58,237,.2)}.profile__avatar{width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:1.875rem;font-weight:700;color:white;flex-shrink:0;box-shadow:0 0 32px rgba(124,58,237,.5),0 4px 20px rgba(0,0,0,.5);border:2px solid rgba(124,58,237,.35)}.profile__info{flex:1}.profile__name{font-size:1.5rem;font-weight:800;letter-spacing:-.015em;margin-bottom:4px}.profile__handle{font-size:.8125rem;color:#5a6480;font-family:'DM Mono',monospace;margin-bottom:.75rem}.profile__stats{display:flex;gap:1.5rem;flex-wrap:wrap}.profile__stat{text-align:center}.profile__stat-value{display:block;font-size:1.25rem;font-weight:800;font-family:'DM Mono',monospace;color:#a78bfa}.profile__stat-label{font-size:.6875rem;color:#5a6480;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em}.profile__tabs{display:flex;gap:0;border-bottom:1px solid rgba(124,58,237,.1);margin-bottom:1.5rem}.profile__tab{padding:.75rem 1.5rem;font-size:.8125rem;font-weight:500;color:#8892b0;border-bottom:2px solid transparent;transition:all .14s}.profile__tab:hover{color:#f0f4ff}.profile__tab--active{color:#a78bfa;border-bottom-color:#7c3aed}
+.prof-hero {
+  background: linear-gradient(135deg, $s2, $s3);
+  border: 1px solid $b2;
+  border-radius: $r3;
+  padding: $sp6;
+  margin-bottom: $sp5;
+  display: flex;
+  align-items: center;
+  gap: $sp6;
+  flex-wrap: wrap;
+
+  &__avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: $r2;
+    flex-shrink: 0;
+    overflow: hidden;
+    box-shadow: 0 0 32px rgba($a1, .5), 0 4px 20px rgba(0, 0, 0, .5);
+    border: 2px solid rgba($a1, .35);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    &-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, $a1, $a2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: $t3x;
+      font-weight: $w7;
+      font-family: $font;
+      color: #fff;
+    }
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    font-size: $t2x;
+    font-weight: $w8;
+    letter-spacing: -.015em;
+    margin-bottom: 4px;
+    color: $t1;
+  }
+
+  &__handle {
+    font-size: $tsm;
+    color: $t4;
+    font-family: $mono;
+    margin-bottom: $sp3;
+  }
+
+  &__bio {
+    font-size: $tsm;
+    color: $t2;
+    margin-bottom: $sp3;
+    line-height: 1.5;
+  }
+
+  &__stats {
+    display: flex;
+    gap: $sp5;
+    flex-wrap: wrap;
+    margin-bottom: $sp3;
+  }
+}
+
+.prof-stat {
+  text-align: center;
+
+  &__v {
+    display: block;
+    font-size: $txl;
+    font-weight: $w8;
+    font-family: $mono;
+    color: $a2;
+  }
+
+  &__l {
+    font-size: $txs;
+    color: $t4;
+    font-family: $mono;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+}
+
+.prof-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid $b1;
+  margin-bottom: $sp5;
+}
+
+.prof-tab {
+  padding: $sp3 $sp5;
+  font-size: $tsm;
+  font-weight: $w5;
+  color: $t2;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all $fast;
+  font-family: $font;
+
+  &:hover {
+    color: $t1;
+  }
+
+  &--active {
+    color: $a2;
+    border-bottom-color: $a1;
+  }
+}
+
+.prof-content {
+  min-height: 200px;
+}
+
+.prof-reviews {
+  display: flex;
+  flex-direction: column;
+  gap: $sp3;
+}
+
+.prof-review-item {
+  display: block;
+  padding: $sp4;
+  background: $s2;
+  border: 1px solid $b1;
+  border-radius: $r1;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color $fast;
+
+  &:hover {
+    border-color: $b2;
+  }
+
+  &__stars {
+    font-size: $tsm;
+    color: $a5;
+    margin-bottom: $sp2;
+    letter-spacing: 1px;
+  }
+
+  &__title {
+    display: block;
+    font-size: $tbs;
+    font-weight: $w6;
+    color: $t1;
+    margin-bottom: $sp1;
+  }
+
+  &__body {
+    font-size: $tsm;
+    color: $t2;
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+.prof-people {
+  display: flex;
+  flex-direction: column;
+  gap: $sp3;
+}
+
+.prof-person {
+  display: flex;
+  align-items: center;
+  gap: $sp4;
+  padding: $sp3 $sp4;
+  background: $s2;
+  border: 1px solid $b1;
+  border-radius: $r1;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color $fast;
+
+  &:hover {
+    border-color: $b2;
+  }
+
+  &__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: $rf;
+    background: linear-gradient(135deg, $a1, $a3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $tbs;
+    font-weight: $w7;
+    font-family: $font;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  &__name {
+    display: block;
+    font-size: $tbs;
+    font-weight: $w6;
+    color: $t1;
+  }
+
+  &__handle {
+    font-size: $txs;
+    color: $t4;
+    font-family: $mono;
+  }
+}
+
+.prof-level-card {
+  margin-top: $sp4;
+  background: linear-gradient(135deg, $ad, $cd);
+  border: 1px solid $b2;
+  border-radius: $r1;
+  padding: $sp3 $sp4;
+  display: flex;
+  align-items: center;
+  gap: $sp3;
+
+  &__badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, $a1, $a3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: $w8;
+    font-size: $tsm;
+    font-family: $mono;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__label {
+    display: block;
+    font-size: $sp3;
+    font-weight: $w6;
+    font-family: $mono;
+    color: $a2;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+
+  &__bar {
+    height: 4px;
+    background: $s3;
+    border-radius: 2px;
+    margin-top: 4px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    background: linear-gradient(90deg, $a1, $a3);
+    border-radius: 2px;
+    transition: width $slow $e1;
+  }
+
+  &__sub {
+    font-size: .625rem;
+    color: $t4;
+    font-family: $mono;
+    margin-top: 2px;
+    display: block;
+  }
+}
