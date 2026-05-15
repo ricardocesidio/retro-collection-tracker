@@ -24,5 +24,8 @@ coverage/
 .DS_Store
 Thumbs.db
 
+# Uploaded files
+uploads/
+
 # Logs
 *.log

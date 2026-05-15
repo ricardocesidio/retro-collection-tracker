@@ -56,12 +56,6 @@ const Sidebar: React.FC = () => {
             </div>
           ))}
         </nav>
-        {user && (
-          <div className="sidebar__user">
-            <div className="sidebar__avatar">{user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : (user.displayName||user.username).charAt(0).toUpperCase()}</div>
-            <div><span className="sidebar__user-name">{user.displayName||user.username}</span><span className="sidebar__user-role">Collector</span></div>
-          </div>
-        )}
         <div className="sidebar__progress">
           <div className="sidebar__progress-header"><span>Collection Progress</span><span className="sidebar__progress-pct">78%</span></div>
           <div className="sidebar__progress-track"><div className="sidebar__progress-fill" /></div>
