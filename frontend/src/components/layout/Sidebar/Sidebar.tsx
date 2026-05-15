@@ -28,6 +28,7 @@ const Sidebar: React.FC = () => {
     ]},
     { label: 'Settings', items: [
       { icon:'fa-solid fa-gear', label:'Settings', path:'/settings' },
+      { icon:'fa-solid fa-heart', label:'Donate', path:'/donate' },
     ]},
   ];
 
