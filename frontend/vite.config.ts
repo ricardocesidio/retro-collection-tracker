@@ -5,6 +5,11 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      '/uploads': 'http://localhost:3000',
+    },
+  },
   css: {
     preprocessorOptions: {
       scss: {

@@ -14,14 +14,35 @@ const Settings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{type:'success'|'danger';text:string}|null>(null);
+  const [uploading, setUploading] = useState(false);
 
-  const [profile, setProfile] = useState({ username:'', displayName:'', bio:'' });
+  const [profile, setProfile] = useState({ username:'', displayName:'', bio:'', avatarUrl:'' });
   const [pw, setPw] = useState({ current:'', newPw:'', confirm:'' });
   const [notifs, setNotifs] = useState({ email:true, push:true, follows:true, reviews:true, wishlist:true });
 
   useEffect(() => {
-    if (state.user) { setProfile({ username:state.user.username||'', displayName:state.user.displayName||'', bio:state.user.bio||'' }); setLoading(false); }
+    if (state.user) { setProfile({ username:state.user.username||'', displayName:state.user.displayName||'', bio:state.user.bio||'', avatarUrl:state.user.avatarUrl||'' }); setLoading(false); }
   }, [state.user]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+      const res = await fetch(`${API_URL}/upload/avatar`, { method: 'POST', body: formData, headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      setProfile(p => ({ ...p, avatarUrl: data.url }));
+      setMsg({ type: 'success', text: 'Profile picture updated!' });
+    } catch (err: any) {
+      setMsg({ type: 'danger', text: err.message || 'Upload failed' });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const saveProfile = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true); setMsg(null);
@@ -29,8 +50,9 @@ const Settings: React.FC = () => {
     if (uname && !/^[a-zA-Z0-9_]+$/.test(uname)) { setMsg({type:'danger',text:'Username can only contain letters, numbers, and underscores. Spaces are not allowed.'}); setSaving(false); return; }
     if (uname && uname.length > 20) { setMsg({type:'danger',text:'Username must be 20 characters or less'}); setSaving(false); return; }
     if (profile.bio && profile.bio.length > 100) { setMsg({type:'danger',text:'Bio must be 100 characters or less'}); setSaving(false); return; }
+    const avatarVal = profile.avatarUrl?.trim() || undefined;
     try {
-      await apiRequest('/auth/me', { method:'PUT', body:JSON.stringify({ username:uname||undefined, displayName:profile.displayName.trim()||undefined, bio:profile.bio.trim()||undefined }) });
+      await apiRequest('/auth/me', { method:'PUT', body:JSON.stringify({ username:uname||undefined, displayName:profile.displayName.trim()||undefined, bio:profile.bio.trim()||undefined, avatarUrl: avatarVal }) });
       setMsg({type:'success',text:'Profile updated successfully'});
     } catch (err:any) { setMsg({type:'danger',text:err.message||'Failed to update'}); }
     finally { setSaving(false); }
@@ -73,6 +95,18 @@ const Settings: React.FC = () => {
       {active==='profile' && (
         <form onSubmit={saveProfile}>
           <div className="panel" style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+            <div className="sett-avatar-section">
+              <div className="sett-avatar__preview" style={profile.avatarUrl ? { backgroundImage: `url(${profile.avatarUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
+                {!profile.avatarUrl && <span>{profile.displayName?.charAt(0) || profile.username?.charAt(0) || '?'}</span>}
+                {profile.avatarUrl && <img src={profile.avatarUrl} alt="" />}
+              </div>
+              <div className="sett-avatar__actions">
+                <label className="btn btn--outline btn--md">
+                  <i className="fa-solid fa-camera" /> Upload Photo
+                  <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
+                </label>
+              </div>
+            </div>
             <h3 style={{fontSize:'1.0625rem',fontWeight:600,marginBottom:'.25rem'}}>Profile Information</h3>
             <Input label="Username" value={profile.username} onChange={(e)=>setProfile({...profile,username:e.target.value})} required maxLength={20} />
             <Input label="Display Name" value={profile.displayName} onChange={(e)=>setProfile({...profile,displayName:e.target.value})} />

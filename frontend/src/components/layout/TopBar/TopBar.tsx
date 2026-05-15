@@ -35,7 +35,7 @@ const TopBar: React.FC = () => {
               <NotificationBell />
             </Link>
             <DropdownMenu
-              trigger={<ProfileChip name={user.displayName || user.username} role={(user as any).level?.name || 'Collector'} />}
+              trigger={<ProfileChip name={user.displayName || user.username} role={(user as any).level?.name || 'Collector'} avatar={user.avatarUrl || undefined} />}
               items={[
                 { label: 'Profile', icon: 'fa-solid fa-circle-user', onClick: () => window.location.href = `/profile/${user.username}` },
                 { label: 'Settings', icon: 'fa-solid fa-gear', onClick: () => window.location.href = '/settings' },

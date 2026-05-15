@@ -58,7 +58,7 @@ const Sidebar: React.FC = () => {
         </nav>
         {user && (
           <div className="sidebar__user">
-            <div className="sidebar__avatar">{(user.displayName||user.username).charAt(0).toUpperCase()}</div>
+            <div className="sidebar__avatar">{user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : (user.displayName||user.username).charAt(0).toUpperCase()}</div>
             <div><span className="sidebar__user-name">{user.displayName||user.username}</span><span className="sidebar__user-role">Collector</span></div>
           </div>
         )}
