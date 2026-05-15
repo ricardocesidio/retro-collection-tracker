@@ -42,6 +42,8 @@
   padding: $sp6 $sp5;
   position: relative;
   overflow: visible;
+  display: flex;
+  flex-direction: column;
 
   &--featured {
     border-color: $a1;
@@ -121,6 +123,7 @@
   &__cta {
     width: 100%;
     justify-content: center;
+    margin-top: auto;
   }
 }
 
