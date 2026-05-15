@@ -1,1 +1,378 @@
 @use '../../styles/variables' as *;
+
+.addgame-page {
+  min-height: 100vh;
+  padding: 2rem 0 4rem;
+}
+
+.addgame-search-bar {
+  display: flex;
+  gap: $sp3;
+  margin-bottom: $sp5;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.addgame-search-input-wrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.addgame-search-icon {
+  position: absolute;
+  left: 14px;
+  color: $t3;
+  font-size: .9rem;
+  pointer-events: none;
+}
+
+.addgame-search-input {
+  width: 100%;
+  background: $s3;
+  border: 1px solid $b1;
+  border-radius: $r1;
+  padding: .75rem 2.5rem .75rem 2.6rem;
+  color: $t1;
+  font-size: $tbs;
+  font-family: $font;
+  transition: all $fast;
+
+  &::placeholder {
+    color: $t4;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $a1;
+    box-shadow: 0 0 0 3px $ad;
+    background: $s2;
+  }
+}
+
+.addgame-search-clear {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: $t3;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all $fast;
+
+  &:hover {
+    color: $t1;
+    background: rgba(255, 255, 255, .06);
+  }
+}
+
+.addgame-filter-select {
+  background: $s3;
+  border: 1px solid $b1;
+  border-radius: $r1;
+  padding: .75rem 1rem;
+  color: $t1;
+  font-size: $tsm;
+  font-family: $font;
+  cursor: pointer;
+  transition: all $fast;
+  min-width: 140px;
+
+  &:focus {
+    outline: none;
+    border-color: $a1;
+    box-shadow: 0 0 0 3px $ad;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+.addgame-results-header {
+  margin-bottom: $sp4;
+}
+
+.addgame-results-count {
+  font-size: $tsm;
+  color: $t3;
+  font-family: $mono;
+}
+
+.addgame-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: $sp4;
+  margin-bottom: $sp5;
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $sp3;
+  }
+}
+
+.addgame-card {
+  background: $s2;
+  border: 1px solid $b1;
+  border-radius: $r2;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all $fast;
+  text-align: left;
+  padding: 0;
+  font-family: $font;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    border-color: $a1;
+    box-shadow: 0 0 20px $ad, 0 8px 24px rgba(0, 0, 0, .3);
+    transform: translateY(-3px);
+    background: $s3;
+  }
+}
+
+.addgame-card__cover {
+  width: 100%;
+  aspect-ratio: 200 / 260;
+  overflow: hidden;
+  background: $s3;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform $med $e1;
+  }
+
+  .addgame-card:hover & img {
+    transform: scale(1.05);
+  }
+}
+
+.addgame-card__info {
+  padding: $sp3;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.addgame-card__title {
+  font-size: $tsm;
+  font-weight: $w6;
+  color: $t1;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.addgame-card__meta {
+  font-size: $txs;
+  color: $t3;
+  font-family: $mono;
+}
+
+.addgame-card__genre {
+  font-size: $txs;
+  color: $a2;
+  margin-top: auto;
+  padding-top: $sp2;
+}
+
+.addgame-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: $s2;
+  border: 1px solid $b1;
+  border-radius: $r3;
+
+  h3 {
+    font-size: $tbs;
+    font-weight: $w6;
+    color: $t1;
+    margin-bottom: $sp2;
+  }
+
+  p {
+    font-size: $tsm;
+    color: $t3;
+    margin-bottom: $sp5;
+  }
+}
+
+.addgame-load-more {
+  text-align: center;
+  padding: $sp4 0;
+}
+
+.addgame-selected-section {
+  animation: fadeIn $med $e1;
+}
+
+.addgame-selected-header {
+  margin-bottom: $sp5;
+}
+
+.addgame-back-btn {
+  background: none;
+  border: none;
+  color: $a2;
+  font-size: $tsm;
+  font-family: $font;
+  cursor: pointer;
+  padding: $sp2 $sp3;
+  border-radius: $r1;
+  transition: all $fast;
+  display: inline-flex;
+  align-items: center;
+  gap: $sp2;
+
+  &:hover {
+    background: $ad;
+    color: $a1;
+  }
+}
+
+.addgame-selected-game {
+  display: flex;
+  gap: $sp6;
+  margin-bottom: $sp6;
+  background: $s2;
+  border: 1px solid $b1;
+  border-radius: $r3;
+  padding: $sp6;
+  align-items: flex-start;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: $sp4;
+    gap: $sp4;
+  }
+}
+
+.addgame-selected__cover {
+  width: 160px;
+  flex-shrink: 0;
+  border-radius: $r2;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
+
+  img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 200 / 260;
+    object-fit: cover;
+  }
+
+  @media (max-width: 768px) {
+    width: 120px;
+  }
+}
+
+.addgame-selected__info {
+  display: flex;
+  flex-direction: column;
+  gap: $sp2;
+  min-width: 0;
+}
+
+.addgame-selected__title {
+  font-size: $txl;
+  font-weight: $w7;
+  color: $t1;
+  line-height: 1.2;
+}
+
+.addgame-selected__meta {
+  font-size: $tsm;
+  color: $t3;
+  font-family: $mono;
+}
+
+.addgame-selected__genre {
+  font-size: $tsm;
+  color: $a2;
+  font-weight: $w6;
+}
+
+.addgame-selected__dev {
+  font-size: $tsm;
+  color: $t2;
+}
+
+.addgame-selected__desc {
+  font-size: $tsm;
+  color: $t2;
+  line-height: 1.6;
+  margin-top: $sp1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.addgame-form {
+  background: $s2;
+  border: 1px solid $b1;
+  border-radius: $r3;
+  padding: $sp6;
+  animation: fadeIn $med $e1;
+
+  @media (max-width: 768px) {
+    padding: $sp4;
+  }
+}
+
+.addgame-form__title {
+  font-size: $tbs;
+  font-weight: $w7;
+  color: $t1;
+  margin-bottom: $sp5;
+  padding-bottom: $sp3;
+  border-bottom: 1px solid $b1;
+}
+
+.addgame-form__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $sp4;
+  margin-bottom: $sp5;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.addgame-form__notes {
+  margin-bottom: $sp5;
+}
+
+.addgame-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $sp3;
+  padding-top: $sp4;
+  border-top: 1px solid $b1;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

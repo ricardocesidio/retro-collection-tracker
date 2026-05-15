@@ -28,7 +28,7 @@ const TopBar: React.FC = () => {
       <div className="topbar__actions">
         {user ? (
           <>
-            <Link to="/add-game" className="topbar__add-btn" title="Add Game">
+            <Link to="/add-game" className="topbar__add-btn" title="Add to Collection">
               <i className="fa-solid fa-plus" />
             </Link>
             <Link to="/notifications">

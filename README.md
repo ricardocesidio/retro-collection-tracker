@@ -76,6 +76,7 @@ A full-stack web application for retro gaming collectors to organize, track, and
 ## Features
 
 ### Core
+- **Shared game catalog** — single canonical entry per game; users search/select existing games rather than creating duplicates. All collections, reviews, and wishlists link to the same game record.
 - **User authentication** — register, login, JWT sessions, protected routes, session persistence across refresh
 - **Collection management** — add, edit, delete games with full metadata (condition, region, estimated value, personal rating, notes, ownership status)
 - **Public catalog** — search by title, filter by platform/genre, sort (A–Z, newest, oldest, most collected), paginated results
@@ -292,7 +293,8 @@ CMD ["node", "dist/main.js"]
 
 - [ ] Image upload for game covers (S3/Cloudinary)
 - [ ] Infinite scroll on explore/collection pages
-- [ ] Advanced search with autocomplete
+- [x] Shared game catalog — search/select existing games instead of creating duplicates
+- [x] Advanced search with autocomplete
 - [ ] Collection export (CSV/JSON)
 - [ ] Price charting integration (PriceCharting API)
 - [ ] Dark/light theme toggle
