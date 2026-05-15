@@ -163,7 +163,7 @@ export const gameData: GameSeed[] = [
   { title: 'Phantasy Star Online', platform: 'sega-dreamcast', genre: 'rpg', releaseYear: 2000, developer: 'Sega', publisher: 'Sega', description: 'The first online console RPG. Paved the way for future MMOs.' },
   { title: 'Space Channel 5', platform: 'sega-dreamcast', genre: 'puzzle', releaseYear: 1999, developer: 'Sega', publisher: 'Sega', description: 'Rhythm game where reporter Ulala saves the world through dance.' },
   { title: 'Ikaruga', platform: 'sega-dreamcast', genre: 'shooter', releaseYear: 2002, developer: 'Treasure', publisher: 'Treasure', description: 'Puzzle-based shoot-em-up with polarity mechanics.' },
-  { title: 'Seaman', platform: 'sega-dreamcast', genre: 'simulation', releaseYear: 2000, developer: 'Vivarium', publisher: 'Sega', description: 'You raise a fish with a human face. Leonard Nimoy narrates.' },
+  { title: 'Seaman', platform: 'sega-dreamcast', genre: 'puzzle', releaseYear: 2000, developer: 'Vivarium', publisher: 'Sega', description: 'You raise a fish with a human face. Leonard Nimoy narrates.' },
   { title: 'Rez', platform: 'sega-dreamcast', genre: 'shooter', releaseYear: 2001, developer: 'United Game Artists', publisher: 'Sega', description: 'A music-based rail shooter experience.' },
 
   // ─── Game Boy (1989) ───────────────────────────────
