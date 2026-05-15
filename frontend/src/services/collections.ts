@@ -58,6 +58,9 @@ export const gamesApi = {
 
   update: (id: string, data: Record<string, any>): Promise<GameData> =>
     apiRequest(`/games/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+
+  delete: (id: string): Promise<void> =>
+    apiRequest(`/games/${id}`, { method: 'DELETE' }),
 };
 
 export type { Genre } from '../types';

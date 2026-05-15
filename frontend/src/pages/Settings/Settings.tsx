@@ -18,10 +18,21 @@ const Settings: React.FC = () => {
 
   const [profile, setProfile] = useState({ username:'', displayName:'', bio:'', avatarUrl:'' });
   const [pw, setPw] = useState({ current:'', newPw:'', confirm:'' });
-  const [notifs, setNotifs] = useState({ email:true, push:true, follows:true, reviews:true, wishlist:true });
+  const [notifs, setNotifs] = useState({ email:true, push:false, follows:true, reviews:true, wishlist:true });
+  const [notifsLoaded, setNotifsLoaded] = useState(false);
 
   useEffect(() => {
-    if (state.user) { setProfile({ username:state.user.username||'', displayName:state.user.displayName||'', bio:state.user.bio||'', avatarUrl:state.user.avatarUrl||'' }); setLoading(false); }
+    if (state.user) {
+      setProfile({ username:state.user.username||'', displayName:state.user.displayName||'', bio:state.user.bio||'', avatarUrl:state.user.avatarUrl||'' });
+      setLoading(false);
+    }
+  }, [state.user]);
+
+  useEffect(() => {
+    if (!state.user) return;
+    let c = false;
+    apiRequest('/notification-preferences').then(d => { if (!c) { setNotifs({ email: d.email, push: d.push, follows: d.follows, reviews: d.reviews, wishlist: d.wishlist }); setNotifsLoaded(true); } }).catch(() => { if (!c) setNotifsLoaded(true); });
+    return () => { c = true; };
   }, [state.user]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,14 +69,30 @@ const Settings: React.FC = () => {
     finally { setSaving(false); }
   };
 
+  const savePreferences = async () => {
+    setMsg(null); setSaving(true);
+    try {
+      await apiRequest('/notification-preferences', { method:'PUT', body:JSON.stringify(notifs) });
+      setMsg({type:'success',text:'Notification preferences saved'});
+    } catch (err:any) { setMsg({type:'danger',text:err.message||'Failed to save preferences'}); }
+    finally { setSaving(false); }
+  };
+
   const savePassword = async (e: React.FormEvent) => {
     e.preventDefault(); setMsg(null);
     if (pw.newPw !== pw.confirm) { setMsg({type:'danger',text:'Passwords do not match'}); return; }
     if (pw.newPw.length < 8) { setMsg({type:'danger',text:'Password must be at least 8 characters'}); return; }
+    if (!pw.current) { setMsg({type:'danger',text:'Current password is required'}); return; }
     setSaving(true);
     try {
-      // Note: requires backend password change endpoint
-      setMsg({type:'success',text:'Password change requires forgot-password flow'});
+      await apiRequest('/auth/change-password', {
+        method: 'POST',
+        body: JSON.stringify({ currentPassword: pw.current, newPassword: pw.newPw }),
+      });
+      setPw({ current:'', newPw:'', confirm:'' });
+      setMsg({type:'success',text:'Password changed successfully'});
+    } catch (err:any) {
+      setMsg({type:'danger',text:err.message||'Failed to change password'});
     } finally { setSaving(false); }
   };
 
@@ -148,6 +175,9 @@ const Settings: React.FC = () => {
               <div><span style={{fontSize:'.875rem',fontWeight:500}}>{n.label}</span><span style={{display:'block',fontSize:'.75rem',color:'#94a3b8'}}>{n.desc}</span></div>
             </label>
           ))}
+          <div style={{display:'flex',justifyContent:'flex-end',marginTop:'.5rem'}}>
+            <Button variant="primary" onClick={savePreferences} loading={saving}>Save Preferences</Button>
+          </div>
         </div>
       )}
 

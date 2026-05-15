@@ -1,12 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import { collectionApi } from '../../../services/collections';
 import './Sidebar.scss';
 
 const Sidebar: React.FC = () => {
   const { state } = useAuth();
   const { user } = state;
   const [open, setOpen] = useState(false);
+  const [progress, setProgress] = useState<{ total: number; pct: number; hint: string } | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    let c = false;
+    collectionApi.getStats().then(d => {
+      if (c) return;
+      const total = d.summary.totalGames || 0;
+      const goal = 50;
+      const pct = Math.min(100, Math.round((total / goal) * 100));
+      setProgress({ total, pct, hint: `${total} game${total !== 1 ? 's' : ''} collected · ${goal} goal` });
+    }).catch(() => {});
+    return () => { c = true; };
+  }, [user]);
 
   const sections = [
     { label: 'Main', items: [
@@ -56,11 +71,13 @@ const Sidebar: React.FC = () => {
             </div>
           ))}
         </nav>
-        <div className="sidebar__progress">
-          <div className="sidebar__progress-header"><span>Collection Progress</span><span className="sidebar__progress-pct">78%</span></div>
-          <div className="sidebar__progress-track"><div className="sidebar__progress-fill" /></div>
-          <p className="sidebar__progress-hint">12 of 15 SNES games collected</p>
-        </div>
+        {progress && (
+          <div className="sidebar__progress">
+            <div className="sidebar__progress-header"><span>Collection Progress</span><span className="sidebar__progress-pct">{progress.pct}%</span></div>
+            <div className="sidebar__progress-track"><div className="sidebar__progress-fill" style={{ width: `${progress.pct}%` }} /></div>
+            <p className="sidebar__progress-hint">{progress.hint}</p>
+          </div>
+        )}
       </aside>
     </>
   );

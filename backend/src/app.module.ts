@@ -11,6 +11,7 @@ import { WishlistModule } from './wishlist/wishlist.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { SocialModule } from './social/social.module';
 import { UploadModule } from './upload/upload.module';
+import { NotificationPreferencesModule } from './notification-preferences/notification-preferences.module';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { CacheMiddleware } from './common/middleware/cache.middleware';
@@ -30,6 +31,7 @@ import { AppService } from './app.service';
     ReviewsModule,
     SocialModule,
     UploadModule,
+    NotificationPreferencesModule,
   ],
   controllers: [AppController],
   providers: [

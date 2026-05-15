@@ -1,28 +1,35 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ErrorBoundary } from './components/auth/ErrorBoundary';
 import AppLayout from './components/layout/AppLayout/AppLayout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import LoadingSpinner from './components/ui/LoadingSpinner/LoadingSpinner';
 import Home from './pages/Home/Home';
-import Explore from './pages/Explore/Explore';
-import GameDetails from './pages/GameDetails/GameDetails';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
-import Dashboard from './pages/Dashboard/Dashboard';
-import Collection from './pages/Collection/Collection';
-import Wishlist from './pages/Wishlist/Wishlist';
-import Profile from './pages/Profile/Profile';
-import Settings from './pages/Settings/Settings';
-import AddGame from './pages/AddGame/AddGame';
-import EditGame from './pages/EditGame/EditGame';
-import Notifications from './pages/Notifications/Notifications';
-import Reviews from './pages/Reviews/Reviews';
-import Platforms from './pages/Platforms/Platforms';
-import Genres from './pages/Genres/Genres';
-import Activity from './pages/Activity/Activity';
-import Friends from './pages/Friends/Friends';
 import NotFound from './pages/NotFound/NotFound';
-import Donate from './pages/Donate/Donate';
+
+const Explore = lazy(() => import('./pages/Explore/Explore'));
+const GameDetails = lazy(() => import('./pages/GameDetails/GameDetails'));
+const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
+const Collection = lazy(() => import('./pages/Collection/Collection'));
+const Wishlist = lazy(() => import('./pages/Wishlist/Wishlist'));
+const Profile = lazy(() => import('./pages/Profile/Profile'));
+const Settings = lazy(() => import('./pages/Settings/Settings'));
+const AddGame = lazy(() => import('./pages/AddGame/AddGame'));
+const EditGame = lazy(() => import('./pages/EditGame/EditGame'));
+const Notifications = lazy(() => import('./pages/Notifications/Notifications'));
+const Reviews = lazy(() => import('./pages/Reviews/Reviews'));
+const Platforms = lazy(() => import('./pages/Platforms/Platforms'));
+const Genres = lazy(() => import('./pages/Genres/Genres'));
+const Activity = lazy(() => import('./pages/Activity/Activity'));
+const Friends = lazy(() => import('./pages/Friends/Friends'));
+const Donate = lazy(() => import('./pages/Donate/Donate'));
+
+const LazyRoute = ({ children }: { children: React.ReactNode }) => (
+  <Suspense fallback={<LoadingSpinner fullPage />}>{children}</Suspense>
+);
 
 const App: React.FC = () => {
   return (
@@ -33,22 +40,22 @@ const App: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/collection" element={<ProtectedRoute><Collection /></ProtectedRoute>} />
-            <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/games/:id" element={<GameDetails />} />
-            <Route path="/profile/:username" element={<Profile />} />
-            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-            <Route path="/add-game" element={<ProtectedRoute><AddGame /></ProtectedRoute>} />
-            <Route path="/edit-game/:id" element={<ProtectedRoute><EditGame /></ProtectedRoute>} />
-            <Route path="/reviews" element={<Reviews />} />
-            <Route path="/platforms" element={<Platforms />} />
-            <Route path="/genres" element={<Genres />} />
-            <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
-            <Route path="/friends" element={<ProtectedRoute><Friends /></ProtectedRoute>} />
-            <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-            <Route path="/donate" element={<Donate />} />
+            <Route path="/dashboard" element={<ProtectedRoute><LazyRoute><Dashboard /></LazyRoute></ProtectedRoute>} />
+            <Route path="/collection" element={<ProtectedRoute><LazyRoute><Collection /></LazyRoute></ProtectedRoute>} />
+            <Route path="/wishlist" element={<ProtectedRoute><LazyRoute><Wishlist /></LazyRoute></ProtectedRoute>} />
+            <Route path="/explore" element={<LazyRoute><Explore /></LazyRoute>} />
+            <Route path="/games/:id" element={<LazyRoute><GameDetails /></LazyRoute>} />
+            <Route path="/profile/:username" element={<LazyRoute><Profile /></LazyRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><LazyRoute><Settings /></LazyRoute></ProtectedRoute>} />
+            <Route path="/add-game" element={<ProtectedRoute><LazyRoute><AddGame /></LazyRoute></ProtectedRoute>} />
+            <Route path="/edit-game/:id" element={<ProtectedRoute><LazyRoute><EditGame /></LazyRoute></ProtectedRoute>} />
+            <Route path="/reviews" element={<LazyRoute><Reviews /></LazyRoute>} />
+            <Route path="/platforms" element={<LazyRoute><Platforms /></LazyRoute>} />
+            <Route path="/genres" element={<LazyRoute><Genres /></LazyRoute>} />
+            <Route path="/activity" element={<ProtectedRoute><LazyRoute><Activity /></LazyRoute></ProtectedRoute>} />
+            <Route path="/friends" element={<ProtectedRoute><LazyRoute><Friends /></LazyRoute></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><LazyRoute><Notifications /></LazyRoute></ProtectedRoute>} />
+            <Route path="/donate" element={<LazyRoute><Donate /></LazyRoute>} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

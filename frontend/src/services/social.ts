@@ -66,6 +66,8 @@ export const wishlistApi = {
     apiRequest(`/wishlist${collectParams(params)}`),
   add: (gameId: string, priority?: number, notes?: string): Promise<WishlistEntry> =>
     apiRequest('/wishlist', { method: 'POST', body: JSON.stringify({ gameId, priority, notes }) }),
+  update: (id: string, data: { priority?: number; notes?: string }): Promise<WishlistEntry> =>
+    apiRequest(`/wishlist/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   remove: (id: string): Promise<void> =>
     apiRequest(`/wishlist/${id}`, { method: 'DELETE' }),
 };

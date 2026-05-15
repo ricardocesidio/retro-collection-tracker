@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Badge from '../../components/ui/Badge/Badge';
 import Button from '../../components/ui/Button/Button';
@@ -30,25 +30,31 @@ const Profile: React.FC = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
 
-  const fetchUser = useCallback(async () => {
-    if (!username) return; setLoading(true);
-    try { const d = await usersApi.getByUsername(username); setUser(d); if(authState.user) followApi.isFollowing(d.id).then((r)=>setIsFollowing(r.isFollowing)).catch(()=>{}); }
-    catch (e: any) { setError(e.message); } finally { setLoading(false); }
+  useEffect(() => {
+    if (!username) return;
+    let c = false;
+    setLoading(true);
+    usersApi.getByUsername(username).then(d => {
+      if (c) return;
+      setUser(d);
+      if (authState.user) {
+        followApi.isFollowing(d.id).then(r => { if (!c) setIsFollowing(r.isFollowing); }).catch(() => {});
+      }
+    }).catch(e => { if (!c) setError(e.message); }).finally(() => { if (!c) setLoading(false); });
+    return () => { c = true; };
   }, [username, authState.user]);
 
-  useEffect(() => { fetchUser(); }, [fetchUser]);
-
-  const fetchTab = useCallback(async () => {
-    if (!user) return; setTabLoading(true);
-    try {
-      if (tab==='collection') { const r = await collectionApi.getPublicCollection(user.id, {limit:'50'}); setCollection(r.data); }
-      else if (tab==='reviews') { const r = await reviewsApi.getByUser(user.id); setReviews(r.data); }
-      else if (tab==='followers') { const r = await followApi.getFollowers(user.id); setFollowers(r.data); }
-      else if (tab==='following') { const r = await followApi.getFollowing(user.id); setFollowing(r.data); }
-    } catch {} finally { setTabLoading(false); }
+  useEffect(() => {
+    if (!user) return;
+    let c = false;
+    setTabLoading(true);
+    const p = tab==='collection' ? collectionApi.getPublicCollection(user.id, {limit:'50'}).then(r => { if (!c) setCollection(r.data); })
+      : tab==='reviews' ? reviewsApi.getByUser(user.id).then(r => { if (!c) setReviews(r.data); })
+      : tab==='followers' ? followApi.getFollowers(user.id).then(r => { if (!c) setFollowers(r.data); })
+      : followApi.getFollowing(user.id).then(r => { if (!c) setFollowing(r.data); });
+    p.catch(() => {}).finally(() => { if (!c) setTabLoading(false); });
+    return () => { c = true; };
   }, [tab, user]);
-
-  useEffect(() => { fetchTab(); }, [fetchTab]);
 
   const handleFollow = async () => {
     if (!user || !authState.user) return;

@@ -14,7 +14,7 @@ const Home: React.FC = () => {
   return (
     <div className="page-shell">
       <section className="home__hero">
-        <div className="home__eyebrow"><i class="fa-solid fa-crown"></i> Retro Collection Platform</div>
+        <div className="home__eyebrow"><i className="fa-solid fa-crown"></i> Retro Collection Platform</div>
         <h1 className="home__title">Build Your Retro<br />Collection</h1>
         <p className="home__subtitle">Track, organize, and showcase your classic game collection. Join {fmt(stats.collectors)} collectors across {stats.platforms} platforms.</p>
         <div className="home__cta">

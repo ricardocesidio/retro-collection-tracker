@@ -17,6 +17,8 @@ function getCollectorLevel(gameCount: number): { name: string; tier: number } {
 }
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,14 +31,22 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
     try {
+      const verificationToken = this.jwtService.sign(
+        { sub: 'verify', email: dto.email, type: 'email-verification' },
+        { expiresIn: '24h' },
+      );
+
       const user = await this.prisma.user.create({
         data: {
           email: dto.email,
           username: dto.username,
           displayName: dto.displayName || dto.username,
           password: passwordHash,
+          emailVerificationToken: verificationToken,
         },
       });
+
+      console.log(`[DEV] Email verification link: ${process.env.API_URL || 'http://localhost:3000'}/auth/verify-email?token=${verificationToken}`);
 
       const token = this.generateToken(user.id, user.email);
       return {
@@ -143,6 +153,66 @@ export class AuthService {
     }
   }
 
+  async verifyEmail(dto: VerifyEmailDto) {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(dto.token);
+    } catch {
+      throw new UnauthorizedException('Invalid or expired verification token');
+    }
+
+    if (payload.type !== 'email-verification') {
+      throw new UnauthorizedException('Invalid verification token');
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { email: payload.email } });
+    if (!user) throw new UnauthorizedException('User not found');
+    if (user.isEmailVerified) return { message: 'Email already verified.' };
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { isEmailVerified: true, emailVerificationToken: null },
+    });
+
+    return { message: 'Email verified successfully.' };
+  }
+
+  async resendVerification(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException('User not found');
+    if (user.isEmailVerified) return { message: 'Email already verified.' };
+
+    const verificationToken = this.jwtService.sign(
+      { sub: 'verify', email: user.email, type: 'email-verification' },
+      { expiresIn: '24h' },
+    );
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { emailVerificationToken: verificationToken },
+    });
+
+    console.log(`[DEV] Email verification link: ${process.env.API_URL || 'http://localhost:3000'}/auth/verify-email?token=${verificationToken}`);
+
+    return { message: 'Verification email sent.' };
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException('User not found');
+
+    const isPasswordValid = await bcrypt.compare(dto.currentPassword, user.password);
+    if (!isPasswordValid) throw new UnauthorizedException('Current password is incorrect');
+
+    const passwordHash = await bcrypt.hash(dto.newPassword, 12);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: passwordHash },
+    });
+
+    return { message: 'Password changed successfully.' };
+  }
+
   async forgotPassword(email: string) {
     const user = await this.prisma.user.findUnique({
       where: { email },
@@ -155,9 +225,9 @@ export class AuthService {
       { expiresIn: '1h' },
     );
 
+    // TODO: Send resetToken via email in production
     return {
       message: 'If the email exists, a reset link has been sent.',
-      resetToken,
     };
   }
 
@@ -188,7 +258,7 @@ export class AuthService {
   }
 
   private sanitizeUser(user: any) {
-    const { password, ...sanitized } = user;
+    const { password, emailVerificationToken, ...sanitized } = user;
     return sanitized;
   }
 }

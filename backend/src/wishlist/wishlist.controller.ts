@@ -1,9 +1,10 @@
 import {
-  Controller, Get, Post, Delete, Body, Param, Query, UseGuards, Request,
+  Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { WishlistService } from './wishlist.service';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
+import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('wishlist')
@@ -27,6 +28,12 @@ export class WishlistController {
   @Throttle({ default: { ttl: 60000, limit: 20 } })
   async add(@Request() req: any, @Body() dto: CreateWishlistDto) {
     return this.wishlistService.add(req.user.id, dto);
+  }
+
+  @Put(':id')
+  @Throttle({ default: { ttl: 60000, limit: 30 } })
+  async update(@Request() req: any, @Param('id') id: string, @Body() dto: UpdateWishlistDto) {
+    return this.wishlistService.update(req.user.id, id, dto);
   }
 
   @Delete(':id')

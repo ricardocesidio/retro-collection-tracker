@@ -4,6 +4,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../social/notifications.service';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
+import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 
 @Injectable()
 export class WishlistService {
@@ -44,6 +45,19 @@ export class WishlistService {
     this.notifications.notifyWishlistAdded(userId, dto.gameId).catch(() => {});
 
     return wishlist;
+  }
+
+  async update(userId: string, id: string, dto: UpdateWishlistDto) {
+    const item = await this.prisma.wishlist.findFirst({
+      where: { id, userId },
+    });
+    if (!item) throw new NotFoundException('Wishlist entry not found');
+
+    return this.prisma.wishlist.update({
+      where: { id },
+      data: dto,
+      include: { game: { include: { platform: true, genre: true } } },
+    });
   }
 
   async remove(userId: string, id: string) {

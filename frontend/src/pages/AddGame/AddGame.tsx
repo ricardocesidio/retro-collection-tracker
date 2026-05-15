@@ -28,6 +28,7 @@ const AddGame: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const mountedRef = useRef(true);
 
   const [games, setGames] = useState<GameData[]>([]);
   const [total, setTotal] = useState(0);
@@ -46,6 +47,7 @@ const AddGame: React.FC = () => {
   const [externalSearching, setExternalSearching] = useState(false);
   const [externalSource, setExternalSource] = useState<string>('');
   const [importingGame, setImportingGame] = useState(false);
+  const [importedGameId, setImportedGameId] = useState<string | null>(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -60,9 +62,16 @@ const AddGame: React.FC = () => {
   });
 
   useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
+
+  useEffect(() => {
+    let c = false;
     Promise.all([catalogApi.getPlatforms(), catalogApi.getGenres()])
-      .then(([p, g]) => { setPlatforms(p); setGenres(g); })
+      .then(([p, g]) => { if (!c) { setPlatforms(p); setGenres(g); } })
       .catch(() => {});
+    return () => { c = true; };
   }, []);
 
   const fetchGames = useCallback(async (searchTerm: string, pageNum: number, platform?: string, genre?: string) => {
@@ -73,6 +82,7 @@ const AddGame: React.FC = () => {
       if (platform) params.platform = platform;
       if (genre) params.genre = genre;
       const res = await gamesApi.list(params);
+      if (!mountedRef.current) return;
       if (pageNum === 1) {
         setGames(res.data);
       } else {
@@ -82,10 +92,12 @@ const AddGame: React.FC = () => {
       setHasMore(pageNum < res.totalPages);
       setPage(pageNum);
     } catch {
-      setError('Failed to load games');
+      if (mountedRef.current) setError('Failed to load games');
     } finally {
-      setSearching(false);
-      setLoading(false);
+      if (mountedRef.current) {
+        setSearching(false);
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -108,22 +120,31 @@ const AddGame: React.FC = () => {
     const timer = setTimeout(async () => {
       try {
         const res = await apiRequest<{ results: ExternalGameResult[]; source: string }>(`/games/external-search?q=${encodeURIComponent(search.trim())}`);
+        if (!mountedRef.current) return;
         setExternalResults(res.results || []);
         setExternalSource(res.source);
       } catch {
-        setExternalResults([]);
+        if (mountedRef.current) setExternalResults([]);
       } finally {
-        setExternalSearching(false);
+        if (mountedRef.current) setExternalSearching(false);
       }
     }, 600);
     return () => clearTimeout(timer);
   }, [search]);
 
-  const loadMore = () => {
-    if (!searching && hasMore) {
-      fetchGames(search, page + 1, platformFilter, genreFilter);
-    }
-  };
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasMore || searching) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && hasMore && !searching) {
+        fetchGames(search, page + 1, platformFilter, genreFilter);
+      }
+    }, { rootMargin: '200px' });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [hasMore, searching, search, page, platformFilter, genreFilter, fetchGames]);
 
   const handleSelectGame = (game: GameData) => {
     setSelectedGame(game);
@@ -133,6 +154,7 @@ const AddGame: React.FC = () => {
   };
 
   const clearSelection = () => {
+    if (importedGameId) { gamesApi.delete(importedGameId).catch(() => {}); setImportedGameId(null); }
     setSelectedGame(null);
     setCollectionForm({ condition: 'GOOD', region: 'NTSC', personalRating: '', estimatedValue: '', notes: '' });
   };
@@ -157,6 +179,7 @@ const AddGame: React.FC = () => {
         genre: { id: '', name: ext.genre || 'Other', slug: '' },
       };
       setSelectedGame(importedGame);
+      setImportedGameId(result.id);
       setExternalResults([]);
     } catch (err: any) {
       setError(err.message || 'Failed to import game');
@@ -181,11 +204,16 @@ const AddGame: React.FC = () => {
         estimatedValue: collectionForm.estimatedValue ? parseFloat(collectionForm.estimatedValue) : undefined,
         notes: collectionForm.notes.trim() || undefined,
       });
+      setImportedGameId(null);
       setSuccess(`${selectedGame.title} added to your collection!`);
       setSelectedGame(null);
       setCollectionForm({ condition: 'GOOD', region: 'NTSC', personalRating: '', estimatedValue: '', notes: '' });
       setTimeout(() => navigate('/collection', { replace: true }), 1200);
     } catch (err: any) {
+      if (importedGameId) {
+        gamesApi.delete(importedGameId).catch(() => {});
+        setImportedGameId(null);
+      }
       setError(err.message || 'Failed to add to collection');
     } finally {
       setSubmitting(false);
@@ -265,11 +293,8 @@ const AddGame: React.FC = () => {
                     </button>
                   ))}
                 </div>
-                {hasMore && (
-                  <div className="addgame-load-more">
-                    <Button variant="outline" onClick={loadMore} loading={searching}>Load More</Button>
-                  </div>
-                )}
+                {hasMore && <div ref={sentinelRef} className="addgame-sentinel" />}
+                {searching && <div className="addgame-load-more"><LoadingSpinner /></div>}
               </>
             )}
 

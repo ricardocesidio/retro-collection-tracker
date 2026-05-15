@@ -133,15 +133,16 @@ export class StatsService {
   }
 
   async getValueHistory(userId: string) {
+    const now = new Date();
+    const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+
     const items = await this.prisma.collection.findMany({
-      where: { userId },
+      where: { userId, createdAt: { gte: sixMonthsAgo } },
       select: { estimatedValue: true, createdAt: true },
       orderBy: { createdAt: 'asc' },
     });
 
     const months = ['Dec','Jan','Feb','Mar','Apr','May'];
-    const now = new Date();
-    const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
     const result: { month: string; value: number }[] = [];
     let cumulative = 0;

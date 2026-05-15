@@ -22,8 +22,8 @@ A full-stack web application for retro gaming collectors to organize, track, and
 ┌────────────────────────────────────────────────┐
 │                   Client (React)               │
 │  ┌──────────┐ ┌──────────┐ ┌───────────────┐  │
-│  │  Pages    │ │ Context  │ │   Services    │  │
-│  │ (14 lazy) │ │ (Auth)   │ │ (API clients) │  │
+│  │  Pages    │ │  Context  │ │   Services    │  │
+│  │  (20)     │ │  (Auth)   │ │ (API clients) │  │
 │  └──────────┘ └──────────┘ └───────┬───────┘  │
 │                                     │          │
 │                         HTTP (JSON) │          │
@@ -53,7 +53,7 @@ A full-stack web application for retro gaming collectors to organize, track, and
 
 - **Separation of concerns** — Frontend and backend are completely independent projects. The React app communicates exclusively through REST APIs. No SSR coupling.
 - **Type safety end-to-end** — TypeScript on both sides with shared type patterns. Prisma generates fully typed database client. DTOs validated at runtime with `class-validator`.
-- **Lazy loading** — All 14 pages are code-split. Initial bundle is under 300 kB. Subsequent navigations load ~2–8 kB chunks.
+- **Lazy loading ready** — Component structure supports code-splitting. All 20 pages are registered in the router.
 - **Stateless auth** — JWT tokens stored in `localStorage`, validated per-request via Passport strategy. No server-side sessions.
 - **Normalized data** — Platform and Genre are separate tables with foreign keys, not string columns. This enables proper filtering, sorting, and analytics.
 - **Global Prisma service** — A single `@Global()` PrismaService module injected across all feature modules, avoiding connection pooling issues.
@@ -76,6 +76,7 @@ A full-stack web application for retro gaming collectors to organize, track, and
 ## Features
 
 ### Core
+- **External game search** — search 350K+ games via RAWG API (with Wikipedia fallback), import any game into the catalog on demand
 - **Shared game catalog** — single canonical entry per game; users search/select existing games rather than creating duplicates. All collections, reviews, and wishlists link to the same game record.
 - **User authentication** — register, login, JWT sessions, protected routes, session persistence across refresh
 - **Collection management** — add, edit, delete games with full metadata (condition, region, estimated value, personal rating, notes, ownership status)
@@ -120,24 +121,25 @@ retro-collection-tracker/
 │       └── types/                # TypeScript interfaces
 ├── backend/                      # NestJS
 │   ├── prisma/
-│   │   ├── schema.prisma         # 10 models, 6 enums, indexes
+│   │   ├── schema.prisma         # 11 models, 6 enums, indexes
 │   │   ├── games-data.ts         # 200+ retro games across 12 platforms
 │   │   └── seed.ts               # 200+ games, 5 users, demo data
 │   └── src/
 │       ├── auth/                 # JWT auth module
 │       ├── users/                # User profiles
-│       ├── games/                # Catalog CRUD + platform/genre lists
+│       ├── games/                # Catalog CRUD + external search/import + platform/genre lists
 │       ├── collections/          # Personal collection CRUD + analytics
 │       ├── wishlist/             # Wishlist CRUD
 │       ├── reviews/              # Review CRUD
 │       ├── social/               # Follow, notifications, activity
+│       ├── upload/               # Avatar file upload
 │       ├── prisma/               # Global database service
 │       └── config/               # Environment configuration
 ```
 
 ## Database Schema
 
-10 models, 6 enums, fully normalized with relations:
+11 models, 6 enums, fully normalized with relations:
 
 | Model | Table | Key Fields |
 |-------|-------|------------|
@@ -216,9 +218,11 @@ PORT=3000
 | GET | /api/games/:id | — | Details + avgRating + recent reviews |
 | GET | /api/games/platforms | — | All platforms |
 | GET | /api/games/genres | — | All genres |
-| POST | /api/games | JWT | Create game |
-| PUT | /api/games/:id | JWT | Update game |
-| DELETE | /api/games/:id | JWT | Delete game |
+| GET | /api/games/external-search | — | Search RAWG/Wikipedia for games not in local catalog |
+| POST | /api/games/import | JWT | Import a game from external source (rawg/wikipedia) |
+| POST | /api/games | JWT | Create game (admin/moderator only) |
+| PUT | /api/games/:id | JWT | Update game (admin/moderator only) |
+| DELETE | /api/games/:id | JWT | Delete game (admin/moderator only) |
 
 ### Collections
 | Method | Path | Auth | Description |
@@ -250,6 +254,16 @@ PORT=3000
 | POST | /api/notifications/:id/read | JWT | Mark as read |
 | POST | /api/notifications/read-all | JWT | Mark all read |
 | GET | /api/activity | JWT | Activity log |
+
+### Upload
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | /api/upload/avatar | JWT | Upload profile picture (jpg/png/webp/gif, 5MB max) |
+
+### Public
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | /api/stats/public | — | Public site stats (games count, platforms count, collectors count) |
 
 ## Deployment
 
@@ -290,26 +304,94 @@ EXPOSE 3000
 CMD ["node", "dist/main.js"]
 ```
 
-## Future Improvements
+## Project Diagnosis
 
-- [x] RAWG API integration for external game search and import
-- [ ] Image upload for game covers (S3/Cloudinary)
-- [ ] Infinite scroll on explore/collection pages
+A full codebase audit identified the following areas for improvement, prioritized by impact:
+
+### P0 — Critical (Security & Data Integrity)
+
+| # | Issue | Location |
+|---|-------|----------|
+| 1 | **Login accepts single-character passwords** — `LoginDto` has `@MinLength(1)` while register requires 8+ | `backend/src/auth/dto/login.dto.ts` |
+| 2 | **Password reset token returned in API response** — not actually emailed, making the flow insecure | `backend/src/auth/auth.service.ts` |
+| 3 | **No email verification on registration** — anyone can register with any email | `backend/src/auth/auth.service.ts` |
+| 4 | **Settings password change is non-functional** — says "use forgot-password flow" with no actual flow | `frontend/src/pages/Settings/Settings.tsx` |
+| 5 | **Notification preferences not persisted** — toggles have no backend API, resets on refresh | `frontend/src/pages/Settings/Settings.tsx` |
+| 6 | **Stats endpoint loads all collection items into memory** — O(N) aggregation without pagination, crash risk at scale | `backend/src/collections/stats.service.ts` |
+| 7 | **Race conditions from missing AbortController cleanup** — stale API responses can corrupt UI state | Multiple pages |
+
+### P1 — Major Missing Features
+
+| # | Feature | Notes |
+|---|---------|-------|
+| 1 | **Code splitting / lazy loading** — all 20 pages eagerly imported, initial bundle is ~325 KB JS + 133 KB CSS | `frontend/src/App.tsx` |
+| 2 | **Wishlist update endpoint** — no way to edit priority or notes once added | `backend/src/wishlist/` |
+| 3 | **Game cover image upload** — only avatar upload works; games use placeholder images | `backend/src/upload/` |
+| 4 | **Collection export (CSV/JSON)** — mentioned as a Donate perk, not implemented | — |
+| 5 | **AddGame two-step API without rollback** — orphaned games if collection creation fails | `frontend/src/pages/AddGame/AddGame.tsx` |
+| 6 | **EditGame two API calls without rollback** — partial updates possible | `frontend/src/pages/EditGame/EditGame.tsx` |
+| 7 | **GameDetails shared loading state** — single `adding` state for both "Add to Collection" and "Add to Wishlist" | `frontend/src/pages/GameDetails/GameDetails.tsx` |
+| 8 | **Home page uses `i class` instead of `i className`** — icon won't render in React 19 strict mode | `frontend/src/pages/Home/Home.tsx` |
+
+### P2 — Nice-to-Have Improvements
+
+| # | Feature | Notes |
+|---|---------|-------|
+| 1 | **TopBar search autocomplete** — currently only navigates to Explore page, no instant suggestions | `frontend/src/components/layout/TopBar/TopBar.tsx` |
+| 2 | **Sidebar "Collection Progress" hardcoded** — shows fake 78% / "12 of 15 SNES games" | `frontend/src/components/layout/Sidebar/Sidebar.tsx` |
+| 3 | **Donate page hardcoded values** — "$247 raised", "49%", "34 supporters" | `frontend/src/pages/Donate/Donate.tsx` |
+| 4 | **WebSocket real-time notifications** — currently polls every 30s | `frontend/src/components/ui/NotificationBell/NotificationBell.tsx` |
+| 5 | **Dark/light theme toggle** — dark-only theme, no light mode | — |
+| 6 | **Price charting integration** — connect actual market values via PriceCharting API | — |
+| 7 | **Infinite scroll** — pagination with "Load More" / page numbers instead of infinite scroll | Multiple pages |
+| 8 | **Pagination not enforced at API level** — `limit=999999` is accepted | Backend services |
+| 9 | **Admin dashboard** — no UI for game catalog management, user moderation | — |
+| 10 | **No Swagger/OpenAPI docs** — API is undocumented beyond this README | — |
+| 11 | **No request logging** — no middleware for latency tracking or request/response logging | Backend |
+
+### P3 — Polish & Code Quality
+
+| # | Issue | Impact |
+|---|-------|--------|
+| 1 | **Dead `types/index.ts`** (54 lines) — not imported by any service, duplicates exist elsewhere | Cleanup |
+| 2 | **Dead `useCancellableFetch` hook** — never used anywhere | Cleanup |
+| 3 | **Empty directories** — `common/interceptors/`, `common/pipes/`, `common/decorators/`, `social/dto/`, `users/dto/` | Cleanup |
+| 4 | **Duplicate `getCollectorLevel()`** — same function in `auth.service.ts` and `users.service.ts` | Code smell |
+| 5 | **Placeholder cover images** — all game covers use placehold.co with text overlays | Visual quality |
+| 6 | **404 page uses inline styles** — should use SCSS like every other page | Consistency |
+| 7 | **Duplicate SCSS patterns** — `.game-card`, `.page-header` styles duplicated across 5+ page SCSS files | Maintainability |
+| 8 | **Triple `@keyframes spin`** — same animation defined in multiple SCSS files | Redundancy |
+| 9 | **Double `@keyframes fadeIn`** — same animation in global.scss and AddGame.scss | Redundancy |
+| 10 | **No Firefox scrollbar styling** — only WebKit (`-webkit-scrollbar`) is styled | Cross-browser |
+| 11 | **Missing `name` prop on Input component** — required for proper form handling | Accessibility |
+
+## Completed Milestones
+
+- [x] JWT authentication with register, login, protected routes
+- [x] Full collection CRUD with filters, pagination, value tracking
 - [x] Shared game catalog — search/select existing games instead of creating duplicates
-- [x] Expanded game database — 200+ notable retro games across 12 platforms in seed data
-- [x] External game search — RAWG API integration (350K+ games) with Wikipedia fallback; import any game on demand
-- [x] Advanced search with autocomplete
-- [ ] Collection export (CSV/JSON)
-- [ ] Price charting integration (PriceCharting API)
-- [ ] Dark/light theme toggle
-- [ ] Email verification on registration
-- [ ] Password reset flow
-- [ ] Admin dashboard for moderation
-- [ ] Public API for third-party integrations
-- [ ] End-to-end tests (Playwright/Cypress)
-- [ ] CI/CD pipeline (GitHub Actions)
-- [ ] Rate limiting and request throttling
-- [ ] WebSocket real-time notifications
+- [x] 200+ retro games seed data across 12 platforms
+- [x] External game search — RAWG API (350K+ games) + Wikipedia fallback
+- [x] Game import on demand from external sources
+- [x] Wishlist with priority levels (1–3)
+- [x] Reviews & star ratings with notifications
+- [x] Follow system with follower/following lists
+- [x] Public profiles with collection/reviews/follow tabs
+- [x] Real-time notification bell badge (polling)
+- [x] Activity feed for collection actions
+- [x] Dashboard with KPIs, platform donut chart, value history, activity, reviews
+- [x] Avatar upload with file type/size validation
+- [x] Username/bio validation (no spaces, max 20/100 chars)
+- [x] Collector level system (New Collector → Museum)
+- [x] 15 reusable UI components with dark premium theme
+- [x] Donate page with tiered support
+- [x] Error boundary catching render errors
+- [x] 404 page for unknown routes
+- [x] Responsive mobile layout with hamburger menu
+- [x] Rate limiting on auth and mutation endpoints
+- [x] Security headers (helmet), CORS config, body size limits
+- [x] GitHub Actions CI workflow
+- [x] 6 test files (3 frontend + 3 backend)
 
 ## License
 

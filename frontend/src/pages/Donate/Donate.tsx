@@ -1,8 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { apiRequest } from '../../services/api-client';
 import './Donate.scss';
 
 const Donate: React.FC = () => {
+  const [donateStats, setDonateStats] = useState({ raised: 247, goal: 500, supporters: 34 });
+
+  useEffect(() => {
+    let c = false;
+    apiRequest<{ raised: number; goal: number; supporters: number }>('/stats/donate').then(d => { if (!c) setDonateStats(d); }).catch(() => {});
+    return () => { c = true; };
+  }, []);
+
+  const pct = Math.min(100, Math.round((donateStats.raised / donateStats.goal) * 100));
+
   return (
     <div className="page-shell">
       <div className="donate-hero">
@@ -63,9 +74,9 @@ const Donate: React.FC = () => {
       </div>
 
       <div className="donate-footer">
-        <p>Total raised this month: <strong>$247</strong> · Goal: <strong>$500</strong></p>
-        <div className="donate-footer__bar"><div className="donate-footer__fill" style={{ width: '49%' }} /></div>
-        <p className="donate-footer__thanks">Thank you to all 34 supporters! ♥</p>
+        <p>Total raised this month: <strong>${donateStats.raised.toLocaleString()}</strong> · Goal: <strong>${donateStats.goal.toLocaleString()}</strong></p>
+        <div className="donate-footer__bar"><div className="donate-footer__fill" style={{ width: `${pct}%` }} /></div>
+        <p className="donate-footer__thanks">Thank you to all {donateStats.supporters} supporters! ♥</p>
       </div>
     </div>
   );
