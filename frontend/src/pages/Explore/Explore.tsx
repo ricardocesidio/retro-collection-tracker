@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
 import Input from '../../components/ui/Input/Input';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
@@ -10,6 +10,7 @@ import type { GameData, Platform } from '../../services/collections';
 import type { Genre } from '../../services/collections';
 
 const Explore: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const [games, setGames] = useState<GameData[]>([]);
   const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -17,13 +18,24 @@ const Explore: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [search, setSearch] = useState('');
+  const urlPlatform = searchParams.get('platform') || '';
+  const urlSearch = searchParams.get('search') || '';
+  const [search, setSearch] = useState(urlSearch);
   const debounce = useDebounce(search, 300);
   const [platId, setPlatId] = useState('');
   const [genreId, setGenreId] = useState('');
   const [sort, setSort] = useState('');
 
-  useEffect(() => { Promise.all([catalogApi.getPlatforms(),catalogApi.getGenres()]).then(([p,g])=>{setPlatforms(p);setGenres(g);}).catch(()=>{}); }, []);
+  useEffect(() => {
+    catalogApi.getPlatforms().then((p) => {
+      setPlatforms(p);
+      if (urlPlatform) {
+        const matched = p.find((pl) => pl.name.toLowerCase() === urlPlatform.toLowerCase());
+        if (matched) setPlatId(matched.id);
+      }
+    }).catch(()=>{});
+    catalogApi.getGenres().then(setGenres).catch(()=>{});
+  }, []);
 
   useEffect(() => {
     let c = false; setLoading(true);

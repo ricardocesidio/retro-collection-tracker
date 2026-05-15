@@ -7,8 +7,14 @@ const collectParams = (params?: Record<string, string>) =>
 export const collectionApi = {
   getStats: (): Promise<any> => apiRequest('/collections/stats'),
 
+  getValueHistory: (): Promise<Array<{month:string;value:number}>> =>
+    apiRequest('/collections/value-history'),
+
   list: (params?: Record<string, string>): Promise<PaginatedResponse<CollectionEntry>> =>
     apiRequest(`/collections${collectParams(params)}`),
+
+  getPublicCollection: (userId: string, params?: Record<string, string>): Promise<PaginatedResponse<CollectionEntry>> =>
+    apiRequest(`/collections/user/${userId}${collectParams(params)}`),
 
   getById: (id: string): Promise<CollectionEntry> =>
     apiRequest(`/collections/${id}`),

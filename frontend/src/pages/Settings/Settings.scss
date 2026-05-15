@@ -1,1 +1,40 @@
 @use '../../styles/variables' as *;
+
+.sett-tabs {
+  display: flex;
+  gap: $sp2;
+  margin-bottom: $sp5;
+  border-bottom: 1px solid $b1;
+  padding-bottom: $sp3;
+}
+
+.sett-tab {
+  display: flex;
+  align-items: center;
+  gap: $sp2;
+  padding: $sp3 $sp5;
+  font-size: $tsm;
+  font-weight: $w5;
+  color: $t2;
+  background: none;
+  border: none;
+  border-radius: $r1;
+  cursor: pointer;
+  transition: all $fast;
+  font-family: $font;
+
+  &:hover {
+    color: $t1;
+    background: rgba(255, 255, 255, .03);
+  }
+
+  &--active {
+    color: $a2;
+    background: $ad;
+    font-weight: $w6;
+  }
+
+  &__icon {
+    font-size: .9rem;
+  }
+}

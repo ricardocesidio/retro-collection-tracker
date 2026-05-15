@@ -7,6 +7,7 @@ import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
 import { CollectionQueryDto } from './dto/collection-query.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('collections')
 @UseGuards(JwtAuthGuard)
@@ -21,12 +22,26 @@ export class CollectionsController {
     return this.statsService.getCollectionStats(req.user.id);
   }
 
+  @Get('value-history')
+  async getValueHistory(@Request() req: any) {
+    return this.statsService.getValueHistory(req.user.id);
+  }
+
   @Get()
   async getUserCollection(
     @Request() req: any,
     @Query() query: CollectionQueryDto,
   ) {
     return this.collectionsService.getUserCollection(req.user.id, query);
+  }
+
+  @Public()
+  @Get('user/:userId')
+  async getPublicCollection(
+    @Param('userId') userId: string,
+    @Query() query: CollectionQueryDto,
+  ) {
+    return this.collectionsService.getUserCollection(userId, query);
   }
 
   @Get(':id')

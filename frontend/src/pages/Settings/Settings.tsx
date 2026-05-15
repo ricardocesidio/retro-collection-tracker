@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Input from '../../components/ui/Input/Input';
 import Button from '../../components/ui/Button/Button';
 import Alert from '../../components/ui/Alert/Alert';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
 import { apiRequest } from '../../services/api-client';
+import './Settings.scss';
 
 const Settings: React.FC = () => {
   const { state } = useAuth();
@@ -110,6 +112,12 @@ const Settings: React.FC = () => {
           ))}
         </div>
       )}
+
+      <div style={{marginTop:'2rem',textAlign:'center'}}>
+        <Link to="/donate" className="btn btn--outline">
+          <i className="fa-solid fa-heart" style={{marginRight:'.5rem',color:'#ec4899'}} /> Support the Project
+        </Link>
+      </div>
     </div>
   );
 };

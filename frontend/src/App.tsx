@@ -22,6 +22,7 @@ import Genres from './pages/Genres/Genres';
 import Activity from './pages/Activity/Activity';
 import Friends from './pages/Friends/Friends';
 import NotFound from './pages/NotFound/NotFound';
+import Donate from './pages/Donate/Donate';
 
 const App: React.FC = () => {
   return (
@@ -47,6 +48,7 @@ const App: React.FC = () => {
             <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
             <Route path="/friends" element={<ProtectedRoute><Friends /></ProtectedRoute>} />
             <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+            <Route path="/donate" element={<Donate />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

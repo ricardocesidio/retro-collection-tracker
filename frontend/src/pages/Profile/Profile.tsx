@@ -37,7 +37,7 @@ const Profile: React.FC = () => {
   const fetchTab = useCallback(async () => {
     if (!user) return; setTabLoading(true);
     try {
-      if (tab==='collection') { const r = await collectionApi.list({limit:'50'}); setCollection(r.data); }
+      if (tab==='collection') { const r = await collectionApi.getPublicCollection(user.id, {limit:'50'}); setCollection(r.data); }
       else if (tab==='reviews') { const r = await reviewsApi.getByUser(user.id); setReviews(r.data); }
       else if (tab==='followers') { const r = await followApi.getFollowers(user.id); setFollowers(r.data); }
       else if (tab==='following') { const r = await followApi.getFollowing(user.id); setFollowing(r.data); }
@@ -46,7 +46,23 @@ const Profile: React.FC = () => {
 
   useEffect(() => { fetchTab(); }, [fetchTab]);
 
-  const handleFollow = async () => { if(!user||!authState.user)return; setFollowLoading(true); try{if(isFollowing){await followApi.unfollow(user.id);setIsFollowing(false);}else{await followApi.follow(user.id);setIsFollowing(true);}}catch{}finally{setFollowLoading(false);}};
+  const handleFollow = async () => {
+    if (!user || !authState.user) return;
+    setFollowLoading(true);
+    try {
+      if (isFollowing) {
+        await followApi.unfollow(user.id);
+        setIsFollowing(false);
+        setUser((prev) => prev ? { ...prev, _count: { ...prev._count, followers: Math.max(0, prev._count.followers - 1) } } : null);
+      } else {
+        await followApi.follow(user.id);
+        setIsFollowing(true);
+        setUser((prev) => prev ? { ...prev, _count: { ...prev._count, followers: prev._count.followers + 1 } } : null);
+      }
+    } catch {} finally {
+      setFollowLoading(false);
+    }
+  };
 
   if (loading) return <LoadingSpinner fullPage />;
   if (error||!user) return <div className="page-shell"><EmptyState icon="👤" title="User not found"/></div>;
@@ -130,6 +146,10 @@ const Profile: React.FC = () => {
             <div className="prof-reviews">
               {reviews.map((r) => (
                 <Link to={`/games/${r.gameId}`} key={r.id} className="prof-review-item">
+                  <div className="prof-review-item__user">
+                    <div className="prof-review-item__avatar">{user.displayName?.charAt(0) || user.username.charAt(0)}</div>
+                    <span className="prof-review-item__username">{user.displayName || user.username}</span>
+                  </div>
                   <div className="prof-review-item__stars">{'★'.repeat(r.rating)}{'☆'.repeat(5-r.rating)}</div>
                   <span className="prof-review-item__title">{r.title||'Untitled'}</span>
                   {r.body && <p className="prof-review-item__body">{r.body.slice(0,120)}{r.body.length>120?'...':''}</p>}

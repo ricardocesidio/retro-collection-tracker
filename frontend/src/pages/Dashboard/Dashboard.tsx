@@ -14,7 +14,7 @@ interface DashboardData {
   genreDistribution: Array<{ name: string; count: number; percentage: number }>;
   conditionDistribution: Array<{ condition: string; count: number; percentage: number }>;
   recentAdditions: Array<{ id: string; gameId: string; title: string; platform: string; coverImageUrl?: string; description?: string; condition: string; score?: string | null; estimatedValue?: number }>;
-  recentReviews: Array<{ id: string; gameId: string; gameTitle: string; platform: string; coverImageUrl?: string | null; rating: number; title?: string; body?: string }>;
+  recentReviews: Array<{ id: string; gameId: string; gameTitle: string; platform: string; coverImageUrl?: string | null; rating: number; title?: string; body?: string; user?: { username: string; displayName?: string; avatarUrl?: string } }>;
   recentActivity: Array<{ id: string; type: string; message?: string; createdAt: string }>;
   wishlistSpotlight: Array<{ id: string; gameId: string; title: string; platform: string; genre: string; priority: number; coverImageUrl?: string }>;
   highlights: { mostValuable: any; highestRated: any };
@@ -25,10 +25,14 @@ const Dashboard: React.FC = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
+  const [valueHistory, setValueHistory] = useState<Array<{month:string;value:number}>>([]);
 
   useEffect(() => {
     let c = false;
-    collectionApi.getStats().then((d) => { if (!c) { setData(d); setTimeout(() => setVisible(true), 50); }}).catch(() => {}).finally(() => { if (!c) setLoading(false); });
+    Promise.all([
+      collectionApi.getStats(),
+      collectionApi.getValueHistory(),
+    ]).then(([d, vh]) => { if (!c) { setData(d); setValueHistory(vh); setTimeout(() => setVisible(true), 50); }}).catch(() => {}).finally(() => { if (!c) setLoading(false); });
     return () => { c = true; };
   }, []);
 
@@ -72,6 +76,17 @@ const Dashboard: React.FC = () => {
   };
   const genreTop5 = genreDistribution.slice(0, 5);
   const genreOtherPct = genreDistribution.slice(5).reduce((s, g) => s + g.percentage, 0);
+  const maxVal = Math.max(...valueHistory.map(v => v.value), 15000);
+  const chartH = 160;
+  const chartBaseline = 170;
+  const chartPoints = valueHistory.map((v, i) => {
+    const x = 60 + i * 104;
+    const y = chartBaseline - (v.value / maxVal) * chartH;
+    return [x, y] as [number, number];
+  });
+  const areaPoints = [[60, chartBaseline], ...chartPoints, [580, chartBaseline]].map(([x, y]) => `${x},${y}`).join(' ');
+  const linePoints = chartPoints.map(([x, y]) => `${x},${y}`).join(' ');
+  const yTicks = [0, Math.round(maxVal / 3), Math.round(maxVal * 2 / 3), maxVal];
   const genreSlices = genreOtherPct > 0 ? [...genreTop5, { name: 'Other', percentage: genreOtherPct }] : genreTop5;
   const getPColor = (name: string, i: number): string => pColorMap[name] || pColors[i % 8];
   const aIcons: Record<string, string> = { ADDED_GAME: 'fa-solid fa-plus', ADDED_REVIEW: 'fa-solid fa-star', ADDED_WISHLIST: 'fa-solid fa-bookmark', CREATED_ACCOUNT: 'fa-solid fa-user-plus', FOLLOWED_USER: 'fa-solid fa-user-plus' };
@@ -148,21 +163,21 @@ const Dashboard: React.FC = () => {
                     <stop offset="100%" stopColor="#d946ef" stopOpacity="0" />
                   </linearGradient>
                 </defs>
-                {[0, 5000, 10000, 15000].map(v => {
-                  const gy = 170 - (v * 160 / 15000);
+                {yTicks.map(v => {
+                  const gy = chartBaseline - (v / maxVal) * chartH;
                   return <line key={v} x1="60" y1={gy} x2="580" y2={gy} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />;
                 })}
-                {[0, 5000, 10000, 15000].map(v => (
-                  <text key={v} x="50" y={170 - (v * 160 / 15000) + 4} textAnchor="end" fill="#5a6480" fontSize="10" fontFamily="DM Mono, monospace">${v >= 1000 ? (v / 1000) + 'k' : v}</text>
+                {yTicks.map(v => (
+                  <text key={v} x="50" y={chartBaseline - (v / maxVal) * chartH + 4} textAnchor="end" fill="#5a6480" fontSize="10" fontFamily="DM Mono, monospace">${v >= 1000 ? Math.round(v / 1000) + 'k' : v}</text>
                 ))}
-                <polygon fill="url(#areaGrad)" points="60,170 60,157.2 164,108.1 268,114.5 372,70.8 476,54.8 580,31.3 580,170" />
-                <polyline points="60,157.2 164,108.1 268,114.5 372,70.8 476,54.8 580,31.3" fill="none" stroke="#d946ef" strokeWidth="2" strokeLinejoin="round" />
-                {[[60,157.2],[164,108.1],[268,114.5],[372,70.8],[476,54.8],[580,31.3]].map(([cx,cy],i) => (
+                <polygon fill="url(#areaGrad)" points={areaPoints} />
+                <polyline points={linePoints} fill="none" stroke="#d946ef" strokeWidth="2" strokeLinejoin="round" />
+                {chartPoints.map(([cx, cy], i) => (
                   <circle key={i} cx={cx} cy={cy} r="4" fill="#d946ef" stroke="#0f111a" strokeWidth="1.5" />
                 ))}
-                {['Dec','Jan','Feb','Mar','Apr','May'].map((m,i) => {
+                {valueHistory.map((v, i) => {
                   const tx = 60 + i * 104;
-                  return <g key={m}><line x1={tx} y1={170} x2={tx} y2={175} stroke="#5a6480" strokeWidth="1" /><text x={tx} y={190} textAnchor="middle" fill="#5a6480" fontSize="10" fontFamily="DM Mono, monospace">{m}</text></g>;
+                  return <g key={i}><line x1={tx} y1={chartBaseline} x2={tx} y2={chartBaseline + 5} stroke="#5a6480" strokeWidth="1" /><text x={tx} y={chartBaseline + 20} textAnchor="middle" fill="#5a6480" fontSize="10" fontFamily="DM Mono, monospace">{v.month}</text></g>;
                 })}
               </svg>
             </div>
@@ -182,6 +197,7 @@ const Dashboard: React.FC = () => {
                       <span className="rev-card__title">{r.gameTitle}</span>
                       <span className="rev-card__platform">{r.platform}</span>
                       <span className="rev-card__stars">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>
+                      {r.user && <span className="rev-card__user">by {r.user.displayName || r.user.username}</span>}
                     </div>
                     <div className="rev-card__badge">{(r.rating / 5 * 10).toFixed(1)}</div>
                   </Link>

@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { notificationsApi } from '../../../services/social';
 import './NotificationBell.scss';
 
 interface NotificationBellProps {
-  count?: number;
   onClick?: () => void;
 }
 
-const NotificationBell: React.FC<NotificationBellProps> = ({ count = 0, onClick }) => {
+const NotificationBell: React.FC<NotificationBellProps> = ({ onClick }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    notificationsApi.getUnreadCount().then((r: any) => setCount(r.count || 0)).catch(() => {});
+    const interval = setInterval(() => {
+      notificationsApi.getUnreadCount().then((r: any) => setCount(r.count || 0)).catch(() => {});
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <button className="notif-bell" onClick={onClick} aria-label={`Notifications${count > 0 ? `: ${count} unread` : ''}`}>
       <span className="notif-bell__icon"><i className="fa-solid fa-bell" /></span>

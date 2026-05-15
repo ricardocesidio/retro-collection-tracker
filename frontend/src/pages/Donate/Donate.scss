@@ -1,0 +1,205 @@
+@use '../../styles/variables' as *;
+
+.donate-hero {
+  text-align: center;
+  padding: $sp8 0 $sp6;
+
+  &__title {
+    font-size: $t3x;
+    font-weight: $w8;
+    margin-bottom: $sp3;
+    letter-spacing: -.025em;
+    background: linear-gradient(135deg, $t1, $a2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  &__sub {
+    color: $t2;
+    font-size: $tbs;
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+}
+
+.donate-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $sp5;
+  margin-bottom: $sp6;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.donate-tier {
+  text-align: center;
+  padding: $sp6 $sp5;
+  position: relative;
+  overflow: visible;
+
+  &--featured {
+    border-color: $a1;
+    box-shadow: 0 0 40px $ad;
+    transform: scale(1.03);
+
+    @media (max-width: 900px) {
+      transform: none;
+    }
+  }
+
+  &__badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, $a1, $a7);
+    color: #fff;
+    font-size: $txs;
+    font-weight: $w7;
+    font-family: $mono;
+    padding: 3px 16px;
+    border-radius: $rf;
+    letter-spacing: .04em;
+  }
+
+  &__icon {
+    font-size: 2rem;
+    color: $a2;
+    margin-bottom: $sp3;
+  }
+
+  &__name {
+    font-size: $txl;
+    font-weight: $w7;
+    color: $t1;
+    margin-bottom: $sp2;
+  }
+
+  &__price {
+    font-size: $t3x;
+    font-weight: $w8;
+    color: $t1;
+    font-family: $mono;
+    margin-bottom: $sp4;
+
+    span {
+      font-size: $tsm;
+      font-weight: $w4;
+      color: $t3;
+      font-family: $font;
+    }
+  }
+
+  &__perks {
+    list-style: none;
+    text-align: left;
+    margin-bottom: $sp5;
+
+    li {
+      font-size: $tsm;
+      color: $t2;
+      padding: $sp2 0;
+      display: flex;
+      align-items: center;
+      gap: $sp2;
+
+      i {
+        color: $a4;
+        font-size: .7rem;
+        width: 18px;
+        text-align: center;
+      }
+    }
+  }
+
+  &__cta {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.donate-onetime {
+  text-align: center;
+  margin-bottom: $sp6;
+
+  h2 {
+    font-size: $tlg;
+    font-weight: $w6;
+    margin-bottom: $sp1;
+  }
+
+  p {
+    color: $t2;
+    font-size: $tsm;
+    margin-bottom: $sp4;
+  }
+
+  &__amounts {
+    display: flex;
+    justify-content: center;
+    gap: $sp3;
+    flex-wrap: wrap;
+  }
+
+  &__chip {
+    padding: $sp3 $sp5;
+    background: $s3;
+    border: 1px solid $b1;
+    border-radius: $r1;
+    color: $t1;
+    font-size: $tbs;
+    font-weight: $w6;
+    font-family: $mono;
+    text-decoration: none;
+    transition: all $fast;
+
+    &:hover {
+      border-color: $a1;
+      background: $ad;
+      color: $a2;
+    }
+  }
+}
+
+.donate-footer {
+  text-align: center;
+  padding: $sp5 0;
+
+  p {
+    color: $t2;
+    font-size: $tsm;
+    margin-bottom: $sp3;
+
+    strong {
+      color: $t1;
+    }
+  }
+
+  &__bar {
+    height: 8px;
+    background: $s4;
+    border-radius: 4px;
+    overflow: hidden;
+    max-width: 400px;
+    margin: 0 auto $sp3;
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, $a1, $a7);
+    transition: width .8s $e1;
+  }
+
+  &__thanks {
+    color: $a2 !important;
+    font-size: $txs !important;
+    font-family: $mono;
+  }
+}

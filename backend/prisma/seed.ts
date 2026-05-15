@@ -117,6 +117,7 @@ async function main() {
         developer: g.developer,
         publisher: g.publisher,
         description: g.description,
+        coverImageUrl: `https://placehold.co/400x300/1a1f35/8b5cf6?text=${encodeURIComponent(g.title.slice(0, 12))}`,
       },
     });
     games[slug] = game.id;
