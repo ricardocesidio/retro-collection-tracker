@@ -467,20 +467,16 @@
   right: $sp2;
   font-size: $txs;
   font-weight: $w6;
-  color: $a2;
-  background: rgba($s2, .9);
-  padding: 2px 8px;
+  color: #fff;
+  background: $a1;
+  padding: 4px 10px;
   border-radius: 6px;
   display: flex;
   align-items: center;
-  gap: 4px;
-  opacity: 0;
-  transition: opacity $fast;
+  gap: 6px;
+  opacity: 1;
   font-family: $mono;
-
-  .addgame-card--external:hover & {
-    opacity: 1;
-  }
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
 }
 
 @keyframes fadeIn {
