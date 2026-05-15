@@ -11,10 +11,14 @@ import type { UserProfile, ReviewEntry } from '../../services/social';
 import type { CollectionEntry } from '../../services/collections';
 import './Profile.scss';
 
+interface ProfileWithLevel extends UserProfile {
+  level?: { name: string; tier: number };
+}
+
 const Profile: React.FC = () => {
   const { username } = useParams<{username:string}>();
   const { state: authState } = useAuth();
-  const [user, setUser] = useState<UserProfile|null>(null);
+  const [user, setUser] = useState<ProfileWithLevel|null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [tab, setTab] = useState<'collection'|'reviews'|'followers'|'following'>('collection');
@@ -82,7 +86,10 @@ const Profile: React.FC = () => {
           {user.avatarUrl ? <img src={user.avatarUrl} alt=""/> : <div className="prof-hero__avatar-placeholder">{(user.displayName||user.username).charAt(0).toUpperCase()}</div>}
         </div>
         <div className="prof-hero__info">
-          <h1 className="prof-hero__name">{user.displayName||user.username}</h1>
+          <h1 className="prof-hero__name">
+            {user.displayName||user.username}
+            {user.level && <span className={`prof-hero__level prof-hero__level--t${user.level.tier}`}>{user.level.name}</span>}
+          </h1>
           <p className="prof-hero__handle">@{user.username}</p>
           {user.bio && <p className="prof-hero__bio">{user.bio}</p>}
           <div className="prof-hero__stats">

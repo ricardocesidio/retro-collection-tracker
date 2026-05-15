@@ -8,6 +8,13 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
+
+function getCollectorLevel(gameCount: number): { name: string; tier: number } {
+  if (gameCount >= 30) return { name: 'Museum', tier: 3 };
+  if (gameCount >= 15) return { name: 'Curator', tier: 2 };
+  if (gameCount >= 5) return { name: 'Collector', tier: 1 };
+  return { name: 'New Collector', tier: 0 };
+}
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
@@ -97,6 +104,7 @@ export class AuthService {
     return {
       ...this.sanitizeUser(user),
       stats: user._count,
+      level: getCollectorLevel(user._count.collections),
     };
   }
 
