@@ -366,6 +366,118 @@
   border-top: 1px solid $b1;
 }
 
+.addgame-external-section {
+  margin-top: $sp6;
+  padding-top: $sp6;
+  border-top: 1px solid $b1;
+  animation: fadeIn $med $e1;
+}
+
+.addgame-external-header {
+  display: flex;
+  align-items: center;
+  gap: $sp3;
+  margin-bottom: $sp2;
+
+  .LoadingSpinner {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.addgame-external-title {
+  font-size: $tbs;
+  font-weight: $w7;
+  color: $t1;
+  display: flex;
+  align-items: center;
+  gap: $sp2;
+
+  i {
+    color: $a2;
+  }
+}
+
+.addgame-external-badge {
+  font-size: $txs;
+  font-weight: $w7;
+  font-family: $mono;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: $a1;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+
+  &--wiki {
+    background: $t4;
+    color: $t1;
+  }
+}
+
+.addgame-external-hint {
+  font-size: $tsm;
+  color: $t3;
+  margin-bottom: $sp4;
+}
+
+.addgame-external-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: $sp4;
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $sp3;
+  }
+}
+
+.addgame-card--external {
+  position: relative;
+  border-style: dashed;
+  border-color: $b2;
+  background: rgba($s2, .6);
+
+  &:hover {
+    border-style: solid;
+    border-color: $a2;
+    background: $s2;
+  }
+}
+
+.addgame-card__desc {
+  font-size: $txs;
+  color: $t3;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: $sp1;
+}
+
+.addgame-card__import-badge {
+  position: absolute;
+  top: $sp2;
+  right: $sp2;
+  font-size: $txs;
+  font-weight: $w6;
+  color: $a2;
+  background: rgba($s2, .9);
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity $fast;
+  font-family: $mono;
+
+  .addgame-card--external:hover & {
+    opacity: 1;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

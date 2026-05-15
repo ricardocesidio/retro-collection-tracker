@@ -5,10 +5,24 @@ import Alert from '../../components/ui/Alert/Alert';
 import Input from '../../components/ui/Input/Input';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import { gamesApi, collectionApi, catalogApi } from '../../services/collections';
+import { apiRequest } from '../../services/api-client';
 import type { GameData, Platform, Genre } from '../../types';
 import './AddGame.scss';
 
 const PLACEHOLDER_COVER = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="260" viewBox="0 0 200 260"><rect fill="#1e1b4b" width="200" height="260"/><text x="100" y="130" text-anchor="middle" fill="#4c1d95" font-size="48" font-family="sans-serif">🎮</text></svg>');
+
+interface ExternalGameResult {
+  source: 'rawg' | 'wikipedia';
+  sourceId: string;
+  title: string;
+  releaseYear?: number;
+  platform?: string;
+  genre?: string;
+  description?: string;
+  coverImageUrl?: string;
+  developer?: string;
+  publisher?: string;
+}
 
 const AddGame: React.FC = () => {
   const navigate = useNavigate();
@@ -27,6 +41,11 @@ const AddGame: React.FC = () => {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [platformFilter, setPlatformFilter] = useState(searchParams.get('platform') || '');
   const [genreFilter, setGenreFilter] = useState(searchParams.get('genre') || '');
+
+  const [externalResults, setExternalResults] = useState<ExternalGameResult[]>([]);
+  const [externalSearching, setExternalSearching] = useState(false);
+  const [externalSource, setExternalSource] = useState<string>('');
+  const [importingGame, setImportingGame] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -79,6 +98,27 @@ const AddGame: React.FC = () => {
     return () => clearTimeout(timer);
   }, [search, platformFilter, genreFilter, fetchGames]);
 
+  useEffect(() => {
+    if (!search.trim() || search.trim().length < 2) {
+      setExternalResults([]);
+      setExternalSource('');
+      return;
+    }
+    setExternalSearching(true);
+    const timer = setTimeout(async () => {
+      try {
+        const res = await apiRequest<{ results: ExternalGameResult[]; source: string }>(`/games/external-search?q=${encodeURIComponent(search.trim())}`);
+        setExternalResults(res.results || []);
+        setExternalSource(res.source);
+      } catch {
+        setExternalResults([]);
+      } finally {
+        setExternalSearching(false);
+      }
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const loadMore = () => {
     if (!searching && hasMore) {
       fetchGames(search, page + 1, platformFilter, genreFilter);
@@ -95,6 +135,34 @@ const AddGame: React.FC = () => {
   const clearSelection = () => {
     setSelectedGame(null);
     setCollectionForm({ condition: 'GOOD', region: 'NTSC', personalRating: '', estimatedValue: '', notes: '' });
+  };
+
+  const handleImportExternal = async (ext: ExternalGameResult) => {
+    setImportingGame(true);
+    setError('');
+    try {
+      const result = await apiRequest<{ id: string; title: string }>('/games/import', {
+        method: 'POST',
+        body: JSON.stringify({ source: ext.source, sourceId: ext.sourceId }),
+      });
+      const importedGame: GameData = {
+        id: result.id,
+        title: result.title,
+        releaseYear: ext.releaseYear || 2000,
+        developer: ext.developer,
+        publisher: ext.publisher,
+        description: ext.description,
+        coverImageUrl: ext.coverImageUrl,
+        platform: { id: '', name: ext.platform || 'Other', slug: '' },
+        genre: { id: '', name: ext.genre || 'Other', slug: '' },
+      };
+      setSelectedGame(importedGame);
+      setExternalResults([]);
+    } catch (err: any) {
+      setError(err.message || 'Failed to import game');
+    } finally {
+      setImportingGame(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -203,6 +271,54 @@ const AddGame: React.FC = () => {
                   </div>
                 )}
               </>
+            )}
+
+            {externalSearching && search.trim().length >= 2 && (
+              <div className="addgame-external-section">
+                <div className="addgame-external-header">
+                  <span className="addgame-external-title">Searching online databases...</span>
+                  <LoadingSpinner />
+                </div>
+              </div>
+            )}
+
+            {!externalSearching && externalResults.length > 0 && search.trim().length >= 2 && (
+              <div className="addgame-external-section">
+                <div className="addgame-external-header">
+                  <span className="addgame-external-title">
+                    <i className="fa-solid fa-globe" /> More results online
+                  </span>
+                  {externalSource === 'rawg' ? (
+                    <span className="addgame-external-badge">RAWG</span>
+                  ) : externalSource === 'wikipedia' ? (
+                    <span className="addgame-external-badge addgame-external-badge--wiki">Wikipedia</span>
+                  ) : null}
+                </div>
+                <p className="addgame-external-hint">Not in our catalog yet. Click to import and add to your collection.</p>
+                <div className="addgame-external-grid">
+                  {externalResults.map((ext) => (
+                    <button
+                      key={`${ext.source}-${ext.sourceId}`}
+                      className="addgame-card addgame-card--external"
+                      onClick={() => handleImportExternal(ext)}
+                      disabled={importingGame}
+                    >
+                      <div className="addgame-card__cover">
+                        <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
+                      </div>
+                      <div className="addgame-card__info">
+                        <span className="addgame-card__title">{ext.title}</span>
+                        {ext.platform && <span className="addgame-card__meta">{ext.platform}{ext.releaseYear ? ` · ${ext.releaseYear}` : ''}</span>}
+                        {ext.genre && <span className="addgame-card__genre">{ext.genre}</span>}
+                        {ext.description && <span className="addgame-card__desc">{ext.description.slice(0, 100)}...</span>}
+                      </div>
+                      <div className="addgame-card__import-badge">
+                        <i className="fa-solid fa-cloud-arrow-down" /> Import
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
           </>
         )}

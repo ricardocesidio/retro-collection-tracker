@@ -3,6 +3,7 @@ import {
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { GamesService } from './games.service';
+import { ExternalGamesService } from './external-games.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { GameQueryDto } from './dto/game-query.dto';
@@ -12,11 +13,25 @@ import { UserRole } from '@prisma/client';
 
 @Controller('games')
 export class GamesController {
-  constructor(private readonly gamesService: GamesService) {}
+  constructor(
+    private readonly gamesService: GamesService,
+    private readonly externalGamesService: ExternalGamesService,
+  ) {}
 
   @Get()
   async findAll(@Query() query: GameQueryDto) {
     return this.gamesService.findAll(query);
+  }
+
+  @Get('external-search')
+  async externalSearch(@Query('q') q: string, @Query('page') page?: string): Promise<any> {
+    return this.externalGamesService.search(q || '', page ? parseInt(page) : 1);
+  }
+
+  @Post('import')
+  @UseGuards(JwtAuthGuard)
+  async importGame(@Body() body: { source: string; sourceId: string }): Promise<any> {
+    return this.externalGamesService.import(body.source, body.sourceId);
   }
 
   @Get('platforms')

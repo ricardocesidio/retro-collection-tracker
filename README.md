@@ -292,10 +292,12 @@ CMD ["node", "dist/main.js"]
 
 ## Future Improvements
 
+- [x] RAWG API integration for external game search and import
 - [ ] Image upload for game covers (S3/Cloudinary)
 - [ ] Infinite scroll on explore/collection pages
 - [x] Shared game catalog — search/select existing games instead of creating duplicates
 - [x] Expanded game database — 200+ notable retro games across 12 platforms in seed data
+- [x] External game search — RAWG API integration (350K+ games) with Wikipedia fallback; import any game on demand
 - [x] Advanced search with autocomplete
 - [ ] Collection export (CSV/JSON)
 - [ ] Price charting integration (PriceCharting API)
