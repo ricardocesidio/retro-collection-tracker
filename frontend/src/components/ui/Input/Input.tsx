@@ -13,6 +13,7 @@ interface InputProps {
   suffix?: string;
   value?: string;
   rows?: number;
+  maxLength?: number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onBlur?: () => void;
 }
@@ -29,6 +30,7 @@ const Input: React.FC<InputProps> = ({
   suffix,
   value,
   rows = 4,
+  maxLength,
   onChange,
   onBlur,
 }) => {
@@ -50,6 +52,7 @@ const Input: React.FC<InputProps> = ({
             className="input-group__control input-group__control--textarea"
             placeholder={placeholder}
             disabled={disabled}
+            maxLength={maxLength}
             value={value}
             onChange={onChange}
             onBlur={onBlur}
@@ -62,6 +65,7 @@ const Input: React.FC<InputProps> = ({
             type={type}
             placeholder={placeholder}
             disabled={disabled}
+            maxLength={maxLength}
             value={value}
             onChange={onChange}
             onBlur={onBlur}

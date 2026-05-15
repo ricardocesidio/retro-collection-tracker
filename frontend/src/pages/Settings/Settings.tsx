@@ -25,8 +25,12 @@ const Settings: React.FC = () => {
 
   const saveProfile = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true); setMsg(null);
+    const uname = profile.username.trim();
+    if (uname && !/^[a-zA-Z0-9_]+$/.test(uname)) { setMsg({type:'danger',text:'Username can only contain letters, numbers, and underscores. Spaces are not allowed.'}); setSaving(false); return; }
+    if (uname && uname.length > 20) { setMsg({type:'danger',text:'Username must be 20 characters or less'}); setSaving(false); return; }
+    if (profile.bio && profile.bio.length > 100) { setMsg({type:'danger',text:'Bio must be 100 characters or less'}); setSaving(false); return; }
     try {
-      await apiRequest('/auth/me', { method:'PUT', body:JSON.stringify({ username:profile.username.trim()||undefined, displayName:profile.displayName.trim()||undefined, bio:profile.bio.trim()||undefined }) });
+      await apiRequest('/auth/me', { method:'PUT', body:JSON.stringify({ username:uname||undefined, displayName:profile.displayName.trim()||undefined, bio:profile.bio.trim()||undefined }) });
       setMsg({type:'success',text:'Profile updated successfully'});
     } catch (err:any) { setMsg({type:'danger',text:err.message||'Failed to update'}); }
     finally { setSaving(false); }
@@ -70,9 +74,9 @@ const Settings: React.FC = () => {
         <form onSubmit={saveProfile}>
           <div className="panel" style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
             <h3 style={{fontSize:'1.0625rem',fontWeight:600,marginBottom:'.25rem'}}>Profile Information</h3>
-            <Input label="Username" value={profile.username} onChange={(e)=>setProfile({...profile,username:e.target.value})} required />
+            <Input label="Username" value={profile.username} onChange={(e)=>setProfile({...profile,username:e.target.value})} required maxLength={20} />
             <Input label="Display Name" value={profile.displayName} onChange={(e)=>setProfile({...profile,displayName:e.target.value})} />
-            <Input label="Bio" type="textarea" value={profile.bio} onChange={(e)=>setProfile({...profile,bio:e.target.value})} rows={3} placeholder="Tell other collectors about yourself..." />
+            <Input label="Bio" type="textarea" value={profile.bio} onChange={(e)=>setProfile({...profile,bio:e.target.value})} rows={3} placeholder="Tell other collectors about yourself..." maxLength={100} />
             <div style={{display:'flex',justifyContent:'flex-end'}}>
               <Button type="submit" variant="primary" loading={saving}>Save Changes</Button>
             </div>
