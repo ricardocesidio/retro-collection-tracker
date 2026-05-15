@@ -1,5 +1,6 @@
 import { PrismaClient, UserRole, Condition, Region, OwnershipStatus, ActivityType, NotificationType } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import { gameData } from './games-data';
 
 const prisma = new PrismaClient();
 
@@ -61,42 +62,7 @@ async function main() {
   console.log(`✓ Created ${Object.keys(genres).length} genres`);
 
   // ─── GAMES ───────────────────────────────────────
-  const gameData = [
-    { title: 'Super Metroid', platform: 'snes', genre: 'action', releaseYear: 1994, developer: 'Nintendo', publisher: 'Nintendo', description: 'The third installment in the Metroid series, following bounty hunter Samus Aran on planet Zebes.' },
-    { title: 'Chrono Trigger', platform: 'snes', genre: 'rpg', releaseYear: 1995, developer: 'Square', publisher: 'Square', description: 'A groundbreaking RPG featuring time travel and multiple endings.' },
-    { title: 'The Legend of Zelda', platform: 'nes', genre: 'adventure', releaseYear: 1986, developer: 'Nintendo', publisher: 'Nintendo', description: 'The original adventure of Link to save Princess Zelda from Ganon.' },
-    { title: 'Sonic the Hedgehog 2', platform: 'sega-genesis', genre: 'platformer', releaseYear: 1992, developer: 'Sega', publisher: 'Sega', description: 'Sonic teams up with Tails to stop Dr. Robotnik.' },
-    { title: 'Castlevania: Symphony of the Night', platform: 'playstation', genre: 'action', releaseYear: 1997, developer: 'Konami', publisher: 'Konami', description: 'Alucard explores Dracula\'s castle in this genre-defining Metroidvania.' },
-    { title: 'Final Fantasy VI', platform: 'snes', genre: 'rpg', releaseYear: 1994, developer: 'Square', publisher: 'Square', description: 'A steampunk fantasy epic with one of the largest casts in the series.' },
-    { title: 'Mega Man X', platform: 'snes', genre: 'action', releaseYear: 1993, developer: 'Capcom', publisher: 'Capcom', description: 'A faster, darker take on the Mega Man formula for the SNES.' },
-    { title: 'Donkey Kong Country', platform: 'snes', genre: 'platformer', releaseYear: 1994, developer: 'Rare', publisher: 'Nintendo', description: 'Donkey Kong and Diddy Kong fight to reclaim their banana hoard.' },
-    { title: 'Street Fighter II', platform: 'snes', genre: 'fighting', releaseYear: 1992, developer: 'Capcom', publisher: 'Capcom', description: 'The fighting game that defined a generation.' },
-    { title: 'Super Mario World', platform: 'snes', genre: 'platformer', releaseYear: 1990, developer: 'Nintendo', publisher: 'Nintendo', description: 'Mario\'s 16-bit debut with Yoshi in Dinosaur Land.' },
-    { title: 'EarthBound', platform: 'snes', genre: 'rpg', releaseYear: 1994, developer: 'HAL Laboratory', publisher: 'Nintendo', description: 'A quirky modern-day RPG with psychic kids and alien invasions.' },
-    { title: 'Metroid', platform: 'nes', genre: 'action', releaseYear: 1986, developer: 'Nintendo', publisher: 'Nintendo', description: 'The original atmospheric adventure of Samus Aran.' },
-    { title: 'Contra', platform: 'nes', genre: 'shooter', releaseYear: 1988, developer: 'Konami', publisher: 'Konami', description: 'Run-and-gun classic known for its cooperative gameplay.' },
-    { title: 'Panzer Dragoon Saga', platform: 'sega-saturn', genre: 'rpg', releaseYear: 1998, developer: 'Team Andromeda', publisher: 'Sega', description: 'A cult-classic RPG on the Sega Saturn with a unique battle system.' },
-    { title: 'Snatcher', platform: 'sega-genesis', genre: 'adventure', releaseYear: 1994, developer: 'Konami', publisher: 'Konami', description: 'A cyberpunk visual novel from Hideo Kojima.' },
-    { title: 'MUSHA', platform: 'sega-genesis', genre: 'shooter', releaseYear: 1990, developer: 'Compile', publisher: 'Toaplan', description: 'A vertically scrolling shoot-em-up with a heavy metal soundtrack.' },
-    { title: 'Radiant Silvergun', platform: 'sega-saturn', genre: 'shooter', releaseYear: 1998, developer: 'Treasure', publisher: 'Treasure', description: 'An acclaimed shoot-em-up with a unique weapon system.' },
-    { title: 'Super Mario 64', platform: 'nintendo-64', genre: 'platformer', releaseYear: 1996, developer: 'Nintendo', publisher: 'Nintendo', description: 'Mario\'s groundbreaking leap into 3D.' },
-    { title: 'The Legend of Zelda: Ocarina of Time', platform: 'nintendo-64', genre: 'adventure', releaseYear: 1998, developer: 'Nintendo', publisher: 'Nintendo', description: 'Often cited as the greatest game of all time.' },
-    { title: 'Pokemon Red', platform: 'game-boy', genre: 'rpg', releaseYear: 1996, developer: 'Game Freak', publisher: 'Nintendo', description: 'The game that started a global phenomenon.' },
-    { title: 'Tetris', platform: 'game-boy', genre: 'puzzle', releaseYear: 1989, developer: 'Nintendo', publisher: 'Nintendo', description: 'The addictive puzzle game that sold millions of Game Boys.' },
-    { title: 'Castlevania: Aria of Sorrow', platform: 'gba', genre: 'action', releaseYear: 2003, developer: 'Konami', publisher: 'Konami', description: 'A standout Metroidvania on the Game Boy Advance.' },
-    { title: 'Shining Force III', platform: 'sega-saturn', genre: 'strategy', releaseYear: 1998, developer: 'Camelot', publisher: 'Sega', description: 'A tactical RPG epic on the Sega Saturn.' },
-    { title: 'Suikoden II', platform: 'playstation', genre: 'rpg', releaseYear: 1998, developer: 'Konami', publisher: 'Konami', description: 'A beloved RPG featuring 108 recruitable characters.' },
-    { title: 'Resident Evil 2', platform: 'playstation', genre: 'horror', releaseYear: 1998, developer: 'Capcom', publisher: 'Capcom', description: 'Survival horror classic set in Raccoon City.' },
-    { title: 'Final Fantasy VII', platform: 'playstation', genre: 'rpg', releaseYear: 1997, developer: 'Square', publisher: 'Square', description: 'The RPG that brought Japanese role-playing games to the mainstream.' },
-    { title: 'Metal Gear Solid', platform: 'playstation', genre: 'action', releaseYear: 1998, developer: 'Konami', publisher: 'Konami', description: 'Tactical espionage action from Hideo Kojima.' },
-    { title: 'Gran Turismo', platform: 'playstation', genre: 'racing', releaseYear: 1997, developer: 'Polyphony Digital', publisher: 'Sony', description: 'A revolutionary racing simulator.' },
-    { title: 'Adventure', platform: 'atari-2600', genre: 'adventure', releaseYear: 1980, developer: 'Atari', publisher: 'Atari', description: 'One of the earliest action-adventure games.' },
-    { title: 'Bonk\'s Adventure', platform: 'pc-engine', genre: 'platformer', releaseYear: 1990, developer: 'Red Company', publisher: 'NEC', description: 'A caveman-themed platformer starring Bonk.' },
-    { title: 'Shenmue', platform: 'sega-dreamcast', genre: 'adventure', releaseYear: 1999, developer: 'Sega AM2', publisher: 'Sega', description: 'Ryo Hazuki seeks revenge in this groundbreaking open-world adventure.' },
-    { title: 'Jet Set Radio', platform: 'sega-dreamcast', genre: 'action', releaseYear: 2000, developer: 'Smilebit', publisher: 'Sega', description: 'Cel-shaded skating graffiti action in Tokyo-to.' },
-    { title: 'Shadow of the Colossus', platform: 'playstation-2', genre: 'adventure', releaseYear: 2005, developer: 'Team Ico', publisher: 'Sony', description: 'A lone warrior battles colossal beings to revive a fallen maiden.' },
-    { title: 'Final Fantasy X', platform: 'playstation-2', genre: 'rpg', releaseYear: 2001, developer: 'Square', publisher: 'Square', description: 'Tidus and Yuna\'s pilgrimage to defeat Sin in the first PS2 Final Fantasy.' },
-  ];
+  // Expanded game data imported from games-data.ts
 
   const games: Record<string, string> = {};
   for (const g of gameData) {

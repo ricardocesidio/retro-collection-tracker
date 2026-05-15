@@ -121,7 +121,8 @@ retro-collection-tracker/
 ├── backend/                      # NestJS
 │   ├── prisma/
 │   │   ├── schema.prisma         # 10 models, 6 enums, indexes
-│   │   └── seed.ts               # 30 games, 5 users, demo data
+│   │   ├── games-data.ts         # 200+ retro games across 12 platforms
+│   │   └── seed.ts               # 200+ games, 5 users, demo data
 │   └── src/
 │       ├── auth/                 # JWT auth module
 │       ├── users/                # User profiles
@@ -171,7 +172,7 @@ cd backend
 cp .env.example .env    # Edit with your PostgreSQL URL + JWT secret
 npm install
 npx prisma migrate dev --name init
-npx prisma db seed       # Populate with 30 games + 5 demo users
+npx prisma db seed       # Populate with 200+ games + 5 demo users
 npm run start:dev        # http://localhost:3000
 
 # 3. Frontend
@@ -294,6 +295,7 @@ CMD ["node", "dist/main.js"]
 - [ ] Image upload for game covers (S3/Cloudinary)
 - [ ] Infinite scroll on explore/collection pages
 - [x] Shared game catalog — search/select existing games instead of creating duplicates
+- [x] Expanded game database — 200+ notable retro games across 12 platforms in seed data
 - [x] Advanced search with autocomplete
 - [ ] Collection export (CSV/JSON)
 - [ ] Price charting integration (PriceCharting API)
