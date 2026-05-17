@@ -9,6 +9,14 @@ import { UpdateCollectionDto } from './dto/update-collection.dto';
 export class CollectionsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getAllForExport(userId: string) {
+    return this.prisma.collection.findMany({
+      where: { userId },
+      include: { game: { include: { platform: true, genre: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async getUserCollection(
     userId: string,
     query: { search?: string; platform?: string; condition?: string; page?: number; limit?: number },

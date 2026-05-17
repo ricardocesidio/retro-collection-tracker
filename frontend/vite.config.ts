@@ -20,6 +20,7 @@ export default defineConfig({
       '/notification-preferences': 'http://localhost:3000',
       '/activity': 'http://localhost:3000',
       '/stats': 'http://localhost:3000',
+      '/admin': 'http://localhost:3000',
     },
   },
   css: {

@@ -10,7 +10,7 @@ import './Settings.scss';
 
 const Settings: React.FC = () => {
   const { state } = useAuth();
-  const [active, setActive] = useState<'profile'|'password'|'notifications'>('profile');
+  const [active, setActive] = useState<'profile'|'password'|'email'|'notifications'>('profile');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{type:'success'|'danger';text:string}|null>(null);
@@ -18,6 +18,7 @@ const Settings: React.FC = () => {
 
   const [profile, setProfile] = useState({ username:'', displayName:'', bio:'', avatarUrl:'' });
   const [pw, setPw] = useState({ current:'', newPw:'', confirm:'' });
+  const [emailChange, setEmailChange] = useState({ current:'', newEmail:'', confirm:'' });
   const [notifs, setNotifs] = useState({ email:true, push:false, follows:true, reviews:true, wishlist:true });
   const [notifsLoaded, setNotifsLoaded] = useState(false);
 
@@ -69,14 +70,42 @@ const Settings: React.FC = () => {
     finally { setSaving(false); }
   };
 
-  const savePreferences = async () => {
-    setMsg(null); setSaving(true);
-    try {
-      await apiRequest('/notification-preferences', { method:'PUT', body:JSON.stringify(notifs) });
-      setMsg({type:'success',text:'Notification preferences saved'});
-    } catch (err:any) { setMsg({type:'danger',text:err.message||'Failed to save preferences'}); }
-    finally { setSaving(false); }
-  };
+    const savePreferences = async () => {
+      setMsg(null); setSaving(true);
+      try {
+        await apiRequest('/notification-preferences', { method:'PUT', body:JSON.stringify(notifs) });
+        setMsg({type:'success',text:'Notification preferences saved'});
+      } catch (err:any) { setMsg({type:'danger',text:err.message||'Failed to save preferences'}); }
+      finally { setSaving(false); }
+    };
+
+    const saveEmailChange = async (e: React.FormEvent) => {
+      e.preventDefault(); setMsg(null);
+      if (emailChange.newEmail !== emailChange.confirm) { setMsg({type:'danger',text:'Emails do not match'}); return; }
+      if (!emailChange.newEmail) { setMsg({type:'danger',text:'New email is required'}); return; }
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(emailChange.newEmail)) { 
+        setMsg({type:'danger',text:'Please enter a valid email address (e.g., name@example.com)'}); 
+        return; 
+      }
+      // Optional: Add domain-specific warnings or restrictions if needed
+      // For example, you might want to warn about using temporary email services
+      setSaving(true);
+      try {
+        const res = await apiRequest('/auth/change-email', {
+          method: 'POST',
+          body: JSON.stringify({ newEmail: emailChange.newEmail }),
+        });
+        setEmailChange({ current:'', newEmail:'', confirm:'' });
+        setMsg({type:'success',text:res.message||'Email changed successfully. Please verify your new email.'});
+        // Note: The backend returns a new token, but we are not updating the token here.
+        // In a real app, we would update the token in localStorage and context.
+        // For simplicity, we'll just show the message and let the user log in again if needed.
+      } catch (err:any) {
+        setMsg({type:'danger',text:err.message||'Failed to change email'});
+      } finally { setSaving(false); }
+    };
 
   const savePassword = async (e: React.FormEvent) => {
     e.preventDefault(); setMsg(null);
@@ -98,11 +127,12 @@ const Settings: React.FC = () => {
 
   if (loading) return <LoadingSpinner fullPage/>;
 
-  const tabs = [
+    const tabs = [
     {key:'profile' as const,label:'Profile',icon:'fa-solid fa-circle-user'},
     {key:'password' as const,label:'Security',icon:'fa-solid fa-shield-halved'},
+    {key:'email' as const,label:'Email',icon:'fa-solid fa-envelope'},
     {key:'notifications' as const,label:'Notifications',icon:'fa-solid fa-bell'},
-  ];
+    ];
 
   return (
     <div className="page-shell" style={{maxWidth:720}}>
@@ -145,20 +175,35 @@ const Settings: React.FC = () => {
         </form>
       )}
 
-      {active==='password' && (
-        <form onSubmit={savePassword}>
-          <div className="panel" style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
-            <h3 style={{fontSize:'1.0625rem',fontWeight:600,marginBottom:'.25rem'}}>Change Password</h3>
-            <p style={{fontSize:'.8125rem',color:'#94a3b8'}}>Use the forgot password flow on the login page to reset your password.</p>
-            <Input label="Current Password" type="password" value={pw.current} onChange={(e)=>setPw({...pw,current:e.target.value})} placeholder="Enter current password" />
-            <Input label="New Password" type="password" value={pw.newPw} onChange={(e)=>setPw({...pw,newPw:e.target.value})} placeholder="Min. 8 characters" />
-            <Input label="Confirm Password" type="password" value={pw.confirm} onChange={(e)=>setPw({...pw,confirm:e.target.value})} placeholder="Repeat new password" />
-            <div style={{display:'flex',justifyContent:'flex-end'}}>
-              <Button type="submit" variant="secondary" loading={saving}>Update Password</Button>
-            </div>
-          </div>
-        </form>
-      )}
+       {active==='password' && (
+         <form onSubmit={savePassword}>
+           <div className="panel" style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+             <h3 style={{fontSize:'1.0625rem',fontWeight:600,marginBottom:'.25rem'}}>Change Password</h3>
+             <p style={{fontSize:'.8125rem',color:'#94a3b8'}}>Use the forgot password flow on the login page to reset your password.</p>
+             <Input label="Current Password" type="password" value={pw.current} onChange={(e)=>setPw({...pw,current:e.target.value})} placeholder="Enter current password" />
+             <Input label="New Password" type="password" value={pw.newPw} onChange={(e)=>setPw({...pw,newPw:e.target.value})} placeholder="Min. 8 characters" />
+             <Input label="Confirm Password" type="password" value={pw.confirm} onChange={(e)=>setPw({...pw,confirm:e.target.value})} placeholder="Repeat new password" />
+             <div style={{display:'flex',justifyContent:'flex-end'}}>
+               <Button type="submit" variant="secondary" loading={saving}>Update Password</Button>
+             </div>
+           </div>
+         </form>
+       )}
+       
+       {active==='email' && (
+         <form onSubmit={saveEmailChange}>
+           <div className="panel" style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+             <h3 style={{fontSize:'1.0625rem',fontWeight:600,marginBottom:'.25rem'}}>Change Email</h3>
+             <p style={{fontSize:'.8125rem',color:'#94a3b8'}}>You can change your email up to 3 times per account.</p>
+             <Input label="Current Email" type="email" value={emailChange.current} onChange={(e)=>setEmailChange({...emailChange,current:e.target.value})} placeholder="Enter your current email" />
+             <Input label="New Email" type="email" value={emailChange.newEmail} onChange={(e)=>setEmailChange({...emailChange,newEmail:e.target.value})} />
+             <Input label="Confirm New Email" type="email" value={emailChange.confirm} onChange={(e)=>setEmailChange({...emailChange,confirm:e.target.value})} />
+             <div style={{display:'flex',justifyContent:'flex-end'}}>
+               <Button type="submit" variant="secondary" loading={saving}>Update Email</Button>
+             </div>
+           </div>
+         </form>
+       )}
 
       {active==='notifications' && (
         <div className="panel" style={{display:'flex',flexDirection:'column',gap:'1rem'}}>

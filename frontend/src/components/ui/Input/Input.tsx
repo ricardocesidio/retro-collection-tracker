@@ -3,6 +3,7 @@ import './Input.scss';
 
 interface InputProps {
   label?: string;
+  name?: string;
   type?: string;
   placeholder?: string;
   required?: boolean;
@@ -46,31 +47,33 @@ const Input: React.FC<InputProps> = ({
       )}
       <div className="input-group__wrapper">
         {prefix && <span className="input-group__prefix">{prefix}</span>}
-        {type === 'textarea' ? (
-          <textarea
-            id={inputId}
-            className="input-group__control input-group__control--textarea"
-            placeholder={placeholder}
-            disabled={disabled}
-            maxLength={maxLength}
-            value={value}
-            onChange={onChange}
-            onBlur={onBlur}
-            rows={rows}
-          />
-        ) : (
-          <input
-            id={inputId}
-            className="input-group__control"
-            type={type}
-            placeholder={placeholder}
-            disabled={disabled}
-            maxLength={maxLength}
-            value={value}
-            onChange={onChange}
-            onBlur={onBlur}
-          />
-        )}
+{type === 'textarea' ? (
+           <textarea
+             id={inputId}
+             name={name || undefined}
+             className="input-group__control input-group__control--textarea"
+             placeholder={placeholder}
+             disabled={disabled}
+             maxLength={maxLength}
+             value={value}
+             onChange={onChange}
+             onBlur={onBlur}
+             rows={rows}
+           />
+         ) : (
+           <input
+             id={inputId}
+             name={name || undefined}
+             className="input-group__control"
+             type={type}
+             placeholder={placeholder}
+             disabled={disabled}
+             maxLength={maxLength}
+             value={value}
+             onChange={onChange}
+             onBlur={onBlur}
+           />
+         )}
         {suffix && <span className="input-group__suffix">{suffix}</span>}
       </div>
       {error && <span className="input-group__error">{error}</span>}

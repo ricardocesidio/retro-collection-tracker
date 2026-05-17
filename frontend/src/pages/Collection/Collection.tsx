@@ -35,6 +35,14 @@ const Collection: React.FC = () => {
   useEffect(() => { fetch(); }, [fetch]);
   useEffect(() => { catalogApi.getPlatforms().then(setPlatforms).catch(()=>{}); }, []);
 
+  const handleExport = async (format: 'csv' | 'json') => {
+    try {
+      await collectionApi.exportCollection(format);
+    } catch (e: any) {
+      setError(e.message || 'Export failed');
+    }
+  };
+
   const remove = async (id: string) => {
     if (!confirm('Remove this game?')) return;
     setDeleting(id);
@@ -47,7 +55,11 @@ const Collection: React.FC = () => {
     <div className="page-shell">
       <div className="page-shell-header">
         <div><h1 className="page-title">My Collection</h1><p className="page-sub">{total} games · Est. {fmt(totalValue)}</p></div>
-        <Link to="/add-game"><Button variant="primary">+ Add Game</Button></Link>
+        <div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
+          <Button variant="ghost" size="sm" onClick={() => handleExport('csv')}><i className="fa-solid fa-file-csv"></i> CSV</Button>
+          <Button variant="ghost" size="sm" onClick={() => handleExport('json')}><i className="fa-solid fa-file-code"></i> JSON</Button>
+          <Link to="/add-game"><Button variant="primary">+ Add Game</Button></Link>
+        </div>
       </div>
 
       <div className="page-shell-filters">

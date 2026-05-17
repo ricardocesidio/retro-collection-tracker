@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { NotificationType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationGateway } from './notification.gateway';
 
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationGateway: NotificationGateway,
+  ) {}
 
   async getUserNotifications(userId: string, params: { page?: number; limit?: number }) {
     const { page = 1, limit = 20 } = params;
@@ -58,7 +62,20 @@ export class NotificationsService {
     body?: string;
     link?: string;
   }) {
-    return this.prisma.notification.create({ data });
+    const notification = await this.prisma.notification.create({ data });
+    const count = await this.prisma.notification.count({
+      where: { recipientId: data.recipientId, isRead: false },
+    });
+    this.notificationGateway.sendToUser(data.recipientId, 'notification:new', notification);
+    this.notificationGateway.sendToUser(data.recipientId, 'notification:unread', { count });
+    return notification;
+  }
+
+  private async emitUnreadCount(userId: string) {
+    const count = await this.prisma.notification.count({
+      where: { recipientId: userId, isRead: false },
+    });
+    this.notificationGateway.sendToUser(userId, 'notification:unread', { count });
   }
 
   // Auto-create notifications for key events
@@ -104,6 +121,21 @@ export class NotificationsService {
         link: `/games/${gameId}`,
       })),
     });
+
+    const created = await this.prisma.notification.findMany({
+      where: { senderId: reviewerId, type: NotificationType.NEW_REVIEW },
+      include: { sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
+      orderBy: { createdAt: 'desc' },
+      take: followers.length,
+    });
+
+    for (const notif of created) {
+      this.notificationGateway.sendToUser(notif.recipientId, 'notification:new', notif);
+    }
+
+    for (const f of followers) {
+      await this.emitUnreadCount(f.followerId);
+    }
   }
 
   async notifyWishlistAdded(userId: string, gameId: string) {
@@ -130,5 +162,20 @@ export class NotificationsService {
         link: `/games/${gameId}`,
       })),
     });
+
+    const created = await this.prisma.notification.findMany({
+      where: { senderId: userId, type: NotificationType.WISHLIST_AVAILABLE },
+      include: { sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
+      orderBy: { createdAt: 'desc' },
+      take: followers.length,
+    });
+
+    for (const notif of created) {
+      this.notificationGateway.sendToUser(notif.recipientId, 'notification:new', notif);
+    }
+
+    for (const f of followers) {
+      await this.emitUnreadCount(f.followerId);
+    }
   }
 }

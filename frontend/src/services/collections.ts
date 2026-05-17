@@ -1,4 +1,4 @@
-import { apiRequest } from './api-client';
+import { apiRequest, uploadFile } from './api-client';
 import type { Platform, GameData, CollectionEntry, PaginatedResponse } from '../types';
 
 const collectParams = (params?: Record<string, string>) =>
@@ -36,6 +36,29 @@ export const collectionApi = {
 
   delete: (id: string): Promise<void> =>
     apiRequest(`/collections/${id}`, { method: 'DELETE' }),
+
+  exportCollection: (format: 'csv' | 'json'): Promise<void> => {
+    const token = localStorage.getItem('token');
+    return fetch(`/collections/export?format=${format}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Export failed');
+        const disposition = res.headers.get('Content-Disposition') || '';
+        const match = disposition.match(/filename="?(.+?)"?$/);
+        const filename = match ? match[1] : `collection.${format}`;
+        return res.blob().then((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        });
+      });
+  },
 };
 
 export const gamesApi = {
@@ -68,6 +91,17 @@ export type { Genre } from '../types';
 export const catalogApi = {
   getPlatforms: (): Promise<Platform[]> => apiRequest('/games/platforms'),
   getGenres: (): Promise<Genre[]> => apiRequest('/games/genres'),
+};
+
+export const uploadApi = {
+  gameCover: (gameId: string, file: File): Promise<{ url: string }> =>
+    uploadFile(`/upload/cover/${gameId}`, file),
+
+  collectionCover: (colId: string, file: File): Promise<{ url: string }> =>
+    uploadFile(`/upload/collection-cover/${colId}`, file),
+
+  avatar: (file: File): Promise<{ url: string }> =>
+    uploadFile('/upload/avatar', file),
 };
 
 export type { Platform, Genre, GameData, CollectionEntry, PaginatedResponse };

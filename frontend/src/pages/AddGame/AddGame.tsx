@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
 import Alert from '../../components/ui/Alert/Alert';
 import Input from '../../components/ui/Input/Input';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
-import { gamesApi, collectionApi, catalogApi } from '../../services/collections';
+import { gamesApi, collectionApi } from '../../services/collections';
 import { apiRequest } from '../../services/api-client';
-import type { GameData, Platform, Genre } from '../../types';
 import './AddGame.scss';
 
 const PLACEHOLDER_COVER = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="260" viewBox="0 0 200 260"><rect fill="#1e1b4b" width="200" height="260"/><text x="100" y="130" text-anchor="middle" fill="#4c1d95" font-size="48" font-family="sans-serif">🎮</text></svg>');
@@ -24,24 +23,25 @@ interface ExternalGameResult {
   publisher?: string;
 }
 
+interface SelectedGame {
+  id: string;
+  title: string;
+  releaseYear: number;
+  developer?: string;
+  publisher?: string;
+  description?: string;
+  coverImageUrl?: string;
+  platform: { name: string };
+  genre: { name: string };
+}
+
 const AddGame: React.FC = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mountedRef = useRef(true);
 
-  const [games, setGames] = useState<GameData[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [searching, setSearching] = useState(false);
-  const [search, setSearch] = useState(searchParams.get('search') || '');
-  const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
-  const [platforms, setPlatforms] = useState<Platform[]>([]);
-  const [genres, setGenres] = useState<Genre[]>([]);
-  const [platformFilter, setPlatformFilter] = useState(searchParams.get('platform') || '');
-  const [genreFilter, setGenreFilter] = useState(searchParams.get('genre') || '');
+  const [search, setSearch] = useState('');
+  const [selectedGame, setSelectedGame] = useState<SelectedGame | null>(null);
 
   const [externalResults, setExternalResults] = useState<ExternalGameResult[]>([]);
   const [externalSearching, setExternalSearching] = useState(false);
@@ -67,50 +67,6 @@ const AddGame: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    let c = false;
-    Promise.all([catalogApi.getPlatforms(), catalogApi.getGenres()])
-      .then(([p, g]) => { if (!c) { setPlatforms(p); setGenres(g); } })
-      .catch(() => {});
-    return () => { c = true; };
-  }, []);
-
-  const fetchGames = useCallback(async (searchTerm: string, pageNum: number, platform?: string, genre?: string) => {
-    setSearching(true);
-    try {
-      const params: Record<string, string> = { limit: '50', page: String(pageNum) };
-      if (searchTerm.trim()) params.search = searchTerm.trim();
-      if (platform) params.platform = platform;
-      if (genre) params.genre = genre;
-      const res = await gamesApi.list(params);
-      if (!mountedRef.current) return;
-      if (pageNum === 1) {
-        setGames(res.data);
-      } else {
-        setGames(prev => [...prev, ...res.data]);
-      }
-      setTotal(res.total);
-      setHasMore(pageNum < res.totalPages);
-      setPage(pageNum);
-    } catch {
-      if (mountedRef.current) setError('Failed to load games');
-    } finally {
-      if (mountedRef.current) {
-        setSearching(false);
-        setLoading(false);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    setLoading(true);
-    setPage(1);
-    const timer = setTimeout(() => {
-      fetchGames(search, 1, platformFilter, genreFilter);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search, platformFilter, genreFilter, fetchGames]);
-
-  useEffect(() => {
     if (!search.trim() || search.trim().length < 2) {
       setExternalResults([]);
       setExternalSource('');
@@ -128,30 +84,9 @@ const AddGame: React.FC = () => {
       } finally {
         if (mountedRef.current) setExternalSearching(false);
       }
-    }, 600);
+    }, 400);
     return () => clearTimeout(timer);
   }, [search]);
-
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el || !hasMore || searching) return;
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && hasMore && !searching) {
-        fetchGames(search, page + 1, platformFilter, genreFilter);
-      }
-    }, { rootMargin: '200px' });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [hasMore, searching, search, page, platformFilter, genreFilter, fetchGames]);
-
-  const handleSelectGame = (game: GameData) => {
-    setSelectedGame(game);
-    setError('');
-    setSuccess('');
-    searchInputRef.current?.focus();
-  };
 
   const clearSelection = () => {
     if (importedGameId) { gamesApi.delete(importedGameId).catch(() => {}); setImportedGameId(null); }
@@ -167,7 +102,7 @@ const AddGame: React.FC = () => {
         method: 'POST',
         body: JSON.stringify({ source: ext.source, sourceId: ext.sourceId }),
       });
-      const importedGame: GameData = {
+      setSelectedGame({
         id: result.id,
         title: result.title,
         releaseYear: ext.releaseYear || 2000,
@@ -175,11 +110,11 @@ const AddGame: React.FC = () => {
         publisher: ext.publisher,
         description: ext.description,
         coverImageUrl: ext.coverImageUrl,
-        platform: { id: '', name: ext.platform || 'Other', slug: '' },
-        genre: { id: '', name: ext.genre || 'Other', slug: '' },
-      };
-      setSelectedGame(importedGame);
+        platform: { name: ext.platform || 'Other' },
+        genre: { name: ext.genre || 'Other' },
+      });
       setImportedGameId(result.id);
+      setSearch('');
       setExternalResults([]);
     } catch (err: any) {
       setError(err.message || 'Failed to import game');
@@ -226,7 +161,7 @@ const AddGame: React.FC = () => {
         <div className="page-header">
           <div>
             <h1 className="page-title">Add to Collection</h1>
-            <p className="page-sub">Search the game catalog and add to your collection</p>
+            <p className="page-sub">Search and import games from the RAWG database</p>
           </div>
           <Link to="/collection"><Button variant="ghost">← Back</Button></Link>
         </div>
@@ -243,67 +178,37 @@ const AddGame: React.FC = () => {
                   ref={searchInputRef}
                   className="addgame-search-input"
                   type="text"
-                  placeholder="Search games by title..."
+                  placeholder="Search RAWG database for any game..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   autoFocus
                 />
                 {search && <button className="addgame-search-clear" onClick={() => setSearch('')}><i className="fa-solid fa-xmark" /></button>}
               </div>
-              <select className="addgame-filter-select" value={platformFilter} onChange={(e) => setPlatformFilter(e.target.value)}>
-                <option value="">All Platforms</option>
-                {platforms.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-              </select>
-              <select className="addgame-filter-select" value={genreFilter} onChange={(e) => setGenreFilter(e.target.value)}>
-                <option value="">All Genres</option>
-                {genres.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
-              </select>
             </div>
 
-            <div className="addgame-results-header">
-              <span className="addgame-results-count">{total} game{total !== 1 ? 's' : ''} found</span>
-            </div>
-
-            {loading ? (
-              <LoadingSpinner fullPage />
-            ) : games.length === 0 ? (
+            {!search.trim() && (
               <div className="addgame-empty">
                 <i className="fa-solid fa-gamepad" style={{ fontSize: '3rem', color: 'var(--t3, #5a6480)', marginBottom: '1rem' }} />
-                <h3>No games found</h3>
-                <p>Try a different search term or browse the catalog</p>
-                <Link to="/explore"><Button variant="outline">Browse All Games</Button></Link>
+                <h3>Search for a game</h3>
+                <p>Type a game title above to search the RAWG database. Import any game and add it to your collection.</p>
               </div>
-            ) : (
-              <>
-                <div className="addgame-grid">
-                  {games.map((game) => (
-                    <button
-                      key={game.id}
-                      className="addgame-card"
-                      onClick={() => handleSelectGame(game)}
-                    >
-                      <div className="addgame-card__cover">
-                        <img src={game.coverImageUrl || PLACEHOLDER_COVER} alt={game.title} loading="lazy" />
-                      </div>
-                      <div className="addgame-card__info">
-                        <span className="addgame-card__title">{game.title}</span>
-                        <span className="addgame-card__meta">{game.platform.name} · {game.releaseYear}</span>
-                        <span className="addgame-card__genre">{game.genre.name}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                {hasMore && <div ref={sentinelRef} className="addgame-sentinel" />}
-                {searching && <div className="addgame-load-more"><LoadingSpinner /></div>}
-              </>
             )}
 
             {externalSearching && search.trim().length >= 2 && (
               <div className="addgame-external-section">
                 <div className="addgame-external-header">
-                  <span className="addgame-external-title">Searching online databases...</span>
                   <LoadingSpinner />
+                  <span className="addgame-external-title">Searching RAWG...</span>
                 </div>
+              </div>
+            )}
+
+            {!externalSearching && externalResults.length === 0 && search.trim().length >= 2 && (
+              <div className="addgame-empty">
+                <i className="fa-solid fa-gamepad" style={{ fontSize: '3rem', color: 'var(--t3, #5a6480)', marginBottom: '1rem' }} />
+                <h3>No results found</h3>
+                <p>Try a different search term</p>
               </div>
             )}
 
@@ -311,15 +216,11 @@ const AddGame: React.FC = () => {
               <div className="addgame-external-section">
                 <div className="addgame-external-header">
                   <span className="addgame-external-title">
-                    <i className="fa-solid fa-globe" /> More results online
+                    <i className="fa-solid fa-globe" /> Results from RAWG
                   </span>
-                  {externalSource === 'rawg' ? (
-                    <span className="addgame-external-badge">RAWG</span>
-                  ) : externalSource === 'wikipedia' ? (
-                    <span className="addgame-external-badge addgame-external-badge--wiki">Wikipedia</span>
-                  ) : null}
+                  {externalSource === 'rawg' && <span className="addgame-external-badge">RAWG</span>}
+                  {externalSource === 'wikipedia' && <span className="addgame-external-badge addgame-external-badge--wiki">Wikipedia</span>}
                 </div>
-                <p className="addgame-external-hint">Not in our catalog yet. Click to import and add to your collection.</p>
                 <div className="addgame-external-grid">
                   {externalResults.map((ext) => (
                     <button
@@ -352,7 +253,7 @@ const AddGame: React.FC = () => {
           <div className="addgame-selected-section">
             <div className="addgame-selected-header">
               <button className="addgame-back-btn" onClick={clearSelection}>
-                <i className="fa-solid fa-arrow-left" /> Back to catalog
+                <i className="fa-solid fa-arrow-left" /> Back to search
               </button>
             </div>
 

@@ -2,10 +2,13 @@ import {
   Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard;
 
+@ApiTags('reviews')
+@ApiBearerAuth()
 @Controller('reviews')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}

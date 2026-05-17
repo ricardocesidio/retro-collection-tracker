@@ -4,13 +4,22 @@ import Button from '../../components/ui/Button/Button';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import { notificationsApi } from '../../services/social';
+import { connectSocket } from '../../services/socket';
 import type { NotificationEntry } from '../../services/social';
 
 const Notifications: React.FC = () => {
   const [items, setItems] = useState<NotificationEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { notificationsApi.list().then((r)=>setItems(r.data)).catch(()=>{}).finally(()=>setLoading(false)); }, []);
+  useEffect(() => {
+    notificationsApi.list().then((r)=>setItems(r.data)).catch(()=>{}).finally(()=>setLoading(false));
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    const socket = connectSocket(token);
+    const handler = (notif: NotificationEntry) => setItems((prev) => [notif, ...prev]);
+    socket.on('notification:new', handler);
+    return () => { socket.off('notification:new', handler); };
+  }, []);
 
   const mark = async (id: string) => { await notificationsApi.markAsRead(id); setItems((p)=>p.map((n)=>n.id===id?{...n,isRead:true}:n)); };
   const getIcon = (t:string)=>({NEW_FOLLOWER:'fa-solid fa-user-group',NEW_REVIEW:'fa-solid fa-star',WISHLIST_AVAILABLE:'fa-solid fa-bookmark',SYSTEM:'fa-solid fa-bell'} as any)[t]||'fa-solid fa-crown';

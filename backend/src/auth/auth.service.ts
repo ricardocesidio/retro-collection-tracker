@@ -6,15 +6,9 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
-import { PrismaService } from '../prisma/prisma.service';
-import { RegisterDto } from './dto/register.dto';
-
-function getCollectorLevel(gameCount: number): { name: string; tier: number } {
-  if (gameCount >= 30) return { name: 'Museum', tier: 3 };
-  if (gameCount >= 15) return { name: 'Curator', tier: 2 };
-  if (gameCount >= 5) return { name: 'Collector', tier: 1 };
-  return { name: 'New Collector', tier: 0 };
-}
+import { PrismaService } = from '../prisma/prisma.service';
+import { RegisterDto } = from './dto/register.dto';
+import { getCollectorLevel } = from '../common/utils/collector-level';
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -251,6 +245,54 @@ export class AuthService {
     });
 
     return { message: 'Password has been reset successfully.' };
+  }
+
+  async changeEmail(userId: string, newEmail: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException('User not found');
+
+    // Check if user has exceeded email change limit (3 times)
+    if (user.emailChangeCount >= 3) {
+      throw new ConflictException('Email change limit exceeded (maximum 3 changes allowed)');
+    }
+
+    // Check if new email already exists
+    const emailExists = await this.prisma.user.findUnique({
+      where: { email: newEmail },
+    });
+
+    if (emailExists && emailExists.id !== userId) {
+      throw new ConflictException('Email already in use');
+    }
+
+    // Update email and increment change count
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        email: newEmail,
+        emailChangeCount: { increment: 1 },
+        // Reset email verification since email changed
+        isEmailVerified: false,
+        emailVerificationToken: this.jwtService.sign(
+          { sub: 'verify', email: newEmail, type: 'email-verification' },
+          { expiresIn: '24h' },
+        ),
+      },
+    });
+
+    // Generate new token with updated email
+    const token = this.generateToken(userId, newEmail);
+
+    // Log verification link in dev
+    console.log(`[DEV] Email verification link: ${process.env.API_URL || 'http://localhost:3000'}/auth/verify-email?token=${this.jwtService.sign(
+      { sub: 'verify', email: newEmail, type: 'email-verification' },
+      { expiresIn: '24h' },
+    )}`);
+
+    return {
+      message: 'Email changed successfully. Please verify your new email.',
+      token,
+    };
   }
 
   private generateToken(userId: string, email: string): string {

@@ -1,9 +1,12 @@
 import {
   Controller, Get, Post, Param, Query, UseGuards, Request,
 } from '@nestjs/common';
-import { NotificationsService } from './notifications.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { SocialService } from './social.service';
+import { JwtAuthGuard } = from '../auth/guards/jwt-auth.guard;
+import { ApiTags, ApiBearerAuth } = from '@nestjs/swagger';
 
+@ApiTags('notifications')
+@ApiBearerAuth()
 @Controller('notifications')
 @UseGuards(JwtAuthGuard)
 export class NotificationsController {

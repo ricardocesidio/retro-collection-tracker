@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { notificationsApi } from '../../../services/social';
+import { connectSocket } from '../../../services/socket';
 import './NotificationBell.scss';
 
 interface NotificationBellProps {
@@ -11,10 +12,12 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onClick }) => {
 
   useEffect(() => {
     notificationsApi.getUnreadCount().then((r: any) => setCount(r.count || 0)).catch(() => {});
-    const interval = setInterval(() => {
-      notificationsApi.getUnreadCount().then((r: any) => setCount(r.count || 0)).catch(() => {});
-    }, 30000);
-    return () => clearInterval(interval);
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    const socket = connectSocket(token);
+    const handler = (data: { count: number }) => setCount(data.count);
+    socket.on('notification:unread', handler);
+    return () => { socket.off('notification:unread', handler); };
   }, []);
 
   return (

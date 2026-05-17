@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Input from '../../components/ui/Input/Input';
 import Button from '../../components/ui/Button/Button';
 import Alert from '../../components/ui/Alert/Alert';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
-import { collectionApi, gamesApi } from '../../services/collections';
+import { collectionApi, gamesApi, uploadApi } from '../../services/collections';
 import { catalogApi } from '../../services/collections';
 import type { Platform, Genre } from '../../services/collections';
 import './EditGame.scss';
@@ -12,11 +12,16 @@ import './EditGame.scss';
 const EditGame: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [gameId, setGameId] = useState('');
+  const [coverUrl, setCoverUrl] = useState('');
+  const originalGameRef = useRef<Record<string, any>>({});
   const [form, setForm] = useState({
     title: '',
     platformId: '',
@@ -36,6 +41,17 @@ const EditGame: React.FC = () => {
     if (!id) return;
     Promise.all([collectionApi.getById(id), catalogApi.getPlatforms(), catalogApi.getGenres()])
       .then(([entry, p, g]) => {
+        setGameId(entry.game.id);
+        setCoverUrl(entry.game.coverImageUrl || entry.coverImage || '');
+        originalGameRef.current = {
+          title: entry.game.title,
+          platformId: entry.game.platform.id,
+          genreId: entry.game.genre.id,
+          releaseYear: entry.game.releaseYear,
+          developer: entry.game.developer,
+          publisher: entry.game.publisher,
+          description: entry.game.description,
+        };
         setPlatforms(p);
         setGenres(g);
         setForm({
@@ -57,6 +73,22 @@ const EditGame: React.FC = () => {
       .finally(() => setLoading(false));
   }, [id]);
 
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !gameId) return;
+    setUploading(true);
+    setError('');
+    try {
+      const { url } = await uploadApi.gameCover(gameId, file);
+      setCoverUrl(url);
+    } catch (err: any) {
+      setError(err.message || 'Failed to upload cover');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
@@ -76,23 +108,32 @@ const EditGame: React.FC = () => {
     setError('');
 
     try {
-      await gamesApi.update(id, {
-        title: form.title.trim(),
-        platformId: form.platformId,
-        genreId: form.genreId,
-        releaseYear: parseInt(form.releaseYear),
-        developer: form.developer.trim() || undefined,
-        publisher: form.publisher.trim() || undefined,
-        description: form.description.trim() || undefined,
-      });
+      if (gameId) {
+        await gamesApi.update(gameId, {
+          title: form.title.trim(),
+          platformId: form.platformId,
+          genreId: form.genreId,
+          releaseYear: parseInt(form.releaseYear),
+          developer: form.developer.trim() || undefined,
+          publisher: form.publisher.trim() || undefined,
+          description: form.description.trim() || undefined,
+        });
+      }
 
-      await collectionApi.update(id, {
-        condition: form.condition,
-        region: form.region,
-        personalRating: form.personalRating ? parseInt(form.personalRating) : null,
-        estimatedValue: form.estimatedValue ? parseFloat(form.estimatedValue) : null,
-        notes: form.notes.trim() || null,
-      });
+      try {
+        await collectionApi.update(id, {
+          condition: form.condition,
+          region: form.region,
+          personalRating: form.personalRating ? parseInt(form.personalRating) : null,
+          estimatedValue: form.estimatedValue ? parseFloat(form.estimatedValue) : null,
+          notes: form.notes.trim() || null,
+        });
+      } catch (colErr: any) {
+        if (gameId) {
+          await gamesApi.update(gameId, originalGameRef.current).catch(() => {});
+        }
+        throw new Error(colErr.message || 'Failed to update collection details');
+      }
 
       navigate('/collection', { replace: true });
     } catch (err: any) {
@@ -128,6 +169,33 @@ const EditGame: React.FC = () => {
       </div>
 
       {error && <div style={{ marginBottom: '1rem' }}><Alert variant="danger">{error}</Alert></div>}
+
+      <div className="form-section">
+        <h2 className="section-title">Cover Image</h2>
+        <div className="cover-upload">
+          {coverUrl ? (
+            <div className="cover-upload__preview">
+              <img src={coverUrl} alt="Game cover" />
+              <button type="button" className="cover-upload__change" onClick={() => fileInputRef.current?.click()}>
+                <i className="fa-solid fa-camera"></i> Change Cover
+              </button>
+            </div>
+          ) : (
+            <div className="cover-upload__placeholder" onClick={() => fileInputRef.current?.click()}>
+              <i className="fa-solid fa-image"></i>
+              <span>Upload Cover Image</span>
+            </div>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            onChange={handleCoverUpload}
+            style={{ display: 'none' }}
+          />
+          {uploading && <p className="cover-upload__status">Uploading...</p>}
+        </div>
+      </div>
 
       <form className="form-layout" onSubmit={handleSubmit}>
         <div className="form-section">

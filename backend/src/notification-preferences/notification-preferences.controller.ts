@@ -1,8 +1,11 @@
 import { Controller, Get, Put, Body, UseGuards, Request } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard;
+import { ApiTags, ApiBearerAuth } = from '@nestjs/swagger';
 import { NotificationPreferencesService } from './notification-preferences.service';
 import { UpdateNotificationPreferencesDto } from './dto/update-notification-preferences.dto';
 
+@ApiTags('notification-preferences')
+@ApiBearerAuth()
 @Controller('notification-preferences')
 @UseGuards(JwtAuthGuard)
 export class NotificationPreferencesController {

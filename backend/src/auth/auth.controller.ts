@@ -81,4 +81,11 @@ export class AuthController {
   async resendVerification(@Request() req: any) {
     return this.authService.resendVerification(req.user.id);
   }
+
+  @Post('change-email')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  async changeEmail(@Request() req: any, @Body() dto: ChangeEmailDto) {
+    return this.authService.changeEmail(req.user.id, dto.newEmail);
+  }
 }

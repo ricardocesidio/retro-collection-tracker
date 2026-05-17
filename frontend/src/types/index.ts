@@ -52,3 +52,24 @@ export interface PaginatedResponse<T> {
   totalPages: number;
   totalValue?: number;
 }
+
+export interface User {
+  id: string;
+  email: string;
+  username: string;
+  displayName?: string;
+  bio?: string;
+  avatarUrl?: string;
+  role: string;
+  isActive: boolean;
+  isEmailVerified: boolean;
+  createdAt: string;
+  lastLoginAt?: string;
+  _count?: {
+    collections: number;
+    wishlists: number;
+    reviews: number;
+    followers: number;
+    following: number;
+  };
+}

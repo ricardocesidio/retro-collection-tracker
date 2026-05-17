@@ -1,44 +1,74 @@
 @use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
 
 .notfound {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
   text-align: center;
-  padding: $sp6;
-
+  padding: 3rem 1rem;
+  
   &__code {
-    font-size: 6rem;
-    font-weight: $w8;
+    font-size: 8rem;
+    font-weight: $w9;
     color: $a1;
     line-height: 1;
+    margin-bottom: 1rem;
     font-family: $mono;
-    letter-spacing: -.04em;
-    margin-bottom: $sp2;
   }
-
+  
   &__title {
-    font-size: $t2x;
-    font-weight: $w7;
-    margin-bottom: $sp2;
-    letter-spacing: -.01em;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
     color: $t1;
   }
-
+  
   &__text {
+    font-size: 1.125rem;
     color: $t2;
-    margin-bottom: $sp6;
-    max-width: 400px;
-    line-height: 1.6;
-    font-size: $tbs;
+    margin-bottom: 2rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
   }
-
+  
   &__actions {
     display: flex;
-    gap: $sp3;
-    flex-wrap: wrap;
+    gap: 1rem;
     justify-content: center;
+    flex-wrap: wrap;
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 0.875rem;
+      border-radius: $r1;
+      
+      &--primary {
+        background: $a1;
+        color: white;
+        border: none;
+        
+        &:hover {
+          background: $ad;
+        }
+      }
+      
+      &--outline {
+        border: 2px solid $a1;
+        color: $a1;
+        background: transparent;
+        
+        &:hover {
+          background: $ad;
+        }
+      }
+      
+      &--ghost {
+        border: none;
+        color: $a2;
+        background: transparent;
+        
+        &:hover {
+          color: $a1;
+        }
+      }
+    }
   }
 }

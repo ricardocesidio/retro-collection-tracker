@@ -1,7 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../prisma/prisma.service';
+import { ConfigService } = from '@nestjs/config';
+import { PrismaService } = from '../prisma/prisma.service';
+import { ApiTags, ApiBearerAuth } = from '@nestjs/swagger';
 
+@ApiTags('stats')
+@ApiBearerAuth()
 @Controller('stats')
 export class StatsController {
   constructor(

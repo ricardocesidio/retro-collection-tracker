@@ -2,6 +2,7 @@ import {
   Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { GamesService } from './games.service';
 import { ExternalGamesService } from './external-games.service';
 import { CreateGameDto } from './dto/create-game.dto';
@@ -11,6 +12,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard, Roles } from '../common/guards/roles.guard';
 import { UserRole } from '@prisma/client';
 
+@ApiTags('games')
+@ApiBearerAuth()
 @Controller('games')
 export class GamesController {
   constructor(

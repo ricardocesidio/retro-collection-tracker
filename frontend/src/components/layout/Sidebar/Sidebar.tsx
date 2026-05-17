@@ -45,6 +45,11 @@ const Sidebar: React.FC = () => {
       { icon:'fa-solid fa-gear', label:'Settings', path:'/settings' },
       { icon:'fa-solid fa-heart', label:'Donate', path:'/donate' },
     ]},
+    ...(user && user.role === 'ADMIN' ? [{
+      label: 'Admin', items: [
+        { icon:'fa-solid fa-shield-halved', label:'Admin Dashboard', path:'/admin' },
+      ]
+    }] : []),
   ];
 
   return (

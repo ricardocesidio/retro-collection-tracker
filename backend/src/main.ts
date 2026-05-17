@@ -8,6 +8,7 @@ import { existsSync, mkdirSync } from 'fs';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { validateConfig, getCorsOrigin } from './config/config.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -53,8 +54,45 @@ async function bootstrap() {
     }),
   );
 
+  // Swagger documentation
+  const config = new DocumentBuilder()
+    .setTitle('Retro Collection Tracker API')
+    .setDescription('API for managing retro game collections, users, reviews, and social features')
+    .setVersion('1.0')
+    .addTag('auth', 'Authentication endpoints')
+    .addTag('users', 'User management')
+    .addTag('games', 'Game catalog')
+    .addTag('collections', 'User collections')
+    .addTag('wishlist', 'Wishlist management')
+    .addTag('reviews', 'Game reviews')
+    .addTag('social', 'Follow/unfollow functionality')
+    .addTag('notifications', 'Notification system')
+    .addTag('notification-preferences', 'Notification preferences')
+    .addTag('activity', 'User activity feed')
+    .addTag('stats', 'Collection statistics')
+    .addTag('admin', 'Admin-only endpoints')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+
   const port = configService.get<number>('PORT') ?? 3000;
   await app.listen(port);
   console.log(`Server running on http://localhost:${port}`);
+  console.log(`API documentation available at http://localhost:${port}/api-docs`);
 }
 bootstrap();
