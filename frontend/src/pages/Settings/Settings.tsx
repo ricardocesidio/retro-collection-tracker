@@ -168,7 +168,7 @@ const Settings: React.FC = () => {
             <Input label="Username" value={profile.username} onChange={(e)=>setProfile({...profile,username:e.target.value})} required maxLength={20} />
             <Input label="Display Name" value={profile.displayName} onChange={(e)=>setProfile({...profile,displayName:e.target.value})} />
             <Input label="Bio" type="textarea" value={profile.bio} onChange={(e)=>setProfile({...profile,bio:e.target.value})} rows={3} placeholder="Tell other collectors about yourself..." maxLength={100} />
-            <div style={{display:'flex',justifyContent:'flex-end'}}>
+            <div style={{display:'flex',justifyContent:'center'}}>
               <Button type="submit" variant="primary" loading={saving}>Save Changes</Button>
             </div>
           </div>
@@ -183,7 +183,7 @@ const Settings: React.FC = () => {
              <Input label="Current Password" type="password" value={pw.current} onChange={(e)=>setPw({...pw,current:e.target.value})} placeholder="Enter current password" />
              <Input label="New Password" type="password" value={pw.newPw} onChange={(e)=>setPw({...pw,newPw:e.target.value})} placeholder="Min. 8 characters" />
              <Input label="Confirm Password" type="password" value={pw.confirm} onChange={(e)=>setPw({...pw,confirm:e.target.value})} placeholder="Repeat new password" />
-              <div style={{display:'flex',justifyContent:'flex-end'}}>
+              <div style={{display:'flex',justifyContent:'center'}}>
                 <Button type="submit" variant="primary" loading={saving}>Update Password</Button>
               </div>
            </div>
@@ -198,7 +198,7 @@ const Settings: React.FC = () => {
              <Input label="Current Email" type="email" value={emailChange.current} onChange={(e)=>setEmailChange({...emailChange,current:e.target.value})} placeholder="Enter your current email" />
              <Input label="New Email" type="email" value={emailChange.newEmail} onChange={(e)=>setEmailChange({...emailChange,newEmail:e.target.value})} />
              <Input label="Confirm New Email" type="email" value={emailChange.confirm} onChange={(e)=>setEmailChange({...emailChange,confirm:e.target.value})} />
-              <div style={{display:'flex',justifyContent:'flex-end'}}>
+              <div style={{display:'flex',justifyContent:'center'}}>
                 <Button type="submit" variant="primary" loading={saving}>Update Email</Button>
               </div>
            </div>
@@ -220,7 +220,7 @@ const Settings: React.FC = () => {
               <div><span style={{fontSize:'.875rem',fontWeight:500}}>{n.label}</span><span style={{display:'block',fontSize:'.75rem',color:'#94a3b8'}}>{n.desc}</span></div>
             </label>
           ))}
-          <div style={{display:'flex',justifyContent:'flex-end',marginTop:'.5rem'}}>
+          <div style={{display:'flex',justifyContent:'center',marginTop:'.5rem'}}>
             <Button variant="primary" onClick={savePreferences} loading={saving}>Save Preferences</Button>
           </div>
         </div>
