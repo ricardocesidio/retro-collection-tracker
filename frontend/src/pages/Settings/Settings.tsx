@@ -158,10 +158,10 @@ const Settings: React.FC = () => {
                 {profile.avatarUrl && <img src={profile.avatarUrl} alt="" />}
               </div>
               <div className="sett-avatar__actions">
-                <label className="btn btn--outline btn--md">
-                  <i className="fa-solid fa-camera" /> Upload Photo
-                  <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
-                </label>
+               <label className="btn btn--primary btn--md">
+                 <i className="fa-solid fa-camera" /> Upload Photo
+                 <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
+               </label>
               </div>
             </div>
             <h3 style={{fontSize:'1.0625rem',fontWeight:600,marginBottom:'.25rem'}}>Profile Information</h3>
@@ -183,9 +183,9 @@ const Settings: React.FC = () => {
              <Input label="Current Password" type="password" value={pw.current} onChange={(e)=>setPw({...pw,current:e.target.value})} placeholder="Enter current password" />
              <Input label="New Password" type="password" value={pw.newPw} onChange={(e)=>setPw({...pw,newPw:e.target.value})} placeholder="Min. 8 characters" />
              <Input label="Confirm Password" type="password" value={pw.confirm} onChange={(e)=>setPw({...pw,confirm:e.target.value})} placeholder="Repeat new password" />
-             <div style={{display:'flex',justifyContent:'flex-end'}}>
-               <Button type="submit" variant="secondary" loading={saving}>Update Password</Button>
-             </div>
+              <div style={{display:'flex',justifyContent:'flex-end'}}>
+                <Button type="submit" variant="primary" loading={saving}>Update Password</Button>
+              </div>
            </div>
          </form>
        )}
@@ -198,9 +198,9 @@ const Settings: React.FC = () => {
              <Input label="Current Email" type="email" value={emailChange.current} onChange={(e)=>setEmailChange({...emailChange,current:e.target.value})} placeholder="Enter your current email" />
              <Input label="New Email" type="email" value={emailChange.newEmail} onChange={(e)=>setEmailChange({...emailChange,newEmail:e.target.value})} />
              <Input label="Confirm New Email" type="email" value={emailChange.confirm} onChange={(e)=>setEmailChange({...emailChange,confirm:e.target.value})} />
-             <div style={{display:'flex',justifyContent:'flex-end'}}>
-               <Button type="submit" variant="secondary" loading={saving}>Update Email</Button>
-             </div>
+              <div style={{display:'flex',justifyContent:'flex-end'}}>
+                <Button type="submit" variant="primary" loading={saving}>Update Email</Button>
+              </div>
            </div>
          </form>
        )}
