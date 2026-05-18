@@ -216,7 +216,7 @@ const AddGame: React.FC = () => {
                       </span>
                       <span className="addgame-external-badge">RAWG</span>
                     </div>
-                    <div className="addgame-external-grid">
+                    <div className="addgame-external-grid addgame-external-grid--4cols">
                       {popularResults.map((ext) => (
                         <button
                           key={`${ext.source}-${ext.sourceId}`}
