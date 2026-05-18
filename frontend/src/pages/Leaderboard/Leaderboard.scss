@@ -1,0 +1,179 @@
+@use '../../styles/variables' as *;
+
+.lb-header {
+  text-align: center;
+  margin-bottom: $sp8;
+}
+
+.lb-podium {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: $sp4;
+  margin-bottom: $sp6;
+  align-items: end;
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $sp2;
+    padding: $sp5 $sp3;
+    background: $s2;
+    border: 1px solid $b1;
+    border-radius: $r3;
+    text-decoration: none;
+    color: inherit;
+    transition: all $fast;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.04;
+      background: radial-gradient(ellipse at center, var(--medal-color), transparent 70%);
+    }
+
+    &:hover {
+      border-color: var(--medal-color);
+      box-shadow: 0 0 24px var(--medal-shadow);
+      transform: translateY(-2px);
+    }
+
+    &:nth-child(2) { margin-top: $sp6; }
+    &:nth-child(1) { margin-top: 0; }
+    &:nth-child(3) { margin-top: $sp6; }
+  }
+
+  &__medal {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  &__avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $a1, $a7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $tlg;
+    font-weight: $w7;
+    color: #fff;
+    border: 2px solid var(--medal-color);
+    box-shadow: 0 0 16px var(--medal-shadow);
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__name {
+    font-size: $tsm;
+    font-weight: $w7;
+    color: $t1;
+    text-align: center;
+  }
+
+  &__value {
+    font-size: $tlg;
+    font-weight: $w8;
+    font-family: $mono;
+    color: var(--medal-color);
+  }
+
+  &__games {
+    font-size: $txs;
+    color: $t3;
+    font-family: $mono;
+  }
+}
+
+.lb-rest {
+  display: flex;
+  flex-direction: column;
+  gap: $sp2;
+}
+
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: $sp4;
+  padding: $sp3 $sp4;
+  background: $s2;
+  border: 1px solid $b1;
+  border-radius: $r1;
+  text-decoration: none;
+  color: inherit;
+  transition: all $fast;
+
+  &:hover {
+    border-color: $b2;
+    background: $s3;
+  }
+
+  &__rank {
+    width: 32px;
+    font-size: $tsm;
+    font-weight: $w7;
+    font-family: $mono;
+    color: $t2;
+    text-align: center;
+  }
+
+  &__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $a1, $a7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $tsm;
+    font-weight: $w7;
+    color: #fff;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__name {
+    flex: 1;
+    font-size: $tsm;
+    font-weight: $w6;
+    color: $t1;
+  }
+
+  &__games {
+    font-size: $txs;
+    color: $t3;
+    font-family: $mono;
+  }
+
+  &__value {
+    font-size: $tsm;
+    font-weight: $w7;
+    font-family: $mono;
+    color: $a4;
+  }
+}
+
+@media (max-width: 640px) {
+  .lb-podium {
+    grid-template-columns: 1fr;
+
+    &__card {
+      margin-top: 0 !important;
+    }
+  }
+}
