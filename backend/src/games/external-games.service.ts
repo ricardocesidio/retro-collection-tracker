@@ -80,8 +80,8 @@ export class ExternalGamesService {
         genre: g.genres?.[0]?.name || undefined,
         description: g.description_raw?.slice(0, 500) || undefined,
         coverImageUrl: g.background_image || undefined,
-        rating: g.rating || undefined,
-        metacritic: g.metacritic || undefined,
+        rating: g.rating != null ? g.rating : undefined,
+        metacritic: g.metacritic != null ? g.metacritic : undefined,
       })),
     };
   }
@@ -186,8 +186,8 @@ export class ExternalGamesService {
       coverImageUrl: g.background_image || undefined,
       developer: g.developers?.[0]?.name || undefined,
       publisher: g.publishers?.[0]?.name || undefined,
-      rating: g.rating || undefined,
-      metacritic: g.metacritic || undefined,
+      rating: g.rating != null ? g.rating : undefined,
+      metacritic: g.metacritic != null ? g.metacritic : undefined,
     };
   }
 
