@@ -230,6 +230,11 @@ const AddGame: React.FC = () => {
                         >
                           <div className="addgame-card__cover">
                             <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
+                            {ext.rating && (
+                              <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
+                                <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
+                              </span>
+                            )}
                           </div>
                           <div className="addgame-card__info">
                             <span className="addgame-card__title">{ext.title}</span>
@@ -284,6 +289,11 @@ const AddGame: React.FC = () => {
                     >
                       <div className="addgame-card__cover">
                         <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
+                        {ext.rating && (
+                          <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
+                            <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
+                          </span>
+                        )}
                       </div>
                       <div className="addgame-card__info">
                         <span className="addgame-card__title">{ext.title}</span>
