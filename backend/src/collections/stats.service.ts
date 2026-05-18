@@ -268,14 +268,4 @@ export class StatsService {
 
     return result;
   }
-      }
-
-      result.push({
-        month: months[(now.getMonth() - 5 + i + 12) % 12] || months[i],
-        value: Math.round(cumulative),
-      });
-    }
-
-    return result;
-  }
 }
