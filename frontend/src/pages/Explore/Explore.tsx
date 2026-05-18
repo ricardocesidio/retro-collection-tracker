@@ -41,6 +41,7 @@ const Explore: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState<string | null>(null);
+  const [wishlisted, setWishlisted] = useState<Set<string>>(new Set());
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -74,6 +75,7 @@ const Explore: React.FC = () => {
 
   const handleAddToWishlist = async (e: React.MouseEvent | React.KeyboardEvent, ext: ExternalGameResult) => {
     e.stopPropagation();
+    if (wishlisted.has(ext.sourceId)) return;
     setImporting(ext.sourceId);
     setError('');
     try {
@@ -82,9 +84,14 @@ const Explore: React.FC = () => {
         body: JSON.stringify({ source: ext.source, sourceId: ext.sourceId }),
       });
       await wishlistApi.add(result.id);
+      setWishlisted((prev) => new Set(prev).add(ext.sourceId));
       setError('');
     } catch (err: any) {
-      setError(err.message || 'Failed to add to wishlist');
+      if (err.message?.includes('already in wishlist') || err.message?.includes('Conflict')) {
+        setWishlisted((prev) => new Set(prev).add(ext.sourceId));
+      } else {
+        setError(err.message || 'Failed to add to wishlist');
+      }
     } finally {
       setImporting(null);
     }
@@ -141,12 +148,12 @@ const Explore: React.FC = () => {
                   <span className="game-card-new__condition">RAWG</span>
                   <button
                     type="button"
-                    className="game-card-new__wishlist-btn"
+                    className={`game-card-new__wishlist-btn${wishlisted.has(ext.sourceId) ? ' game-card-new__wishlist-btn--added' : ''}`}
                     onClick={(e) => { e.stopPropagation(); handleAddToWishlist(e, ext); }}
-                    disabled={importing === ext.sourceId}
-                    aria-label="Add to wishlist"
+                    disabled={importing === ext.sourceId || wishlisted.has(ext.sourceId)}
+                    aria-label={wishlisted.has(ext.sourceId) ? 'In wishlist' : 'Add to wishlist'}
                   >
-                    <i className="fa-solid fa-bookmark" />
+                    <i className={`fa-solid ${wishlisted.has(ext.sourceId) ? 'fa-bookmark' : 'fa-bookmark'}`} />
                   </button>
                 </div>
                 <div className="game-card-new__body">
