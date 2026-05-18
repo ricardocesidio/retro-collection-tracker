@@ -46,6 +46,8 @@ const AddGame: React.FC = () => {
   const [externalResults, setExternalResults] = useState<ExternalGameResult[]>([]);
   const [externalSearching, setExternalSearching] = useState(false);
   const [externalSource, setExternalSource] = useState<string>('');
+  const [popularResults, setPopularResults] = useState<ExternalGameResult[]>([]);
+  const [popularLoading, setPopularLoading] = useState(true);
   const [importingGame, setImportingGame] = useState(false);
   const [importedGameId, setImportedGameId] = useState<string | null>(null);
 
@@ -63,6 +65,10 @@ const AddGame: React.FC = () => {
 
   useEffect(() => {
     mountedRef.current = true;
+    apiRequest<{ results: ExternalGameResult[] }>('/games/external-search')
+      .then((r) => { if (mountedRef.current) setPopularResults(r.results || []); })
+      .catch(() => {})
+      .finally(() => { if (mountedRef.current) setPopularLoading(false); });
     return () => { mountedRef.current = false; };
   }, []);
 
@@ -188,11 +194,54 @@ const AddGame: React.FC = () => {
             </div>
 
             {!search.trim() && (
-              <div className="addgame-empty">
-                <i className="fa-solid fa-gamepad" style={{ fontSize: '3rem', color: 'var(--t3, #5a6480)', marginBottom: '1rem' }} />
-                <h3>Search for a game</h3>
-                <p>Type a game title above to search the RAWG database. Import any game and add it to your collection.</p>
-              </div>
+              <>
+                <div className="addgame-empty">
+                  <i className="fa-solid fa-gamepad" style={{ fontSize: '3rem', color: 'var(--t3, #5a6480)', marginBottom: '1rem' }} />
+                  <h3>Search for a game</h3>
+                  <p>Type a game title above to search the RAWG database. Import any game and add it to your collection.</p>
+                </div>
+
+                {popularLoading ? (
+                  <div className="addgame-external-section">
+                    <div className="addgame-external-header">
+                      <LoadingSpinner />
+                      <span className="addgame-external-title">Loading popular games...</span>
+                    </div>
+                  </div>
+                ) : popularResults.length > 0 && (
+                  <div className="addgame-external-section">
+                    <div className="addgame-external-header">
+                      <span className="addgame-external-title">
+                        <i className="fa-solid fa-fire" /> Popular Games
+                      </span>
+                      <span className="addgame-external-badge">RAWG</span>
+                    </div>
+                    <div className="addgame-external-grid">
+                      {popularResults.map((ext) => (
+                        <button
+                          key={`${ext.source}-${ext.sourceId}`}
+                          className="addgame-card addgame-card--external"
+                          onClick={() => handleImportExternal(ext)}
+                          disabled={importingGame}
+                        >
+                          <div className="addgame-card__cover">
+                            <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
+                          </div>
+                          <div className="addgame-card__info">
+                            <span className="addgame-card__title">{ext.title}</span>
+                            {ext.platform && <span className="addgame-card__meta">{ext.platform}{ext.releaseYear ? ` · ${ext.releaseYear}` : ''}</span>}
+                            {ext.genre && <span className="addgame-card__genre">{ext.genre}</span>}
+                            {ext.description && <span className="addgame-card__desc">{ext.description.slice(0, 100)}...</span>}
+                          </div>
+                          <div className="addgame-card__import-badge">
+                            <i className="fa-solid fa-cloud-arrow-down" /> Import
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
             {externalSearching && search.trim().length >= 2 && (
