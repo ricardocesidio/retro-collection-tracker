@@ -49,7 +49,7 @@ const Explore: React.FC = () => {
     setLoading(true);
     const q = debounce.trim();
     const params = new URLSearchParams();
-    if (q.length >= 2) params.set('q', q);
+    if (q.length >= 1) params.set('q', q);
     params.set('page', String(page));
     apiRequest<SearchResponse>(`/games/external-search?${params}`)
       .then((r) => { if (!c) { setResults(r.results || []); setTotal(r.total); } })
@@ -115,7 +115,7 @@ const Explore: React.FC = () => {
       <section className="explore-hero">
         <h1 className="explore-hero__title">Explore the Catalog</h1>
         <p className="explore-hero__sub">
-          {debounce.trim().length >= 2
+          {debounce.trim().length >= 1
             ? `Searching "${debounce}" — ${total.toLocaleString()} results`
             : `${total.toLocaleString()} games available — browse popular titles from RAWG`}
         </p>
