@@ -72,7 +72,7 @@ const Explore: React.FC = () => {
     }
   };
 
-  const handleAddToWishlist = async (e: React.MouseEvent, ext: ExternalGameResult) => {
+  const handleAddToWishlist = async (e: React.MouseEvent | React.KeyboardEvent, ext: ExternalGameResult) => {
     e.stopPropagation();
     setImporting(ext.sourceId);
     setError('');
@@ -137,7 +137,7 @@ const Explore: React.FC = () => {
                 <div className="game-card-new__img">
                   <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
                   <span className="game-card-new__condition">RAWG</span>
-                  <button className="sidebar__item-icon" onClick={(e) => handleAddToWishlist(e, ext)} disabled={importing === ext.sourceId} style={{position:'absolute',right:'10px',bottom:'10px',color:'white',fontSize:'1.1rem',background:'rgba(2,6,23,.85)',padding:'6px 14px',borderRadius:'6px',backdropFilter:'blur(4px)',border:'1px solid rgba(139,92,246,.35)',minWidth:'36px',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}><i className="fa-solid fa-heart" /></button>
+                  <span className="sidebar__item-icon" role="button" tabIndex={0} onClick={(e) => handleAddToWishlist(e, ext)} onKeyDown={(e) => e.key === 'Enter' && handleAddToWishlist(e as any, ext)} style={{position:'absolute',right:'10px',bottom:'10px',color:'white',fontSize:'1.1rem',background:'rgba(2,6,23,.85)',padding:'6px 14px',borderRadius:'6px',backdropFilter:'blur(4px)',border:'1px solid rgba(139,92,246,.35)',minWidth:'36px',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',zIndex:1}}><i className="fa-solid fa-bookmark" /></span>
                 </div>
                 <div className="game-card-new__body">
                   <h3 className="game-card-new__title">
