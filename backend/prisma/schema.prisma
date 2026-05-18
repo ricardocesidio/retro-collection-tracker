@@ -180,6 +180,7 @@ model Wishlist {
   gameId   String
   priority Int      @default(0) @db.SmallInt
   notes    String?
+  estimatedValue Float?
   addedAt  DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -40,6 +40,7 @@ const Wishlist: React.FC = () => {
               <div className="game-card-new__body">
                 <h3 className="game-card-new__title">{w.game.title}</h3>
                 <p className="game-card-new__meta">{w.game.platform.name} · {w.game.genre.name}</p>
+                {w.estimatedValue != null && <p className="game-card-new__meta" style={{color:'#34d399',fontWeight:700}}>${w.estimatedValue}</p>}
                 <div className="game-card-new__footer">
                   <Badge variant={w.priority===0?'highlight':w.priority===1?'warning':'default'}>Priority {w.priority+1}</Badge>
                 </div>

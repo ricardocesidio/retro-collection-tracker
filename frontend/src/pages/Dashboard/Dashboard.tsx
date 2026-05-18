@@ -16,7 +16,7 @@ interface DashboardData {
   recentAdditions: Array<{ id: string; gameId: string; title: string; platform: string; coverImageUrl?: string; description?: string; condition: string; score?: string | null; estimatedValue?: number }>;
   recentReviews: Array<{ id: string; gameId: string; gameTitle: string; platform: string; coverImageUrl?: string | null; rating: number; title?: string; body?: string; user?: { username: string; displayName?: string; avatarUrl?: string } }>;
   recentActivity: Array<{ id: string; type: string; message?: string; createdAt: string }>;
-  wishlistSpotlight: Array<{ id: string; gameId: string; title: string; platform: string; genre: string; priority: number; coverImageUrl?: string }>;
+  wishlistSpotlight: Array<{ id: string; gameId: string; title: string; platform: string; genre: string; priority: number; coverImageUrl?: string; estimatedValue?: number }>;
   highlights: { mostValuable: any; highestRated: any };
 }
 
@@ -275,7 +275,7 @@ const Dashboard: React.FC = () => {
             {wishlistSpotlight.map((w) => (
               <Link to={`/games/${w.gameId}`} key={w.id} className="dash-wish-item">
                 <div className="dash-wish-item__img"><img src={w.coverImageUrl || `https://placehold.co/80x100/141829/f0f4ff?text=${encodeURIComponent(w.title.slice(0,3))}`} alt="" loading="lazy" /></div>
-                <div className="dash-wish-item__body"><span className="dash-wish-item__title">{w.title}</span><span className="dash-wish-item__meta">{w.platform} · {w.genre}</span><span className="dash-wish-item__priority">P{w.priority + 1}</span></div>
+                <div className="dash-wish-item__body"><span className="dash-wish-item__title">{w.title}</span><span className="dash-wish-item__meta">{w.platform} · {w.genre}</span><span className="dash-wish-item__priority">P{w.priority + 1}{w.estimatedValue != null ? ` · $${w.estimatedValue}` : ''}</span></div>
               </Link>
             ))}
           </div>

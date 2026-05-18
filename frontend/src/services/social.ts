@@ -7,6 +7,7 @@ export interface WishlistEntry {
   gameId: string;
   priority: number;
   notes?: string;
+  estimatedValue?: number;
   addedAt: string;
   game: GameData;
 }
@@ -64,9 +65,9 @@ const collectParams = (params?: Record<string, string>) =>
 export const wishlistApi = {
   list: (params?: Record<string, string>): Promise<PaginatedResponse<WishlistEntry>> =>
     apiRequest(`/wishlist${collectParams(params)}`),
-  add: (gameId: string, priority?: number, notes?: string): Promise<WishlistEntry> =>
-    apiRequest('/wishlist', { method: 'POST', body: JSON.stringify({ gameId, priority, notes }) }),
-  update: (id: string, data: { priority?: number; notes?: string }): Promise<WishlistEntry> =>
+  add: (gameId: string, priority?: number, notes?: string, estimatedValue?: number): Promise<WishlistEntry> =>
+    apiRequest('/wishlist', { method: 'POST', body: JSON.stringify({ gameId, priority, notes, estimatedValue }) }),
+  update: (id: string, data: { priority?: number; notes?: string; estimatedValue?: number }): Promise<WishlistEntry> =>
     apiRequest(`/wishlist/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   remove: (id: string): Promise<void> =>
     apiRequest(`/wishlist/${id}`, { method: 'DELETE' }),

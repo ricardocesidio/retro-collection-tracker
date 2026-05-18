@@ -1,4 +1,4 @@
-import { IsString, IsInt, IsOptional, Min, Max } from 'class-validator';
+import { IsString, IsInt, IsOptional, IsNumber, Min, Max } from 'class-validator';
 
 export class CreateWishlistDto {
   @IsString()
@@ -13,4 +13,9 @@ export class CreateWishlistDto {
   @IsString()
   @IsOptional()
   notes?: string;
+
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  estimatedValue?: number;
 }

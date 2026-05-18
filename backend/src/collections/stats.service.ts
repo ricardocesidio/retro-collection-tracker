@@ -206,6 +206,7 @@ export class StatsService {
         genre: w.game.genre.name,
         priority: w.priority,
         coverImageUrl: w.game.coverImageUrl,
+        estimatedValue: w.estimatedValue,
       })),
       highlights: {
         mostValuable: mostValuable
