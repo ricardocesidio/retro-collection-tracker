@@ -77,16 +77,19 @@ const Explore: React.FC = () => {
     e.stopPropagation();
     setError('');
 
-    const existingId = wishlisted.get(ext.sourceId);
-    if (existingId) {
-      try {
-        await wishlistApi.remove(existingId);
-        const next = new Map(wishlisted);
-        next.delete(ext.sourceId);
-        setWishlisted(next);
-      } catch (err: any) {
-        setError(err.message || 'Failed to remove from wishlist');
+    if (wishlisted.has(ext.sourceId)) {
+      const existingId = wishlisted.get(ext.sourceId);
+      if (existingId) {
+        try {
+          await wishlistApi.remove(existingId);
+        } catch (err: any) {
+          setError(err.message || 'Failed to remove from wishlist');
+          return;
+        }
       }
+      const next = new Map(wishlisted);
+      next.delete(ext.sourceId);
+      setWishlisted(next);
       return;
     }
 
