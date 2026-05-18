@@ -13,7 +13,6 @@ interface DashboardData {
   platformDistribution: Array<{ name: string; count: number; percentage: number }>;
   genreDistribution: Array<{ name: string; count: number; percentage: number }>;
   conditionDistribution: Array<{ condition: string; count: number; percentage: number }>;
-  recentAdditions: Array<{ id: string; gameId: string; title: string; platform: string; coverImageUrl?: string; description?: string; condition: string; score?: string | null; estimatedValue?: number }>;
   recentReviews: Array<{ id: string; gameId: string; gameTitle: string; platform: string; coverImageUrl?: string | null; rating: number; title?: string; body?: string; user?: { username: string; displayName?: string; avatarUrl?: string } }>;
   recentActivity: Array<{ id: string; type: string; message?: string; createdAt: string }>;
   wishlistSpotlight: Array<{ id: string; gameId: string; title: string; platform: string; genre: string; priority: number; coverImageUrl?: string }>;
@@ -52,7 +51,7 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  const { summary, platformDistribution, genreDistribution, recentAdditions, recentReviews, recentActivity, wishlistSpotlight, highlights } = data;
+  const { summary, platformDistribution, genreDistribution, recentReviews, recentActivity, wishlistSpotlight, highlights } = data;
   const fmt = (v: number) => '$' + v.toLocaleString();
   const pColors = ['#7c3aed', '#a78bfa', '#3b82f6', '#d97706', '#f59e0b', '#06b6d4', '#ec4899', '#6366f1'];
   const pColorMap: Record<string, string> = { 'PlayStation': '#7c3aed', 'SNES': '#ec4899', 'NES': '#3b82f6', 'Sega Genesis': '#d97706', 'Nintendo 64': '#f59e0b', 'Game Boy': '#06b6d4', 'Game Boy Advance': '#6366f1', 'Sega Saturn': '#a78bfa', 'Atari 2600': '#f87171', 'PC Engine': '#84cc16', 'Other': '#059669' };
@@ -126,27 +125,6 @@ const Dashboard: React.FC = () => {
       {/* Main Grid */}
       <div className="dash-grid">
         <div className="dash-col">
-          {/* Recently Added */}
-          <div className="panel">
-            <div className="panel-header"><h3>Recently Added</h3><Link to="/collection" className="panel-link">View All</Link></div>
-            <div className="ra-grid">
-              {recentAdditions.slice(0, 4).map((g) => (
-                <Link to={`/games/${g.gameId}`} key={g.id} className="ra-card">
-                  <div className="ra-card__img">
-                    <img src={g.coverImageUrl || `https://placehold.co/400x240/181d30/f0f4ff?text=${encodeURIComponent(g.title.slice(0,8))}`} alt="" loading="lazy" />
-                  </div>
-                  <div className="ra-card__body">
-                    <div className="ra-card__text">
-                      <span className="ra-card__title">{g.title}</span>
-                      <span className="ra-card__platform">{g.platform}</span>
-                    </div>
-                    {g.score ? <div className={`ra-card__score ra-card__score--${parseFloat(g.score) >= 4 ? 'high' : parseFloat(g.score) >= 3 ? 'mid' : 'low'}`}>{g.score}</div> : null}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-
           {/* Collection Value Over Time */}
           <div className="panel">
             <div className="panel-header">
