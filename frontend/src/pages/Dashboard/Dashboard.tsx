@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import StatCard from '../../components/ui/StatCard/StatCard';
 import ActivityItem from '../../components/ui/ActivityItem/ActivityItem';
 import ProgressCard from '../../components/ui/ProgressCard/ProgressCard';
@@ -25,6 +25,7 @@ const Dashboard: React.FC = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
+  const navigate = useNavigate();
   const [valueHistory, setValueHistory] = useState<Array<{month:string;value:number}>>([]);
 
   useEffect(() => {
@@ -247,6 +248,7 @@ const Dashboard: React.FC = () => {
                       message={parsed.text}
                       highlight={parsed.highlight || undefined}
                       timestamp={relTime(a.createdAt)}
+                      onClick={a.targetType === 'Game' && a.targetId ? () => navigate(`/games/${a.targetId}`) : undefined}
                     />
                   );
                 })}

@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
+import { ActivityType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
@@ -80,10 +81,22 @@ export class CollectionsService {
     if (existing)
       throw new ConflictException('Game already in your collection');
 
-    return this.prisma.collection.create({
+    const item = await this.prisma.collection.create({
       data: { ...dto, userId },
       include: { game: { include: { platform: true, genre: true } } },
     });
+
+    await this.prisma.activityLog.create({
+      data: {
+        userId,
+        type: ActivityType.ADDED_GAME,
+        targetId: dto.gameId,
+        targetType: 'Game',
+        message: `Added ${item.game.title} to collection`,
+      },
+    }).catch(() => {});
+
+    return item;
   }
 
   async update(userId: string, id: string, dto: UpdateCollectionDto) {

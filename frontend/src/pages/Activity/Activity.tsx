@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import ActivityItem from '../../components/ui/ActivityItem/ActivityItem';
 import { followApi } from '../../services/social';
 
 const Activity: React.FC = () => {
+  const navigate = useNavigate();
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -29,6 +30,7 @@ const Activity: React.FC = () => {
               iconBg={bg[log.type] || '#6366f1'}
               message={log.message || log.type.replace('_', ' ')}
               timestamp={new Date(log.createdAt).toLocaleDateString()}
+              onClick={log.targetType === 'Game' && log.targetId ? () => navigate(`/games/${log.targetId}`) : undefined}
             />
           ))}
         </div>

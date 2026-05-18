@@ -42,6 +42,8 @@ export class SocialService {
       data: {
         userId: followingId,
         type: ActivityType.FOLLOWED_USER,
+        targetId: followerId,
+        targetType: 'User',
         message: `${follower?.displayName || follower?.username || 'Someone'} started following you`,
       },
     });
