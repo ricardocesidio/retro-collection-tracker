@@ -179,22 +179,20 @@
 }
 
 .addgame-card__info {
-  padding: $sp3;
+  padding: $sp4 $sp5;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
   flex: 1;
 }
 
 .addgame-card__title {
   font-size: $tsm;
-  font-weight: $w6;
+  font-weight: $w7;
   color: $t1;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .addgame-card__meta {
@@ -205,9 +203,8 @@
 
 .addgame-card__genre {
   font-size: $txs;
-  color: $a2;
-  margin-top: auto;
-  padding-top: $sp2;
+  color: $t3;
+  font-family: $mono;
 }
 
 .addgame-empty {
