@@ -90,7 +90,6 @@ const Collection: React.FC = () => {
                     {!item.personalRating && item.game.rawgRating ? <span className={`ra-card__score ra-card__score--${item.game.rawgRating >= 4 ? 'high' : item.game.rawgRating >= 3 ? 'mid' : 'low'}`}>{item.game.rawgRating.toFixed(1)}</span> : null}
                   </h3>
                   <p className="game-card-new__meta">{item.game.platform.name} · {item.game.genre.name}</p>
-                  {item.estimatedValue != null && <p className="game-card-new__meta" style={{color:'#34d399',fontWeight:700}}>{fmt(item.estimatedValue)}</p>}
                 </div>
                 <div className="game-card-new__actions" onClick={(e) => e.preventDefault()}>
                   <Button variant="ghost" size="sm" onClick={() => setConfirmRemove(item.id)}>Remove</Button>
