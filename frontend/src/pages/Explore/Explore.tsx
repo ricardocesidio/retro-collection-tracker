@@ -107,25 +107,6 @@ const Explore: React.FC = () => {
     }
   };
 
-    setImporting(ext.sourceId);
-    try {
-      const result = await apiRequest<{ id: string; title: string }>('/games/import', {
-        method: 'POST',
-        body: JSON.stringify({ source: ext.source, sourceId: ext.sourceId }),
-      });
-      const entry = await wishlistApi.add(result.id);
-      setWishlisted((prev) => new Map(prev).set(ext.sourceId, entry.id));
-    } catch (err: any) {
-      if (err.message?.includes('already in wishlist') || err.message?.includes('Conflict')) {
-        setWishlisted((prev) => new Map(prev).set(ext.sourceId, ''));
-      } else {
-        setError(err.message || 'Failed to add to wishlist');
-      }
-    } finally {
-      setImporting(null);
-    }
-  };
-
   const totalPages = Math.ceil(total / 24);
 
   return (
