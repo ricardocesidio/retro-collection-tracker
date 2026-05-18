@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { collectionApi } from '../../../services/collections';
 import './Sidebar.scss';
@@ -59,8 +59,8 @@ const Sidebar: React.FC = () => {
       </button>
       {open && <div className="sidebar-overlay" onClick={() => setOpen(false)}/>}
       <aside className={`sidebar${open ? ' sidebar--open' : ''}`}>
-        <div className="sidebar__brand">
-        </div>
+        <Link to="/dashboard" className="sidebar__brand">
+        </Link>
         <nav className="sidebar__nav">
           {sections.map((s) => (
             <div key={s.label} className="sidebar__section">
