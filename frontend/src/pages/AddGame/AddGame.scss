@@ -72,6 +72,24 @@
   }
 }
 
+.addgame-search-hint {
+  font-size: $txs;
+  color: $t3;
+  text-align: center;
+  margin-top: -$sp3;
+  margin-bottom: $sp5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $sp2;
+
+  i {
+    color: $a5;
+    font-size: .75rem;
+    opacity: .7;
+  }
+}
+
 .addgame-filter-select {
   background: $s3;
   border: 1px solid $b1;

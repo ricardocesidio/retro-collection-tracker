@@ -193,6 +193,10 @@ const AddGame: React.FC = () => {
               </div>
             </div>
 
+            <div className="addgame-search-hint">
+              <i className="fa-solid fa-lightbulb" /> For best results, type the full game name
+            </div>
+
             {!search.trim() && (
               <>
                 <div className="addgame-empty">
