@@ -46,7 +46,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         <p className="confirm-dialog__message">{message}</p>
         <div className="confirm-dialog__actions">
           <Button variant="ghost" onClick={onCancel} disabled={loading}>{cancelLabel}</Button>
-          <Button variant={variant} onClick={onConfirm} loading={loading}>{confirmLabel}</Button>
+          <Button variant="ghost" className="btn--confirm-danger" onClick={onConfirm} loading={loading}>{confirmLabel}</Button>
         </div>
       </div>
     </div>

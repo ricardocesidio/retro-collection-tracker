@@ -8,6 +8,7 @@ interface ButtonProps {
   disabled?: boolean;
   loading?: boolean;
   onClick?: () => void;
+  className?: string;
   children: React.ReactNode;
 }
 
@@ -18,12 +19,13 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   loading = false,
   onClick,
+  className = '',
   children,
 }) => {
   return (
     <button
       type={type}
-      className={`btn btn--${variant} btn--${size}`}
+      className={`btn btn--${variant} btn--${size}${className ? ` ${className}` : ''}`}
       disabled={disabled || loading}
       aria-busy={loading}
       onClick={onClick}

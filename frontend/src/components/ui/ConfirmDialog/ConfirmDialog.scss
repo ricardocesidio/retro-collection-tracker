@@ -54,6 +54,15 @@
   }
 }
 
+.btn--confirm-danger {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.2);
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.22);
+  }
+}
+
 @keyframes cfIn {
   from { opacity: 0; }
   to { opacity: 1; }
