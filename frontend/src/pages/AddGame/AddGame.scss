@@ -130,6 +130,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
 
   &:hover {
     border-color: $a1;
@@ -141,9 +142,10 @@
 
 .addgame-card__cover {
   width: 100%;
-  aspect-ratio: 200 / 260;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
   background: $s3;
+  position: relative;
 
   img {
     width: 100%;
