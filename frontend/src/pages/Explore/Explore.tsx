@@ -23,11 +23,19 @@ interface ExternalGameResult {
   publisher?: string;
 }
 
+interface SearchResponse {
+  results: ExternalGameResult[];
+  total: number;
+  source: string;
+}
+
 const Explore: React.FC = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const debounce = useDebounce(search, 300);
+  const [page, setPage] = useState(1);
   const [results, setResults] = useState<ExternalGameResult[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState<string | null>(null);
   const [error, setError] = useState('');
@@ -36,13 +44,15 @@ const Explore: React.FC = () => {
     let c = false;
     setLoading(true);
     const q = debounce.trim();
-    const params = q.length >= 2 ? `?q=${encodeURIComponent(q)}` : '';
-    apiRequest<{ results: ExternalGameResult[]; source: string }>(`/games/external-search${params}`)
-      .then((r) => { if (!c) setResults(r.results || []); })
-      .catch(() => { if (!c) setResults([]); })
+    const params = new URLSearchParams();
+    if (q.length >= 2) params.set('q', q);
+    params.set('page', String(page));
+    apiRequest<SearchResponse>(`/games/external-search?${params}`)
+      .then((r) => { if (!c) { setResults(r.results || []); setTotal(r.total); } })
+      .catch(() => { if (!c) { setResults([]); setTotal(0); } })
       .finally(() => { if (!c) setLoading(false); });
     return () => { c = true; };
-  }, [debounce]);
+  }, [debounce, page]);
 
   const handleImport = async (ext: ExternalGameResult) => {
     setImporting(ext.sourceId);
@@ -59,14 +69,20 @@ const Explore: React.FC = () => {
     }
   };
 
+  const totalPages = Math.ceil(total / 24);
+
   return (
     <div className="page-shell">
       {error && <div style={{ marginBottom: '1rem' }}><Alert variant="danger">{error}</Alert></div>}
       <section className="explore-hero">
         <h1 className="explore-hero__title">Explore the Catalog</h1>
-        <p className="explore-hero__sub">{debounce ? `Searching "${debounce}"` : 'Browse popular games from the RAWG database'}</p>
+        <p className="explore-hero__sub">
+          {debounce.trim().length >= 2
+            ? `Searching "${debounce}" — ${total.toLocaleString()} results`
+            : `${total.toLocaleString()} games available — browse popular titles from RAWG`}
+        </p>
         <div className="explore-hero__search">
-          <Input placeholder="Search RAWG database for any game..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input placeholder="Search RAWG database for any game..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
         </div>
       </section>
 
@@ -75,37 +91,40 @@ const Explore: React.FC = () => {
       ) : results.length === 0 ? (
         <EmptyState icon="🔍" title="No games found" message={debounce ? `No RAWG results for "${debounce}". Try a different search term.` : 'No popular games loaded. Try searching for something.'} />
       ) : (
-        <div className="page-grid">
-          {results.map((ext) => (
-            <button
-              key={`${ext.source}-${ext.sourceId}`}
-              className="game-card-new"
-              onClick={() => handleImport(ext)}
-              disabled={importing === ext.sourceId}
-              style={{ textAlign: 'left', cursor: 'pointer', width: '100%', border: 'none', padding: 0 }}
-            >
-              <div className="game-card-new__img">
-                <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
-                <span className="game-card-new__condition">RAWG</span>
-              </div>
-              <div className="game-card-new__body">
-                <h3 className="game-card-new__title">{ext.title}</h3>
-                <p className="game-card-new__meta">
-                  {ext.platform || 'Multi-platform'}
-                  {ext.releaseYear ? ` · ${ext.releaseYear}` : ''}
-                  {ext.genre ? ` · ${ext.genre}` : ''}
-                </p>
-                {ext.description && <p className="game-card-new__meta" style={{ color: '#64748b', marginTop: '0.25rem' }}>{ext.description.slice(0, 100)}...</p>}
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {!loading && results.length > 0 && !debounce && (
-        <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.825rem', marginTop: '2rem' }}>
-          Showing top-rated games from RAWG. Search for something specific above.
-        </p>
+        <>
+          <div className="page-grid">
+            {results.map((ext) => (
+              <button
+                key={`${ext.source}-${ext.sourceId}`}
+                className="game-card-new"
+                onClick={() => handleImport(ext)}
+                disabled={importing === ext.sourceId}
+                style={{ textAlign: 'left', cursor: 'pointer', width: '100%', border: 'none', padding: 0 }}
+              >
+                <div className="game-card-new__img">
+                  <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
+                  <span className="game-card-new__condition">RAWG</span>
+                </div>
+                <div className="game-card-new__body">
+                  <h3 className="game-card-new__title">{ext.title}</h3>
+                  <p className="game-card-new__meta">
+                    {ext.platform || 'Multi-platform'}
+                    {ext.releaseYear ? ` · ${ext.releaseYear}` : ''}
+                    {ext.genre ? ` · ${ext.genre}` : ''}
+                  </p>
+                  {ext.description && <p className="game-card-new__meta" style={{ color: '#64748b', marginTop: '0.25rem' }}>{ext.description.slice(0, 100)}...</p>}
+                </div>
+              </button>
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', padding: '2rem 0' }}>
+              <Button variant="ghost" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>← Prev</Button>
+              <span style={{ fontSize: '0.875rem', color: '#94a3b8' }}>Page {page} of {totalPages}</span>
+              <Button variant="ghost" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Next →</Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

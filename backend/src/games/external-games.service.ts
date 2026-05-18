@@ -30,8 +30,8 @@ export class ExternalGamesService {
   async search(query: string, page = 1): Promise<{ results: ExternalGameResult[]; total: number; source: string }> {
     if (this.rawgKey) {
       try {
-        const results = await this.searchRawg(query, page);
-        return { results, total: results.length, source: 'rawg' };
+        const { results, total } = await this.searchRawg(query, page);
+        return { results, total, source: 'rawg' };
       } catch (err) {
         this.logger.warn(`RAWG search failed, falling back to Wikipedia: ${err}`);
       }
@@ -50,25 +50,28 @@ export class ExternalGamesService {
     }
   }
 
-  private async searchRawg(query: string, page: number): Promise<ExternalGameResult[]> {
+  private async searchRawg(query: string, page: number): Promise<{ results: ExternalGameResult[]; total: number }> {
     const baseUrl = query
-      ? `https://api.rawg.io/api/games?key=${this.rawgKey}&search=${encodeURIComponent(query)}&page_size=20&page=${page}`
+      ? `https://api.rawg.io/api/games?key=${this.rawgKey}&search=${encodeURIComponent(query)}&page_size=24&page=${page}`
       : `https://api.rawg.io/api/games?key=${this.rawgKey}&page_size=24&page=${page}&ordering=-rating`;
     const url = baseUrl;
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`RAWG API returned ${res.status}`);
     const data = await res.json();
 
-    return (data.results || []).map((g: any) => ({
-      source: 'rawg' as const,
-      sourceId: String(g.id),
-      title: g.name,
-      releaseYear: g.released ? parseInt(g.released.slice(0, 4)) : undefined,
-      platform: g.platforms?.[0]?.platform?.name || undefined,
-      genre: g.genres?.[0]?.name || undefined,
-      description: g.description_raw?.slice(0, 500) || undefined,
-      coverImageUrl: g.background_image || undefined,
-    }));
+    return {
+      total: data.count || 0,
+      results: (data.results || []).map((g: any) => ({
+        source: 'rawg' as const,
+        sourceId: String(g.id),
+        title: g.name,
+        releaseYear: g.released ? parseInt(g.released.slice(0, 4)) : undefined,
+        platform: g.platforms?.[0]?.platform?.name || undefined,
+        genre: g.genres?.[0]?.name || undefined,
+        description: g.description_raw?.slice(0, 500) || undefined,
+        coverImageUrl: g.background_image || undefined,
+      })),
+    };
   }
 
   private async searchWikipedia(query: string): Promise<ExternalGameResult[]> {
