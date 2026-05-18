@@ -38,7 +38,10 @@ const Wishlist: React.FC = () => {
                 <span className="game-card-new__condition">P{w.priority+1}</span>
               </div>
               <div className="game-card-new__body">
-                <h3 className="game-card-new__title">{w.game.title}</h3>
+                <h3 className="game-card-new__title">
+                  <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{w.game.title}</span>
+                  {w.game.rawgRating ? <span className={`ra-card__score ra-card__score--${w.game.rawgRating >= 4 ? 'high' : w.game.rawgRating >= 3 ? 'mid' : 'low'}`}>{w.game.rawgRating.toFixed(1)}</span> : null}
+                </h3>
                 <p className="game-card-new__meta">{w.game.platform.name} · {w.game.genre.name}</p>
                 {w.estimatedValue != null && <p className="game-card-new__meta" style={{color:'#34d399',fontWeight:700}}>${w.estimatedValue}</p>}
                 <div className="game-card-new__footer">
