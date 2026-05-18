@@ -1,15 +1,23 @@
 @use '../../styles/variables' as *;
 
 .gd-back {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: $sp2;
   color: $t2;
   font-size: $tsm;
   margin-bottom: $sp5;
-  transition: color $fast;
   text-decoration: none;
+  background: rgba(255,255,255,.04);
+  border: 1px solid $b1;
+  border-radius: $r1;
+  padding: $sp2 $sp4;
+  transition: all $fast;
 
   &:hover {
     color: $t1;
+    background: rgba(255,255,255,.08);
+    border-color: $b2;
   }
 }
 
