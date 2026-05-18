@@ -244,11 +244,6 @@ const AddGame: React.FC = () => {
                             </span>
                             {ext.platform && <span className="addgame-card__meta">{ext.platform}{ext.releaseYear ? ` · ${ext.releaseYear}` : ''}</span>}
                             {ext.genre && <span className="addgame-card__genre">{ext.genre}</span>}
-                            {ext.rating && (
-                              <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
-                                <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
-                              </span>
-                            )}
                             {ext.description && <span className="addgame-card__desc">{ext.description.slice(0, 100)}...</span>}
                           </div>
                           <div className="addgame-card__import-badge">
@@ -310,11 +305,6 @@ const AddGame: React.FC = () => {
                         </span>
                         {ext.platform && <span className="addgame-card__meta">{ext.platform}{ext.releaseYear ? ` · ${ext.releaseYear}` : ''}</span>}
                         {ext.genre && <span className="addgame-card__genre">{ext.genre}</span>}
-                        {ext.rating && (
-                          <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
-                            <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
-                          </span>
-                        )}
                         {ext.description && <span className="addgame-card__desc">{ext.description.slice(0, 100)}...</span>}
                       </div>
                       <div className="addgame-card__import-badge">
