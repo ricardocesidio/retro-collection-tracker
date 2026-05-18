@@ -234,7 +234,14 @@ const AddGame: React.FC = () => {
                             <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
                           </div>
                           <div className="addgame-card__info">
-                            <span className="addgame-card__title">{ext.title}</span>
+                            <span className="addgame-card__title">
+                              <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{ext.title}</span>
+                              {ext.rating && (
+                                <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
+                                  <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
+                                </span>
+                              )}
+                            </span>
                             {ext.platform && <span className="addgame-card__meta">{ext.platform}{ext.releaseYear ? ` · ${ext.releaseYear}` : ''}</span>}
                             {ext.genre && <span className="addgame-card__genre">{ext.genre}</span>}
                             {ext.rating && (
@@ -293,7 +300,14 @@ const AddGame: React.FC = () => {
                         <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
                       </div>
                       <div className="addgame-card__info">
-                        <span className="addgame-card__title">{ext.title}</span>
+                        <span className="addgame-card__title">
+                          <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{ext.title}</span>
+                          {ext.rating && (
+                            <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
+                              <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
+                            </span>
+                          )}
+                        </span>
                         {ext.platform && <span className="addgame-card__meta">{ext.platform}{ext.releaseYear ? ` · ${ext.releaseYear}` : ''}</span>}
                         {ext.genre && <span className="addgame-card__genre">{ext.genre}</span>}
                         {ext.rating && (

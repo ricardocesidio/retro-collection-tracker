@@ -190,9 +190,10 @@
   font-size: $tsm;
   font-weight: $w7;
   color: $t1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
 }
 
 .addgame-card__meta {
