@@ -248,7 +248,7 @@ const Dashboard: React.FC = () => {
                       message={parsed.text}
                       highlight={parsed.highlight || undefined}
                       timestamp={relTime(a.createdAt)}
-                      onClick={a.targetType === 'Game' && a.targetId ? () => navigate(`/games/${a.targetId}`) : a.targetType === 'User' && a.metadata?.username ? () => navigate(`/profile/${a.metadata.username}`) : undefined}
+                      onClick={a.targetType === 'Game' && a.targetId ? () => navigate(`/games/${a.targetId}`) : a.targetType === 'User' ? () => { const name = a.metadata?.username || (a.message ? a.message.replace(' started following you', '') : null); if (name) navigate(`/profile/${name}`); } : undefined}
                     />
                   );
                 })}

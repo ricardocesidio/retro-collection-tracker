@@ -30,7 +30,7 @@ const Activity: React.FC = () => {
               iconBg={bg[log.type] || '#6366f1'}
               message={log.message || log.type.replace('_', ' ')}
               timestamp={new Date(log.createdAt).toLocaleDateString()}
-              onClick={log.targetType === 'Game' && log.targetId ? () => navigate(`/games/${log.targetId}`) : log.targetType === 'User' && log.metadata?.username ? () => navigate(`/profile/${log.metadata.username}`) : undefined}
+              onClick={log.targetType === 'Game' && log.targetId ? () => navigate(`/games/${log.targetId}`) : log.targetType === 'User' ? () => { const name = log.metadata?.username || (log.message ? log.message.replace(' started following you', '') : null); if (name) navigate(`/profile/${name}`); } : undefined}
             />
           ))}
         </div>
