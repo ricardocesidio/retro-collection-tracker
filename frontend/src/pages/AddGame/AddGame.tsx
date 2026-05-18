@@ -260,7 +260,7 @@ const AddGame: React.FC = () => {
                               <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{ext.title}</span>
                               {ext.rating && (
                                 <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
-                                  <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
+                                  {ext.rating.toFixed(1)}
                                 </span>
                               )}
                             </span>
@@ -321,7 +321,7 @@ const AddGame: React.FC = () => {
                           <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{ext.title}</span>
                           {ext.rating && (
                             <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
-                              <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
+                              {ext.rating.toFixed(1)}
                             </span>
                           )}
                         </span>

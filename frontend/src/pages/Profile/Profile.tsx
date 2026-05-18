@@ -147,7 +147,7 @@ const Profile: React.FC = () => {
                     <div className="game-card-new__body">
                       <h3 className="game-card-new__title">
                         <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{item.game.title}</span>
-                        {item.personalRating && <span className={`ra-card__score ra-card__score--${item.personalRating >= 4 ? 'high' : item.personalRating >= 3 ? 'mid' : 'low'}`}>★ {item.personalRating.toFixed(1)}</span>}
+                        {item.personalRating && <span className={`ra-card__score ra-card__score--${item.personalRating >= 4 ? 'high' : item.personalRating >= 3 ? 'mid' : 'low'}`}>{item.personalRating.toFixed(1)}</span>}
                         {!item.personalRating && item.game.rawgRating ? <span className={`ra-card__score ra-card__score--${item.game.rawgRating >= 4 ? 'high' : item.game.rawgRating >= 3 ? 'mid' : 'low'}`}>{item.game.rawgRating.toFixed(1)}</span> : null}
                       </h3>
                       <p className="game-card-new__meta">{item.game.platform.name} · {item.game.genre.name}</p>
