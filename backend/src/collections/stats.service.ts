@@ -197,6 +197,9 @@ export class StatsService {
         type: a.type,
         message: a.message,
         createdAt: a.createdAt,
+        targetId: a.targetId,
+        targetType: a.targetType,
+        metadata: a.metadata,
       })),
       wishlistSpotlight: wishlistItems.map((w) => ({
         id: w.id,

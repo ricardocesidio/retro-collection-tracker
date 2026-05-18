@@ -45,6 +45,7 @@ export class SocialService {
         targetId: followerId,
         targetType: 'User',
         message: `${follower?.displayName || follower?.username || 'Someone'} started following you`,
+        metadata: { username: follower?.username },
       },
     });
 

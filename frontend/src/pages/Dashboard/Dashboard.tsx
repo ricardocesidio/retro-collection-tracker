@@ -15,7 +15,7 @@ interface DashboardData {
   conditionDistribution: Array<{ condition: string; count: number; percentage: number }>;
   recentAdditions: Array<{ id: string; gameId: string; title: string; platform: string; coverImageUrl?: string; description?: string; condition: string; score?: string | null; estimatedValue?: number }>;
   recentReviews: Array<{ id: string; gameId: string; gameTitle: string; platform: string; coverImageUrl?: string | null; rating: number; title?: string; body?: string; user?: { username: string; displayName?: string; avatarUrl?: string } }>;
-  recentActivity: Array<{ id: string; type: string; message?: string; createdAt: string }>;
+  recentActivity: Array<{ id: string; type: string; message?: string; createdAt: string; targetId?: string; targetType?: string; metadata?: any }>;
   wishlistSpotlight: Array<{ id: string; gameId: string; title: string; platform: string; genre: string; priority: number; coverImageUrl?: string; estimatedValue?: number }>;
   highlights: { mostValuable: any; highestRated: any };
 }
@@ -248,7 +248,7 @@ const Dashboard: React.FC = () => {
                       message={parsed.text}
                       highlight={parsed.highlight || undefined}
                       timestamp={relTime(a.createdAt)}
-                      onClick={a.targetType === 'Game' && a.targetId ? () => navigate(`/games/${a.targetId}`) : undefined}
+                      onClick={a.targetType === 'Game' && a.targetId ? () => navigate(`/games/${a.targetId}`) : a.targetType === 'User' && a.metadata?.username ? () => navigate(`/profile/${a.metadata.username}`) : undefined}
                     />
                   );
                 })}
