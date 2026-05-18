@@ -230,16 +230,16 @@ const AddGame: React.FC = () => {
                         >
                           <div className="addgame-card__cover">
                             <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
-                            {ext.rating && (
-                              <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
-                                <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
-                              </span>
-                            )}
                           </div>
                           <div className="addgame-card__info">
                             <span className="addgame-card__title">{ext.title}</span>
                             {ext.platform && <span className="addgame-card__meta">{ext.platform}{ext.releaseYear ? ` · ${ext.releaseYear}` : ''}</span>}
                             {ext.genre && <span className="addgame-card__genre">{ext.genre}</span>}
+                            {ext.rating && (
+                              <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
+                                <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
+                              </span>
+                            )}
                             {ext.description && <span className="addgame-card__desc">{ext.description.slice(0, 100)}...</span>}
                           </div>
                           <div className="addgame-card__import-badge">
@@ -289,16 +289,16 @@ const AddGame: React.FC = () => {
                     >
                       <div className="addgame-card__cover">
                         <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
-                        {ext.rating && (
-                          <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
-                            <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
-                          </span>
-                        )}
                       </div>
                       <div className="addgame-card__info">
                         <span className="addgame-card__title">{ext.title}</span>
                         {ext.platform && <span className="addgame-card__meta">{ext.platform}{ext.releaseYear ? ` · ${ext.releaseYear}` : ''}</span>}
                         {ext.genre && <span className="addgame-card__genre">{ext.genre}</span>}
+                        {ext.rating && (
+                          <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
+                            <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
+                          </span>
+                        )}
                         {ext.description && <span className="addgame-card__desc">{ext.description.slice(0, 100)}...</span>}
                       </div>
                       <div className="addgame-card__import-badge">

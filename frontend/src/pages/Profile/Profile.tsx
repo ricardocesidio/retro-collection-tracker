@@ -147,7 +147,7 @@ const Profile: React.FC = () => {
                     <div className="game-card-new__body">
                       <h3 className="game-card-new__title">{item.game.title}</h3>
                       <p className="game-card-new__meta">{item.game.platform.name} · {item.game.genre.name}</p>
-                      {item.personalRating && <span className="game-card-new__rating">★ {item.personalRating}</span>}
+                      {item.personalRating && <span className={`ra-card__score ra-card__score--${item.personalRating >= 4 ? 'high' : item.personalRating >= 3 ? 'mid' : 'low'}`}>★ {item.personalRating}</span>}
                     </div>
                   </div>
                 </Link>

@@ -104,11 +104,6 @@ const Explore: React.FC = () => {
                 <div className="game-card-new__img">
                   <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
                   <span className="game-card-new__condition">RAWG</span>
-                  {ext.rating && (
-                    <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
-                      <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
-                    </span>
-                  )}
                 </div>
                 <div className="game-card-new__body">
                   <h3 className="game-card-new__title">{ext.title}</h3>
@@ -117,6 +112,11 @@ const Explore: React.FC = () => {
                     {ext.releaseYear ? ` · ${ext.releaseYear}` : ''}
                     {ext.genre ? ` · ${ext.genre}` : ''}
                   </p>
+                  {ext.rating && (
+                    <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
+                      <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
+                    </span>
+                  )}
                   {ext.description && <p className="game-card-new__meta" style={{ color: '#64748b', marginTop: '0.25rem' }}>{ext.description.slice(0, 100)}...</p>}
                 </div>
               </button>
