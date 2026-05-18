@@ -87,29 +87,6 @@ const GameDetails: React.FC = () => {
           {actionMsg && <p className="gd-action-msg">{actionMsg}</p>}
         </div>
       </div>
-
-      {/* Related Games */}
-      {game.related && game.related.length > 0 && (
-        <div className="gd-related">
-          <h2 className="gd-section-title">You Might Also Like</h2>
-          <div className="page-grid">
-            {game.related.map((r) => (
-              <Link to={`/games/${r.id}`} key={r.id} style={{textDecoration:'none',color:'inherit'}}>
-                <div className="game-card-new">
-                  <div className="game-card-new__img">
-                    <img src={r.coverImageUrl||`https://placehold.co/400x300/181c28/f1f5f9?text=${encodeURIComponent(r.title.slice(0,6))}`} alt="" loading="lazy"/>
-                    <span className="game-card-new__condition">{r.platform.name}</span>
-                  </div>
-                  <div className="game-card-new__body">
-                    <h3 className="game-card-new__title">{r.title}</h3>
-                    <p className="game-card-new__meta">{r.platform.name} · {r.genre.name} · {r.releaseYear}</p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
