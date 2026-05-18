@@ -175,7 +175,6 @@ export class StatsService {
         score: item.personalRating != null ? item.personalRating + '.0' : item.game.rawgRating != null ? item.game.rawgRating.toFixed(1) : null,
         estimatedValue: item.estimatedValue,
         addedAt: item.createdAt,
-        isRawg: item.game.rawgRating != null,
       })),
       recentReviews: recentReviews.map((r) => ({
         id: r.id,
