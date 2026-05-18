@@ -7,6 +7,7 @@ import Alert from '../../components/ui/Alert/Alert';
 import Badge from '../../components/ui/Badge/Badge';
 import { wishlistApi } from '../../services/social';
 import type { WishlistEntry } from '../../services/social';
+import './Wishlist.scss';
 
 const Wishlist: React.FC = () => {
   const [items, setItems] = useState<WishlistEntry[]>([]);

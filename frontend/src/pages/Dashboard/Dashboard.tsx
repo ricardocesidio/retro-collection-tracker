@@ -140,7 +140,7 @@ const Dashboard: React.FC = () => {
                       <span className="ra-card__title">{g.title}</span>
                       <span className="ra-card__platform">{g.platform}</span>
                     </div>
-                    <div className="ra-card__score">{g.score || '—'}</div>
+                    {g.score ? <div className={`ra-card__score ra-card__score--${parseFloat(g.score) >= 4 ? 'high' : parseFloat(g.score) >= 3 ? 'mid' : 'low'}`}>{g.score}</div> : null}
                   </div>
                 </Link>
               ))}

@@ -161,6 +161,8 @@ export class ExternalGamesService {
         publisher: details.publisher,
         description: details.description,
         coverImageUrl: details.coverImageUrl,
+        rawgRating: details.rating,
+        rawgMetacritic: details.metacritic,
       },
     });
 

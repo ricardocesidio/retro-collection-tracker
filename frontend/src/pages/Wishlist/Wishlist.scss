@@ -1,0 +1,21 @@
+@use '../../styles/variables' as *;
+
+.game-card-new__actions {
+  a:first-child .btn--ghost {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.2);
+
+    &:hover {
+      background: rgba(59, 130, 246, 0.22);
+    }
+  }
+
+  > .btn--ghost:last-child {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.2);
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.22);
+    }
+  }
+}

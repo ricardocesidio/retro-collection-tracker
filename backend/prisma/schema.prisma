@@ -131,6 +131,8 @@ model Game {
   publisher     String?
   description   String?
   coverImageUrl String?
+  rawgRating    Float?
+  rawgMetacritic Int?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

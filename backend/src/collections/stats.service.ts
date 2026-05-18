@@ -172,7 +172,7 @@ export class StatsService {
         coverImageUrl: item.game.coverImageUrl,
         description: item.game.description || '',
         condition: item.condition,
-        score: item.personalRating != null ? item.personalRating + '.0' : null,
+        score: item.personalRating != null ? item.personalRating + '.0' : item.game.rawgRating != null ? item.game.rawgRating.toFixed(1) : null,
         estimatedValue: item.estimatedValue,
         addedAt: item.createdAt,
       })),
