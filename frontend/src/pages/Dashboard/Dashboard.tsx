@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import StatCard from '../../components/ui/StatCard/StatCard';
 import ActivityItem from '../../components/ui/ActivityItem/ActivityItem';
 import ProgressCard from '../../components/ui/ProgressCard/ProgressCard';
@@ -25,7 +25,6 @@ const Dashboard: React.FC = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
-  const navigate = useNavigate();
   const [valueHistory, setValueHistory] = useState<Array<{month:string;value:number}>>([]);
 
   useEffect(() => {
@@ -248,7 +247,7 @@ const Dashboard: React.FC = () => {
                       message={parsed.text}
                       highlight={parsed.highlight || undefined}
                       timestamp={relTime(a.createdAt)}
-                      onClick={a.targetType === 'Game' && a.targetId ? () => navigate(`/games/${a.targetId}`) : a.targetType === 'User' ? () => { const name = a.metadata?.username || (a.message ? a.message.replace(' started following you', '') : null); if (name) navigate(`/profile/${name}`); } : undefined}
+                      to={a.targetType === 'Game' && a.targetId ? `/games/${a.targetId}` : a.targetType === 'User' ? `/profile/${a.metadata?.username || (a.message ? a.message.replace(' started following you', '') : '')}` : undefined}
                     />
                   );
                 })}
