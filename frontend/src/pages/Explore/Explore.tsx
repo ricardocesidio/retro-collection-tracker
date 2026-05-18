@@ -153,7 +153,7 @@ const Explore: React.FC = () => {
                     disabled={importing === ext.sourceId || wishlisted.has(ext.sourceId)}
                     aria-label={wishlisted.has(ext.sourceId) ? 'In wishlist' : 'Add to wishlist'}
                   >
-                    <i className={`fa-solid ${wishlisted.has(ext.sourceId) ? 'fa-bookmark' : 'fa-bookmark'}`} />
+                    <i className="fa-solid fa-star" />
                   </button>
                 </div>
                 <div className="game-card-new__body">
