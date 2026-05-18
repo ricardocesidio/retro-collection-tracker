@@ -55,11 +55,17 @@
 }
 
 .btn--confirm-danger {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.2);
+  background: transparent;
+  border-color: transparent;
 
-  &:hover {
-    background: rgba(239, 68, 68, 0.22);
+  .btn__content {
+    background: rgba(248, 113, 113, 0.12);
+    border-radius: 4px;
+    padding: 2px 10px;
+  }
+
+  &:hover .btn__content {
+    background: rgba(248, 113, 113, 0.22);
   }
 }
 
