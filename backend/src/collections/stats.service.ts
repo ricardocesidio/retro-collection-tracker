@@ -77,7 +77,7 @@ export class StatsService {
         where: { userId },
         include: { game: { include: { platform: true, genre: true } } },
         orderBy: { priority: 'asc' },
-        take: 4,
+        take: 8,
       }),
     ]);
 
