@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
 import Alert from '../../components/ui/Alert/Alert';
 import Input from '../../components/ui/Input/Input';
@@ -39,6 +39,7 @@ interface SelectedGame {
 
 const AddGame: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mountedRef = useRef(true);
 
@@ -73,6 +74,27 @@ const AddGame: React.FC = () => {
       .finally(() => { if (mountedRef.current) setPopularLoading(false); });
     return () => { mountedRef.current = false; };
   }, []);
+
+  useEffect(() => {
+    const importId = searchParams.get('import');
+    if (importId) {
+      gamesApi.getById(importId).then((game) => {
+        if (mountedRef.current) {
+          setSelectedGame({
+            id: game.id,
+            title: game.title,
+            releaseYear: game.releaseYear,
+            developer: game.developer,
+            publisher: game.publisher,
+            description: game.description,
+            coverImageUrl: game.coverImageUrl,
+            platform: game.platform,
+            genre: game.genre,
+          });
+        }
+      }).catch(() => {});
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!search.trim() || search.trim().length < 2) {

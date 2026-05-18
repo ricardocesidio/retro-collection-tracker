@@ -66,7 +66,7 @@ const Explore: React.FC = () => {
         method: 'POST',
         body: JSON.stringify({ source: ext.source, sourceId: ext.sourceId }),
       });
-      navigate(`/games/${result.id}`);
+      navigate(`/add-game?import=${result.id}`);
     } catch (err: any) {
       setError(err.message || 'Failed to import game');
       setImporting(null);
@@ -94,8 +94,8 @@ const Explore: React.FC = () => {
         method: 'POST',
         body: JSON.stringify({ source: ext.source, sourceId: ext.sourceId }),
       });
-      const entry = await wishlistApi.add(result.id);
-      setWishlisted((prev) => new Map(prev).set(ext.sourceId, entry.id));
+      await wishlistApi.add(result.id);
+      navigate(`/add-game?import=${result.id}`);
     } catch (err: any) {
       if (err.message?.includes('already in wishlist') || err.message?.includes('Conflict')) {
         setWishlisted((prev) => new Map(prev).set(ext.sourceId, ''));
