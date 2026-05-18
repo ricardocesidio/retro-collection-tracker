@@ -76,7 +76,7 @@ export class StatsService {
       this.prisma.wishlist.findMany({
         where: { userId },
         include: { game: { include: { platform: true, genre: true } } },
-        orderBy: { priority: 'asc' },
+        orderBy: { addedAt: 'desc' },
         take: 7,
       }),
     ]);
