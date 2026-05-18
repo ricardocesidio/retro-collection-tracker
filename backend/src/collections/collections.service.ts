@@ -1,5 +1,7 @@
 import {
-  Injectable, NotFoundException, ConflictException,
+  Injectable,
+  NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCollectionDto } from './dto/create-collection.dto';
@@ -19,13 +21,20 @@ export class CollectionsService {
 
   async getUserCollection(
     userId: string,
-    query: { search?: string; platform?: string; condition?: string; page?: number; limit?: number },
+    query: {
+      search?: string;
+      platform?: string;
+      condition?: string;
+      page?: number;
+      limit?: number;
+    },
   ) {
     const { search, platform, condition, page = 1, limit = 20 } = query;
     const skip = (page - 1) * limit;
 
     const where: any = { userId };
-    if (search) where.game = { title: { contains: search, mode: 'insensitive' } };
+    if (search)
+      where.game = { title: { contains: search, mode: 'insensitive' } };
     if (platform) where.game = { ...(where.game || {}), platformId: platform };
     if (condition) where.condition = condition;
 
@@ -68,7 +77,8 @@ export class CollectionsService {
     const existing = await this.prisma.collection.findUnique({
       where: { userId_gameId: { userId, gameId: dto.gameId } },
     });
-    if (existing) throw new ConflictException('Game already in your collection');
+    if (existing)
+      throw new ConflictException('Game already in your collection');
 
     return this.prisma.collection.create({
       data: { ...dto, userId },

@@ -1,6 +1,4 @@
-import {
-  IsString, IsInt, IsOptional, Min, Max, IsEnum,
-} from 'class-validator';
+import { IsString, IsInt, IsOptional, Min, Max, IsEnum } from 'class-validator';
 import { Condition, Region, OwnershipStatus } from '@prisma/client';
 
 export class CreateCollectionDto {

@@ -1,5 +1,7 @@
 import {
-  Injectable, NotFoundException, ConflictException,
+  Injectable,
+  NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../social/notifications.service';
@@ -19,7 +21,16 @@ export class ReviewsService {
     const [reviews, total] = await Promise.all([
       this.prisma.review.findMany({
         where: { gameId },
-        include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              avatarUrl: true,
+            },
+          },
+        },
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
@@ -27,7 +38,13 @@ export class ReviewsService {
       this.prisma.review.count({ where: { gameId } }),
     ]);
 
-    return { data: reviews, total, page, limit, totalPages: Math.ceil(total / limit) };
+    return {
+      data: reviews,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async findByUser(userId: string, params: { page?: number; limit?: number }) {
@@ -45,7 +62,13 @@ export class ReviewsService {
       this.prisma.review.count({ where: { userId } }),
     ]);
 
-    return { data: reviews, total, page, limit, totalPages: Math.ceil(total / limit) };
+    return {
+      data: reviews,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async create(userId: string, dto: CreateReviewDto) {
@@ -56,7 +79,16 @@ export class ReviewsService {
 
     const review = await this.prisma.review.create({
       data: { ...dto, userId },
-      include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            avatarUrl: true,
+          },
+        },
+      },
     });
 
     this.notifications.notifyNewReview(userId, dto.gameId).catch(() => {});
@@ -73,7 +105,16 @@ export class ReviewsService {
     return this.prisma.review.update({
       where: { id },
       data: dto,
-      include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            avatarUrl: true,
+          },
+        },
+      },
     });
   }
 

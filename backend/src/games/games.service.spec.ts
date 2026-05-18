@@ -31,10 +31,16 @@ describe('GamesService', () => {
         count: jest.fn().mockResolvedValue(30),
       },
       platform: {
-        findMany: jest.fn().mockResolvedValue([{ id: 'snes', name: 'SNES', slug: 'snes' }]),
+        findMany: jest
+          .fn()
+          .mockResolvedValue([{ id: 'snes', name: 'SNES', slug: 'snes' }]),
       },
       genre: {
-        findMany: jest.fn().mockResolvedValue([{ id: 'action', name: 'Action', slug: 'action' }]),
+        findMany: jest
+          .fn()
+          .mockResolvedValue([
+            { id: 'action', name: 'Action', slug: 'action' },
+          ]),
       },
       review: {
         aggregate: jest.fn().mockResolvedValue({ _avg: { rating: 4.5 } }),
@@ -42,10 +48,7 @@ describe('GamesService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        GamesService,
-        { provide: PrismaService, useValue: prisma },
-      ],
+      providers: [GamesService, { provide: PrismaService, useValue: prisma }],
     }).compile();
 
     service = module.get<GamesService>(GamesService);
@@ -65,7 +68,9 @@ describe('GamesService', () => {
 
   it('should throw NotFoundException for missing game', async () => {
     prisma.game.findUnique.mockResolvedValue(null);
-    await expect(service.findById('missing')).rejects.toThrow(NotFoundException);
+    await expect(service.findById('missing')).rejects.toThrow(
+      NotFoundException,
+    );
   });
 
   it('should return platforms', async () => {

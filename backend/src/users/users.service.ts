@@ -50,4 +50,3 @@ export class UsersService {
     return { ...sanitized, level: getCollectorLevel(user._count.collections) };
   }
 }
-

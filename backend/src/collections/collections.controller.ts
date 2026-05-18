@@ -1,5 +1,15 @@
 import {
-  Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request, Res,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Request,
+  Res,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -22,11 +32,16 @@ export class CollectionsController {
   ) {}
 
   @Get('export')
-  async exportCollection(@Request() req: any, @Query('format') format: string, @Res() res: Response) {
+  async exportCollection(
+    @Request() req: any,
+    @Query('format') format: string,
+    @Res() res: Response,
+  ) {
     const data = await this.collectionsService.getAllForExport(req.user.id);
 
     if (format === 'csv') {
-      const header = 'Title,Platform,Genre,Release Year,Developer,Publisher,Condition,Region,Rating,Estimated Value,Notes,Cover URL';
+      const header =
+        'Title,Platform,Genre,Release Year,Developer,Publisher,Condition,Region,Rating,Estimated Value,Notes,Cover URL';
       const rows = data.map((item) =>
         [
           `"${item.game.title.replace(/"/g, '""')}"`,
@@ -45,7 +60,10 @@ export class CollectionsController {
       );
       const csv = [header, ...rows].join('\n');
       res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename="collection.csv"');
+      res.setHeader(
+        'Content-Disposition',
+        'attachment; filename="collection.csv"',
+      );
       return res.send(csv);
     }
 
@@ -64,7 +82,10 @@ export class CollectionsController {
       coverImageUrl: item.game.coverImageUrl,
     }));
     res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', 'attachment; filename="collection.json"');
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename="collection.json"',
+    );
     return res.send(json);
   }
 
@@ -106,7 +127,11 @@ export class CollectionsController {
   }
 
   @Put(':id')
-  async update(@Request() req: any, @Param('id') id: string, @Body() dto: UpdateCollectionDto) {
+  async update(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() dto: UpdateCollectionDto,
+  ) {
     return this.collectionsService.update(req.user.id, id, dto);
   }
 

@@ -1,5 +1,13 @@
 import {
-  Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -27,13 +35,18 @@ export class GamesController {
   }
 
   @Get('external-search')
-  async externalSearch(@Query('q') q: string, @Query('page') page?: string): Promise<any> {
+  async externalSearch(
+    @Query('q') q: string,
+    @Query('page') page?: string,
+  ): Promise<any> {
     return this.externalGamesService.search(q || '', page ? parseInt(page) : 1);
   }
 
   @Post('import')
   @UseGuards(JwtAuthGuard)
-  async importGame(@Body() body: { source: string; sourceId: string }): Promise<any> {
+  async importGame(
+    @Body() body: { source: string; sourceId: string },
+  ): Promise<any> {
     return this.externalGamesService.import(body.source, body.sourceId);
   }
 

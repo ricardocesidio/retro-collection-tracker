@@ -59,7 +59,10 @@ describe('AuthService', () => {
     it('should return user and token on valid credentials', async () => {
       prisma.user.findUnique.mockResolvedValue(mockUser);
 
-      const result = await service.login({ email: 'test@example.com', password: 'correct' });
+      const result = await service.login({
+        email: 'test@example.com',
+        password: 'correct',
+      });
 
       expect(result.token).toBe('mock-jwt-token');
       expect(result.user.email).toBe('test@example.com');
@@ -109,7 +112,11 @@ describe('AuthService', () => {
       });
 
       await expect(
-        service.register({ email: 'exists@test.com', username: 'user', password: 'pass123456' }),
+        service.register({
+          email: 'exists@test.com',
+          username: 'user',
+          password: 'pass123456',
+        }),
       ).rejects.toThrow(ConflictException);
     });
   });
@@ -118,7 +125,13 @@ describe('AuthService', () => {
     it('should return user with stats', async () => {
       prisma.user.findUnique.mockResolvedValue({
         ...mockUser,
-        _count: { collections: 5, wishlists: 2, reviews: 3, followers: 4, following: 6 },
+        _count: {
+          collections: 5,
+          wishlists: 2,
+          reviews: 3,
+          followers: 4,
+          following: 6,
+        },
       });
 
       const result = await service.getProfile('user-1');

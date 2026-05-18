@@ -20,7 +20,10 @@ export class NotificationPreferencesService {
     return prefs;
   }
 
-  async updatePreferences(userId: string, dto: UpdateNotificationPreferencesDto) {
+  async updatePreferences(
+    userId: string,
+    dto: UpdateNotificationPreferencesDto,
+  ) {
     const existing = await this.prisma.notificationPreference.findUnique({
       where: { userId },
     });

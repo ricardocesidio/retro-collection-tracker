@@ -17,7 +17,10 @@ export class NotificationPreferencesController {
   }
 
   @Put()
-  async update(@Request() req: any, @Body() dto: UpdateNotificationPreferencesDto) {
+  async update(
+    @Request() req: any,
+    @Body() dto: UpdateNotificationPreferencesDto,
+  ) {
     return this.service.updatePreferences(req.user.id, dto);
   }
 }

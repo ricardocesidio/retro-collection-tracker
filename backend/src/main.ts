@@ -39,7 +39,9 @@ async function bootstrap() {
   app.use((req: any, _res: any, next: any) => {
     req.setTimeout(30000, () => {
       if (!req.res.headersSent) {
-        req.res.status(408).json({ statusCode: 408, message: 'Request timeout' });
+        req.res
+          .status(408)
+          .json({ statusCode: 408, message: 'Request timeout' });
       }
     });
     next();
@@ -57,7 +59,9 @@ async function bootstrap() {
   // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('Retro Collection Tracker API')
-    .setDescription('API for managing retro game collections, users, reviews, and social features')
+    .setDescription(
+      'API for managing retro game collections, users, reviews, and social features',
+    )
     .setVersion('1.0')
     .addTag('auth', 'Authentication endpoints')
     .addTag('users', 'User management')
@@ -93,6 +97,8 @@ async function bootstrap() {
   const port = configService.get<number>('PORT') ?? 3000;
   await app.listen(port);
   console.log(`Server running on http://localhost:${port}`);
-  console.log(`API documentation available at http://localhost:${port}/api-docs`);
+  console.log(
+    `API documentation available at http://localhost:${port}/api-docs`,
+  );
 }
 bootstrap();

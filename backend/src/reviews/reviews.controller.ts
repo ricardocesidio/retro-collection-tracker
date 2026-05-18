@@ -1,5 +1,14 @@
 import {
-  Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -47,7 +56,11 @@ export class ReviewsController {
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   @Throttle({ default: { ttl: 60000, limit: 20 } })
-  async update(@Request() req: any, @Param('id') id: string, @Body() dto: Partial<CreateReviewDto>) {
+  async update(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() dto: Partial<CreateReviewDto>,
+  ) {
     return this.reviewsService.update(req.user.id, id, dto);
   }
 

@@ -1,5 +1,7 @@
 import {
-  Injectable, NotFoundException, ConflictException,
+  Injectable,
+  NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../social/notifications.service';
@@ -13,7 +15,10 @@ export class WishlistService {
     private readonly notifications: NotificationsService,
   ) {}
 
-  async getUserWishlist(userId: string, params: { page?: number; limit?: number }) {
+  async getUserWishlist(
+    userId: string,
+    params: { page?: number; limit?: number },
+  ) {
     const { page = 1, limit = 20 } = params;
     const skip = (page - 1) * limit;
 
@@ -28,7 +33,13 @@ export class WishlistService {
       this.prisma.wishlist.count({ where: { userId } }),
     ]);
 
-    return { data: items, total, page, limit, totalPages: Math.ceil(total / limit) };
+    return {
+      data: items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async add(userId: string, dto: CreateWishlistDto) {

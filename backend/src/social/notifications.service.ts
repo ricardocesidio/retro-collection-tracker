@@ -10,14 +10,26 @@ export class NotificationsService {
     private readonly notificationGateway: NotificationGateway,
   ) {}
 
-  async getUserNotifications(userId: string, params: { page?: number; limit?: number }) {
+  async getUserNotifications(
+    userId: string,
+    params: { page?: number; limit?: number },
+  ) {
     const { page = 1, limit = 20 } = params;
     const skip = (page - 1) * limit;
 
     const [notifications, total] = await Promise.all([
       this.prisma.notification.findMany({
         where: { recipientId: userId },
-        include: { sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
+        include: {
+          sender: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              avatarUrl: true,
+            },
+          },
+        },
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
@@ -25,7 +37,13 @@ export class NotificationsService {
       this.prisma.notification.count({ where: { recipientId: userId } }),
     ]);
 
-    return { data: notifications, total, page, limit, totalPages: Math.ceil(total / limit) };
+    return {
+      data: notifications,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async getUnreadCount(userId: string) {
@@ -66,8 +84,16 @@ export class NotificationsService {
     const count = await this.prisma.notification.count({
       where: { recipientId: data.recipientId, isRead: false },
     });
-    this.notificationGateway.sendToUser(data.recipientId, 'notification:new', notification);
-    this.notificationGateway.sendToUser(data.recipientId, 'notification:unread', { count });
+    this.notificationGateway.sendToUser(
+      data.recipientId,
+      'notification:new',
+      notification,
+    );
+    this.notificationGateway.sendToUser(
+      data.recipientId,
+      'notification:unread',
+      { count },
+    );
     return notification;
   }
 
@@ -75,7 +101,9 @@ export class NotificationsService {
     const count = await this.prisma.notification.count({
       where: { recipientId: userId, isRead: false },
     });
-    this.notificationGateway.sendToUser(userId, 'notification:unread', { count });
+    this.notificationGateway.sendToUser(userId, 'notification:unread', {
+      count,
+    });
   }
 
   // Auto-create notifications for key events
@@ -98,8 +126,14 @@ export class NotificationsService {
 
   async notifyNewReview(reviewerId: string, gameId: string) {
     const [reviewer, game] = await Promise.all([
-      this.prisma.user.findUnique({ where: { id: reviewerId }, select: { username: true, displayName: true } }),
-      this.prisma.game.findUnique({ where: { id: gameId }, select: { title: true } }),
+      this.prisma.user.findUnique({
+        where: { id: reviewerId },
+        select: { username: true, displayName: true },
+      }),
+      this.prisma.game.findUnique({
+        where: { id: gameId },
+        select: { title: true },
+      }),
     ]);
     if (!reviewer || !game) return;
 
@@ -124,13 +158,26 @@ export class NotificationsService {
 
     const created = await this.prisma.notification.findMany({
       where: { senderId: reviewerId, type: NotificationType.NEW_REVIEW },
-      include: { sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            avatarUrl: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
       take: followers.length,
     });
 
     for (const notif of created) {
-      this.notificationGateway.sendToUser(notif.recipientId, 'notification:new', notif);
+      this.notificationGateway.sendToUser(
+        notif.recipientId,
+        'notification:new',
+        notif,
+      );
     }
 
     for (const f of followers) {
@@ -140,8 +187,14 @@ export class NotificationsService {
 
   async notifyWishlistAdded(userId: string, gameId: string) {
     const [user, game] = await Promise.all([
-      this.prisma.user.findUnique({ where: { id: userId }, select: { username: true, displayName: true } }),
-      this.prisma.game.findUnique({ where: { id: gameId }, select: { title: true } }),
+      this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { username: true, displayName: true },
+      }),
+      this.prisma.game.findUnique({
+        where: { id: gameId },
+        select: { title: true },
+      }),
     ]);
     if (!user || !game) return;
 
@@ -165,13 +218,26 @@ export class NotificationsService {
 
     const created = await this.prisma.notification.findMany({
       where: { senderId: userId, type: NotificationType.WISHLIST_AVAILABLE },
-      include: { sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            avatarUrl: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
       take: followers.length,
     });
 
     for (const notif of created) {
-      this.notificationGateway.sendToUser(notif.recipientId, 'notification:new', notif);
+      this.notificationGateway.sendToUser(
+        notif.recipientId,
+        'notification:new',
+        notif,
+      );
     }
 
     for (const f of followers) {

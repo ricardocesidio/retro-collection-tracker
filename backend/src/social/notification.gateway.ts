@@ -1,5 +1,8 @@
 import {
-  WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect,
+  WebSocketGateway,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
@@ -8,7 +11,9 @@ import { JwtService } from '@nestjs/jwt';
   cors: { origin: '*', credentials: true },
   namespace: '/ws',
 })
-export class NotificationGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class NotificationGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server!: Server;
 

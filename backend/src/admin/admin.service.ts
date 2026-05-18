@@ -19,9 +19,15 @@ export class AdminService {
       this.prisma.user.findMany({
         where,
         select: {
-          id: true, email: true, username: true, displayName: true,
-          role: true, isActive: true, isEmailVerified: true,
-          createdAt: true, lastLoginAt: true,
+          id: true,
+          email: true,
+          username: true,
+          displayName: true,
+          role: true,
+          isActive: true,
+          isEmailVerified: true,
+          createdAt: true,
+          lastLoginAt: true,
           _count: { select: { collections: true, reviews: true } },
         },
         skip,
@@ -30,7 +36,13 @@ export class AdminService {
       }),
       this.prisma.user.count({ where }),
     ]);
-    return { data: users, total, page, limit, totalPages: Math.ceil(total / limit) };
+    return {
+      data: users,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async updateUserRole(userId: string, role: string) {
@@ -42,7 +54,10 @@ export class AdminService {
   }
 
   async toggleUserActive(userId: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { isActive: true } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { isActive: true },
+    });
     if (!user) throw new Error('User not found');
     return this.prisma.user.update({
       where: { id: userId },
@@ -58,13 +73,23 @@ export class AdminService {
     const [games, total] = await Promise.all([
       this.prisma.game.findMany({
         where,
-        include: { platform: true, genre: true, _count: { select: { collections: true, reviews: true } } },
+        include: {
+          platform: true,
+          genre: true,
+          _count: { select: { collections: true, reviews: true } },
+        },
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
       }),
       this.prisma.game.count({ where }),
     ]);
-    return { data: games, total, page, limit, totalPages: Math.ceil(total / limit) };
+    return {
+      data: games,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 }

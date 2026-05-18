@@ -40,7 +40,9 @@ export class AuthService {
         },
       });
 
-      console.log(`[DEV] Email verification link: ${process.env.API_URL || 'http://localhost:3000'}/auth/verify-email?token=${verificationToken}`);
+      console.log(
+        `[DEV] Email verification link: ${process.env.API_URL || 'http://localhost:3000'}/auth/verify-email?token=${verificationToken}`,
+      );
 
       const token = this.generateToken(user.id, user.email);
       return {
@@ -73,10 +75,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() },
-    }).catch(() => {});
+    await this.prisma.user
+      .update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() },
+      })
+      .catch(() => {});
 
     const token = this.generateToken(user.id, user.email);
     return {
@@ -130,7 +134,9 @@ export class AuthService {
         where: { id: userId },
         data: {
           ...(dto.username && { username: dto.username }),
-          ...(dto.displayName !== undefined && { displayName: dto.displayName }),
+          ...(dto.displayName !== undefined && {
+            displayName: dto.displayName,
+          }),
           ...(dto.bio !== undefined && { bio: dto.bio }),
           ...(dto.avatarUrl !== undefined && { avatarUrl: dto.avatarUrl }),
         },
@@ -159,7 +165,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid verification token');
     }
 
-    const user = await this.prisma.user.findUnique({ where: { email: payload.email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email: payload.email },
+    });
     if (!user) throw new UnauthorizedException('User not found');
     if (user.isEmailVerified) return { message: 'Email already verified.' };
 
@@ -186,7 +194,9 @@ export class AuthService {
       data: { emailVerificationToken: verificationToken },
     });
 
-    console.log(`[DEV] Email verification link: ${process.env.API_URL || 'http://localhost:3000'}/auth/verify-email?token=${verificationToken}`);
+    console.log(
+      `[DEV] Email verification link: ${process.env.API_URL || 'http://localhost:3000'}/auth/verify-email?token=${verificationToken}`,
+    );
 
     return { message: 'Verification email sent.' };
   }
@@ -195,8 +205,12 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new UnauthorizedException('User not found');
 
-    const isPasswordValid = await bcrypt.compare(dto.currentPassword, user.password);
-    if (!isPasswordValid) throw new UnauthorizedException('Current password is incorrect');
+    const isPasswordValid = await bcrypt.compare(
+      dto.currentPassword,
+      user.password,
+    );
+    if (!isPasswordValid)
+      throw new UnauthorizedException('Current password is incorrect');
 
     const passwordHash = await bcrypt.hash(dto.newPassword, 12);
     await this.prisma.user.update({
@@ -212,7 +226,8 @@ export class AuthService {
       where: { email },
     });
     // Always return success to prevent email enumeration
-    if (!user) return { message: 'If the email exists, a reset link has been sent.' };
+    if (!user)
+      return { message: 'If the email exists, a reset link has been sent.' };
 
     const resetToken = this.jwtService.sign(
       { sub: user.id, email: user.email, type: 'password-reset' },
@@ -253,7 +268,9 @@ export class AuthService {
 
     // Check if user has exceeded email change limit (3 times)
     if (user.emailChangeCount >= 3) {
-      throw new ConflictException('Email change limit exceeded (maximum 3 changes allowed)');
+      throw new ConflictException(
+        'Email change limit exceeded (maximum 3 changes allowed)',
+      );
     }
 
     // Check if new email already exists
@@ -284,10 +301,12 @@ export class AuthService {
     const token = this.generateToken(userId, newEmail);
 
     // Log verification link in dev
-    console.log(`[DEV] Email verification link: ${process.env.API_URL || 'http://localhost:3000'}/auth/verify-email?token=${this.jwtService.sign(
-      { sub: 'verify', email: newEmail, type: 'email-verification' },
-      { expiresIn: '24h' },
-    )}`);
+    console.log(
+      `[DEV] Email verification link: ${process.env.API_URL || 'http://localhost:3000'}/auth/verify-email?token=${this.jwtService.sign(
+        { sub: 'verify', email: newEmail, type: 'email-verification' },
+        { expiresIn: '24h' },
+      )}`,
+    );
 
     return {
       message: 'Email changed successfully. Please verify your new email.',

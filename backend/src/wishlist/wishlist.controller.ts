@@ -1,5 +1,14 @@
 import {
-  Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -37,7 +46,11 @@ export class WishlistController {
 
   @Put(':id')
   @Throttle({ default: { ttl: 60000, limit: 30 } })
-  async update(@Request() req: any, @Param('id') id: string, @Body() dto: UpdateWishlistDto) {
+  async update(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() dto: UpdateWishlistDto,
+  ) {
     return this.wishlistService.update(req.user.id, id, dto);
   }
 

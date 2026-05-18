@@ -1,5 +1,11 @@
 import {
-  Controller, Get, Post, Param, Query, UseGuards, Request,
+  Controller,
+  Get,
+  Post,
+  Param,
+  Query,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { SocialService } from './social.service';
 import { NotificationsService } from './notifications.service';

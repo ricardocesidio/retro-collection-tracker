@@ -27,11 +27,16 @@ export class GamesService {
 
     const orderBy: any = (() => {
       switch (sort) {
-        case 'newest': return { releaseYear: 'desc' as const };
-        case 'oldest': return { releaseYear: 'asc' as const };
-        case 'title': return { title: 'asc' as const };
-        case 'popular': return { collections: { _count: 'desc' as const } };
-        default: return { title: 'asc' as const };
+        case 'newest':
+          return { releaseYear: 'desc' as const };
+        case 'oldest':
+          return { releaseYear: 'asc' as const };
+        case 'title':
+          return { title: 'asc' as const };
+        case 'popular':
+          return { collections: { _count: 'desc' as const } };
+        default:
+          return { title: 'asc' as const };
       }
     })();
 
@@ -76,13 +81,20 @@ export class GamesService {
         reviews: {
           include: {
             user: {
-              select: { id: true, username: true, displayName: true, avatarUrl: true },
+              select: {
+                id: true,
+                username: true,
+                displayName: true,
+                avatarUrl: true,
+              },
             },
           },
           orderBy: { createdAt: 'desc' },
           take: 5,
         },
-        _count: { select: { collections: true, wishlists: true, reviews: true } },
+        _count: {
+          select: { collections: true, wishlists: true, reviews: true },
+        },
       },
     });
     if (!game) throw new NotFoundException('Game not found');
@@ -107,7 +119,10 @@ export class GamesService {
   }
 
   async getRelated(id: string) {
-    const game = await this.prisma.game.findUnique({ where: { id }, select: { platformId: true, genreId: true } });
+    const game = await this.prisma.game.findUnique({
+      where: { id },
+      select: { platformId: true, genreId: true },
+    });
     if (!game) return [];
 
     return this.prisma.game.findMany({
