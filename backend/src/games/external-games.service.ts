@@ -28,10 +28,6 @@ export class ExternalGamesService {
   }
 
   async search(query: string, page = 1): Promise<{ results: ExternalGameResult[]; total: number; source: string }> {
-    if (!query || query.trim().length < 2) {
-      return { results: [], total: 0, source: 'none' };
-    }
-
     if (this.rawgKey) {
       try {
         const results = await this.searchRawg(query, page);
@@ -39,6 +35,10 @@ export class ExternalGamesService {
       } catch (err) {
         this.logger.warn(`RAWG search failed, falling back to Wikipedia: ${err}`);
       }
+    }
+
+    if (!query || query.trim().length < 2) {
+      return { results: [], total: 0, source: 'none' };
     }
 
     try {
@@ -51,7 +51,10 @@ export class ExternalGamesService {
   }
 
   private async searchRawg(query: string, page: number): Promise<ExternalGameResult[]> {
-    const url = `https://api.rawg.io/api/games?key=${this.rawgKey}&search=${encodeURIComponent(query)}&page_size=20&page=${page}`;
+    const baseUrl = query
+      ? `https://api.rawg.io/api/games?key=${this.rawgKey}&search=${encodeURIComponent(query)}&page_size=20&page=${page}`
+      : `https://api.rawg.io/api/games?key=${this.rawgKey}&page_size=24&page=${page}&ordering=-rating`;
+    const url = baseUrl;
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`RAWG API returned ${res.status}`);
     const data = await res.json();
