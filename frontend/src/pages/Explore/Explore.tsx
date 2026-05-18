@@ -6,6 +6,7 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import Alert from '../../components/ui/Alert/Alert';
 import { apiRequest } from '../../services/api-client';
+import { wishlistApi } from '../../services/social';
 import { useDebounce } from '../../hooks/useDebounce';
 
 const PLACEHOLDER_COVER = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="260" viewBox="0 0 200 260"><rect fill="#1e1b4b" width="200" height="260"/><text x="100" y="130" text-anchor="middle" fill="#4c1d95" font-size="48" font-family="sans-serif">🎮</text></svg>');
@@ -71,6 +72,24 @@ const Explore: React.FC = () => {
     }
   };
 
+  const handleAddToWishlist = async (e: React.MouseEvent, ext: ExternalGameResult) => {
+    e.stopPropagation();
+    setImporting(ext.sourceId);
+    setError('');
+    try {
+      const result = await apiRequest<{ id: string; title: string }>('/games/import', {
+        method: 'POST',
+        body: JSON.stringify({ source: ext.source, sourceId: ext.sourceId }),
+      });
+      await wishlistApi.add(result.id);
+      setError('');
+    } catch (err: any) {
+      setError(err.message || 'Failed to add to wishlist');
+    } finally {
+      setImporting(null);
+    }
+  };
+
   const totalPages = Math.ceil(total / 24);
 
   return (
@@ -118,7 +137,7 @@ const Explore: React.FC = () => {
                 <div className="game-card-new__img">
                   <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
                   <span className="game-card-new__condition">RAWG</span>
-                  <span className="sidebar__item-icon" style={{position:'absolute',right:'10px',bottom:'10px',color:'white',fontSize:'1.1rem',background:'rgba(2,6,23,.85)',padding:'6px 14px',borderRadius:'6px',backdropFilter:'blur(4px)',border:'1px solid rgba(139,92,246,.35)',minWidth:'36px',display:'flex',alignItems:'center',justifyContent:'center'}}><i className="fa-solid fa-cloud-arrow-down" /></span>
+                  <button className="sidebar__item-icon" onClick={(e) => handleAddToWishlist(e, ext)} disabled={importing === ext.sourceId} style={{position:'absolute',right:'10px',bottom:'10px',color:'white',fontSize:'1.1rem',background:'rgba(2,6,23,.85)',padding:'6px 14px',borderRadius:'6px',backdropFilter:'blur(4px)',border:'1px solid rgba(139,92,246,.35)',minWidth:'36px',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}><i className="fa-solid fa-heart" /></button>
                 </div>
                 <div className="game-card-new__body">
                   <h3 className="game-card-new__title">
