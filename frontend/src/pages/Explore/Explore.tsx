@@ -41,7 +41,7 @@ const Explore: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState<string | null>(null);
-  const [wishlisted, setWishlisted] = useState<Set<string>>(new Set());
+  const [wishlisted, setWishlisted] = useState<Map<string, string>>(new Map());
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -75,20 +75,32 @@ const Explore: React.FC = () => {
 
   const handleAddToWishlist = async (e: React.MouseEvent | React.KeyboardEvent, ext: ExternalGameResult) => {
     e.stopPropagation();
-    if (wishlisted.has(ext.sourceId)) return;
-    setImporting(ext.sourceId);
     setError('');
+
+    const existingId = wishlisted.get(ext.sourceId);
+    if (existingId) {
+      try {
+        await wishlistApi.remove(existingId);
+        const next = new Map(wishlisted);
+        next.delete(ext.sourceId);
+        setWishlisted(next);
+      } catch (err: any) {
+        setError(err.message || 'Failed to remove from wishlist');
+      }
+      return;
+    }
+
+    setImporting(ext.sourceId);
     try {
       const result = await apiRequest<{ id: string; title: string }>('/games/import', {
         method: 'POST',
         body: JSON.stringify({ source: ext.source, sourceId: ext.sourceId }),
       });
       await wishlistApi.add(result.id);
-      setWishlisted((prev) => new Set(prev).add(ext.sourceId));
-      setError('');
+      setWishlisted((prev) => new Map(prev).set(ext.sourceId, result.id));
     } catch (err: any) {
       if (err.message?.includes('already in wishlist') || err.message?.includes('Conflict')) {
-        setWishlisted((prev) => new Set(prev).add(ext.sourceId));
+        setWishlisted((prev) => new Map(prev).set(ext.sourceId, ''));
       } else {
         setError(err.message || 'Failed to add to wishlist');
       }
@@ -150,10 +162,10 @@ const Explore: React.FC = () => {
                     type="button"
                     className={`game-card-new__wishlist-btn${wishlisted.has(ext.sourceId) ? ' game-card-new__wishlist-btn--added' : ''}`}
                     onClick={(e) => { e.stopPropagation(); handleAddToWishlist(e, ext); }}
-                    disabled={importing === ext.sourceId || wishlisted.has(ext.sourceId)}
-                    aria-label={wishlisted.has(ext.sourceId) ? 'In wishlist' : 'Add to wishlist'}
+                    disabled={importing === ext.sourceId}
+                    aria-label={wishlisted.has(ext.sourceId) ? 'Remove from wishlist' : 'Add to wishlist'}
                   >
-                    <i className="fa-solid fa-star" />
+                    <i className={`fa${wishlisted.has(ext.sourceId) ? 's' : 'r'} fa-star`} />
                   </button>
                 </div>
                 <div className="game-card-new__body">
