@@ -21,6 +21,8 @@ interface ExternalGameResult {
   coverImageUrl?: string;
   developer?: string;
   publisher?: string;
+  rating?: number;
+  metacritic?: number;
 }
 
 interface SearchResponse {
