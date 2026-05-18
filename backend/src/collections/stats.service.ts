@@ -241,7 +241,7 @@ export class StatsService {
       orderBy: { createdAt: 'asc' },
     });
 
-    const months = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     const result: { month: string; value: number }[] = [];
     let cumulative = 0;
@@ -258,6 +258,16 @@ export class StatsService {
         if (d >= monthStart && d < monthEnd) {
           cumulative += item.estimatedValue || 0;
         }
+      }
+
+      result.push({
+        month: monthNames[(now.getMonth() - 5 + i + 12) % 12],
+        value: cumulative,
+      });
+    }
+
+    return result;
+  }
       }
 
       result.push({
