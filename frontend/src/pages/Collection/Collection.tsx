@@ -84,10 +84,12 @@ const Collection: React.FC = () => {
                   <span className="game-card-new__condition">{item.condition.replace('_',' ')}</span>
                 </div>
                 <div className="game-card-new__body">
-                  <h3 className="game-card-new__title">{item.game.title}</h3>
+                  <h3 className="game-card-new__title">
+                    <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{item.game.title}</span>
+                    {item.personalRating && <span className={`ra-card__score ra-card__score--${item.personalRating >= 4 ? 'high' : item.personalRating >= 3 ? 'mid' : 'low'}`}>★ {item.personalRating}</span>}
+                  </h3>
                   <p className="game-card-new__meta">{item.game.platform.name} · {item.game.genre.name}</p>
                   <div className="game-card-new__footer">
-                    {item.personalRating && <span className={`ra-card__score ra-card__score--${item.personalRating >= 4 ? 'high' : item.personalRating >= 3 ? 'mid' : 'low'}`}>★ {item.personalRating}</span>}
                     {item.estimatedValue != null && <span className="game-card-new__value">{fmt(item.estimatedValue)}</span>}
                   </div>
                 </div>

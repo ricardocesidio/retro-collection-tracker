@@ -106,17 +106,19 @@ const Explore: React.FC = () => {
                   <span className="game-card-new__condition">RAWG</span>
                 </div>
                 <div className="game-card-new__body">
-                  <h3 className="game-card-new__title">{ext.title}</h3>
+                  <h3 className="game-card-new__title">
+                    <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{ext.title}</span>
+                    {ext.rating && (
+                      <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
+                        <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
+                      </span>
+                    )}
+                  </h3>
                   <p className="game-card-new__meta">
                     {ext.platform || 'Multi-platform'}
                     {ext.releaseYear ? ` · ${ext.releaseYear}` : ''}
                     {ext.genre ? ` · ${ext.genre}` : ''}
                   </p>
-                  {ext.rating && (
-                    <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
-                      <i className="fa-solid fa-star" /> {ext.rating.toFixed(1)}
-                    </span>
-                  )}
                   {ext.description && <p className="game-card-new__meta" style={{ color: '#64748b', marginTop: '0.25rem' }}>{ext.description.slice(0, 100)}...</p>}
                 </div>
               </button>
