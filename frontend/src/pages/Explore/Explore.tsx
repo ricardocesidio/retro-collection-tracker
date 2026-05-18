@@ -118,7 +118,7 @@ const Explore: React.FC = () => {
                 <div className="game-card-new__img">
                   <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
                   <span className="game-card-new__condition">RAWG</span>
-                  <span className="sidebar__item-icon" style={{position:'absolute',right:'10px',bottom:'10px',color:'white',fontSize:'1.1rem',background:'rgba(2,6,23,.85)',padding:'6px 14px',borderRadius:'6px',backdropFilter:'blur(4px)',border:'1px solid rgba(139,92,246,.35)',minWidth:'36px',textAlign:'center'}}><i className="fa-solid fa-cloud-arrow-down" /></span>
+                  <span className="sidebar__item-icon" style={{position:'absolute',right:'10px',bottom:'10px',color:'white',fontSize:'1.1rem',background:'rgba(2,6,23,.85)',padding:'6px 14px',borderRadius:'6px',backdropFilter:'blur(4px)',border:'1px solid rgba(139,92,246,.35)',minWidth:'36px',display:'flex',alignItems:'center',justifyContent:'center'}}><i className="fa-solid fa-cloud-arrow-down" /></span>
                 </div>
                 <div className="game-card-new__body">
                   <h3 className="game-card-new__title">
