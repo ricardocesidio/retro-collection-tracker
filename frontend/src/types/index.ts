@@ -22,6 +22,8 @@ export interface GameData {
   publisher?: string;
   description?: string;
   coverImageUrl?: string;
+  rawgRating?: number;
+  rawgMetacritic?: number;
   platform: Platform;
   genre: Genre;
   _count?: { collections: number; wishlists: number; reviews: number };
