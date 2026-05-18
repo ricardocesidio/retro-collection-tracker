@@ -5,6 +5,7 @@ import Input from '../../components/ui/Input/Input';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import Alert from '../../components/ui/Alert/Alert';
+import ConfirmDialog from '../../components/ui/ConfirmDialog/ConfirmDialog';
 import { collectionApi, catalogApi } from '../../services/collections';
 import { useDebounce } from '../../hooks/useDebounce';
 import type { CollectionEntry, Platform } from '../../services/collections';
@@ -21,6 +22,7 @@ const Collection: React.FC = () => {
   const [plat, setPlat] = useState('');
   const [cond, setCond] = useState('');
   const [platforms, setPlatforms] = useState<Platform[]>([]);
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
 
   const fetch = useCallback(async () => {
     setLoading(true);setError('');
@@ -44,8 +46,8 @@ const Collection: React.FC = () => {
   };
 
   const remove = async (id: string) => {
-    if (!confirm('Remove this game?')) return;
     setDeleting(id);
+    setConfirmRemove(null);
     try { await collectionApi.delete(id); setItems((p) => p.filter((g) => g.id !== id)); } catch (e: any) { setError(e.message); } finally { setDeleting(null); }
   };
 
@@ -90,13 +92,23 @@ const Collection: React.FC = () => {
                   </div>
                 </div>
                 <div className="game-card-new__actions" onClick={(e) => e.preventDefault()}>
-                  <Button variant="ghost" size="sm" onClick={() => remove(item.id)} loading={deleting===item.id}>Remove</Button>
+                  <Button variant="ghost" size="sm" onClick={() => setConfirmRemove(item.id)}>Remove</Button>
                 </div>
               </div>
             </Link>
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={confirmRemove !== null}
+        title="Remove Game"
+        message="Are you sure you want to remove this game from your collection? This action cannot be undone."
+        confirmLabel="Remove"
+        variant="danger"
+        loading={deleting === confirmRemove}
+        onConfirm={() => confirmRemove && remove(confirmRemove)}
+        onCancel={() => setConfirmRemove(null)}
+      />
     </div>
   );
 };
