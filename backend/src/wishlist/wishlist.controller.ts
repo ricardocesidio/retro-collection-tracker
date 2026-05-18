@@ -6,7 +6,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { WishlistService } from './wishlist.service';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard;
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('wishlist')
 @ApiBearerAuth()

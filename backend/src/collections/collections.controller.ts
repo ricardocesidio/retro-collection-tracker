@@ -1,7 +1,7 @@
 import {
   Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request, Res,
 } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CollectionsService } from './collections.service';
 import { StatsService } from './stats.service';
@@ -9,7 +9,7 @@ import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
 import { CollectionQueryDto } from './dto/collection-query.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Public } from '../auth/decorators/public.decorator;
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('collections')
 @ApiBearerAuth()

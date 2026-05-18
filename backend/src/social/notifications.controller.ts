@@ -2,8 +2,9 @@ import {
   Controller, Get, Post, Param, Query, UseGuards, Request,
 } from '@nestjs/common';
 import { SocialService } from './social.service';
-import { JwtAuthGuard } = from '../auth/guards/jwt-auth.guard;
-import { ApiTags, ApiBearerAuth } = from '@nestjs/swagger';
+import { NotificationsService } from './notifications.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('notifications')
 @ApiBearerAuth()
