@@ -86,6 +86,18 @@ const Explore: React.FC = () => {
         <div className="explore-hero__search">
           <Input placeholder="Search RAWG database for any game..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
         </div>
+        <div className="explore-alpha">
+          <span className="explore-alpha__label">A–Z</span>
+          {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((letter) => (
+            <button
+              key={letter}
+              className={`explore-alpha__letter${debounce.toUpperCase() === letter ? ' explore-alpha__letter--active' : ''}`}
+              onClick={() => { setSearch(letter); setPage(1); }}
+            >
+              {letter}
+            </button>
+          ))}
+        </div>
       </section>
 
       {loading ? (
