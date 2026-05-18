@@ -127,17 +127,27 @@ const Explore: React.FC = () => {
         <>
           <div className="page-grid">
             {results.map((ext) => (
-              <button
+              <div
                 key={`${ext.source}-${ext.sourceId}`}
                 className="game-card-new"
                 onClick={() => handleImport(ext)}
-                disabled={importing === ext.sourceId}
-                style={{ textAlign: 'left', cursor: 'pointer', width: '100%', border: 'none', padding: 0 }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && handleImport(ext)}
+                style={{ cursor: 'pointer' }}
               >
                 <div className="game-card-new__img">
                   <img src={ext.coverImageUrl || PLACEHOLDER_COVER} alt={ext.title} loading="lazy" />
                   <span className="game-card-new__condition">RAWG</span>
-                  <span className="sidebar__item-icon" role="button" tabIndex={0} onClick={(e) => handleAddToWishlist(e, ext)} onKeyDown={(e) => e.key === 'Enter' && handleAddToWishlist(e as any, ext)} style={{position:'absolute',right:'10px',bottom:'10px',color:'white',fontSize:'1.1rem',background:'rgba(2,6,23,.85)',padding:'6px 14px',borderRadius:'6px',backdropFilter:'blur(4px)',border:'1px solid rgba(139,92,246,.35)',minWidth:'36px',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',zIndex:1}}><i className="fa-solid fa-bookmark" /></span>
+                  <button
+                    type="button"
+                    className="game-card-new__wishlist-btn"
+                    onClick={(e) => { e.stopPropagation(); handleAddToWishlist(e, ext); }}
+                    disabled={importing === ext.sourceId}
+                    aria-label="Add to wishlist"
+                  >
+                    <i className="fa-solid fa-bookmark" />
+                  </button>
                 </div>
                 <div className="game-card-new__body">
                   <h3 className="game-card-new__title">
@@ -155,7 +165,7 @@ const Explore: React.FC = () => {
                   </p>
                   {ext.description && <p className="game-card-new__meta" style={{ color: '#64748b', marginTop: '0.25rem' }}>{ext.description.slice(0, 100)}...</p>}
                 </div>
-              </button>
+              </div>
             ))}
           </div>
           {totalPages > 1 && (
