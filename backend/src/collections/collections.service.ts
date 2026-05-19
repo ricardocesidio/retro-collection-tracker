@@ -5,12 +5,16 @@ import {
 } from '@nestjs/common';
 import { ActivityType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { XpService } from '../xp/xp.service';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
 
 @Injectable()
 export class CollectionsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly xpService: XpService,
+  ) {}
 
   async getAllForExport(userId: string) {
     return this.prisma.collection.findMany({
@@ -109,6 +113,8 @@ export class CollectionsService {
         message: `Added ${item.game.title} to collection`,
       },
     }).catch(() => {});
+
+    this.xpService.award(userId, 'ADD_GAME').catch(() => {});
 
     return item;
   }

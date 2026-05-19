@@ -1,10 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { getCollectorLevel } from '../common/utils/collector-level';
+import { XpService } from '../xp/xp.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly xpService: XpService,
+  ) {}
 
   async findById(id: string) {
     const user = await this.prisma.user.findUnique({
@@ -25,7 +28,8 @@ export class UsersService {
     if (!user) throw new NotFoundException('User not found');
 
     const { password, ...sanitized } = user;
-    return { ...sanitized, level: getCollectorLevel(user._count.collections) };
+    const xpLevel = this.xpService.getLevel(user.xp || 0);
+    return { ...sanitized, level: { ...xpLevel, xp: user.xp || 0 } };
   }
 
   async findByUsername(username: string) {
@@ -47,6 +51,7 @@ export class UsersService {
     if (!user) throw new NotFoundException('User not found');
 
     const { password, ...sanitized } = user;
-    return { ...sanitized, level: getCollectorLevel(user._count.collections) };
+    const xpLevel = this.xpService.getLevel(user.xp || 0);
+    return { ...sanitized, level: { ...xpLevel, xp: user.xp || 0 } };
   }
 }

@@ -13,7 +13,7 @@ import type { CollectionEntry } from '../../services/collections';
 import './Profile.scss';
 
 interface ProfileWithLevel extends UserProfile {
-  level?: { name: string; tier: number };
+  level?: { name: string; tier: number; xp?: number; currentXp?: number; nextLevelXp?: number };
 }
 
 const Profile: React.FC = () => {
@@ -113,19 +113,24 @@ const Profile: React.FC = () => {
                 {isFollowing?'Following':'Follow'}
               </Button>
               <Link to="/messages"><Button variant="outline" size="sm"><i className="fa-solid fa-envelope" /> Message</Button></Link>
+              <Link to={`/trade?with=${user.username}`}><Button variant="outline" size="sm"><i className="fa-solid fa-handshake" /> Trade</Button></Link>
             </>
           )}
 
-          <div className="prof-level-card">
-            <div className="prof-level-card__badge">{Math.min(99, user._count.collections * 2)}</div>
-            <div className="prof-level-card__info">
-              <span className="prof-level-card__label">Collector Level</span>
-              <div className="prof-level-card__bar">
-                <div className="prof-level-card__fill" style={{ width: `${Math.min(100, user._count.collections * 2)}%` }} />
+          {user.level && (
+            <div className="prof-level-card">
+              <div className="prof-level-card__badge">{user.level.name.charAt(0)}</div>
+              <div className="prof-level-card__info">
+                <span className="prof-level-card__label">{user.level.name}</span>
+                <div className="prof-level-card__bar">
+                  <div className="prof-level-card__fill" style={{ width: `${user.level.nextLevelXp > 0 ? Math.min(100, (user.xp || 0) / user.level.nextLevelXp * 100) : 100}%` }} />
+                </div>
+                <span className="prof-level-card__sub">
+                  {(user as any).xp != null ? `${(user as any).xp} XP` : `${user._count.collections} games collected`}
+                </span>
               </div>
-              <span className="prof-level-card__sub">{user._count.collections} games collected · {user._count.collections * 2}/100 XP</span>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

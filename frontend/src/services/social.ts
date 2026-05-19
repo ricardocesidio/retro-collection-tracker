@@ -86,6 +86,10 @@ export const reviewsApi = {
     apiRequest(`/reviews/${id}`, { method: 'DELETE' }),
   toggleLike: (reviewId: string): Promise<{ likes: number }> =>
     apiRequest(`/reviews/${reviewId}/like`, { method: 'POST' }),
+  addComment: (reviewId: string, content: string): Promise<any> =>
+    apiRequest(`/reviews/${reviewId}/comments`, { method: 'POST', body: JSON.stringify({ content }) }),
+  getComments: (reviewId: string): Promise<any[]> =>
+    apiRequest(`/reviews/${reviewId}/comments`),
 };
 
 export const followApi = {

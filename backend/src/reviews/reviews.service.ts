@@ -4,6 +4,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { XpService } from '../xp/xp.service';
 import { NotificationsService } from '../social/notifications.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 
@@ -11,6 +12,7 @@ import { CreateReviewDto } from './dto/create-review.dto';
 export class ReviewsService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly xpService: XpService,
     private readonly notifications: NotificationsService,
   ) {}
 
@@ -92,6 +94,7 @@ export class ReviewsService {
     });
 
     this.notifications.notifyNewReview(userId, dto.gameId).catch(() => {});
+    this.xpService.award(userId, 'ADD_REVIEW').catch(() => {});
 
     return review;
   }
@@ -153,5 +156,31 @@ export class ReviewsService {
     if (!review) throw new NotFoundException('Review not found');
 
     return this.prisma.review.delete({ where: { id } });
+  }
+
+  async addComment(userId: string, reviewId: string, content: string) {
+    const review = await this.prisma.review.findUnique({ where: { id: reviewId } });
+    if (!review) throw new NotFoundException('Review not found');
+
+    const comment = await this.prisma.reviewComment.create({
+      data: { reviewId, userId, content },
+      include: {
+        user: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+      },
+    });
+
+    this.xpService.award(userId, 'WRITE_COMMENT').catch(() => {});
+
+    return comment;
+  }
+
+  async getComments(reviewId: string) {
+    return this.prisma.reviewComment.findMany({
+      where: { reviewId },
+      include: {
+        user: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
   }
 }

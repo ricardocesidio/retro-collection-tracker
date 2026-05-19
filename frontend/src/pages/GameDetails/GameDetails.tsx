@@ -31,6 +31,9 @@ const GameDetails: React.FC = () => {
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewBody, setReviewBody] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [comments, setComments] = useState<Record<string, any[]>>({});
+  const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
+  const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!id) return; let c = false; setLoading(true);
@@ -57,6 +60,24 @@ const GameDetails: React.FC = () => {
       const { likes } = await reviewsApi.toggleLike(reviewId);
       setGame((prev) => prev ? { ...prev, reviews: prev.reviews?.map((rv) => rv.id === reviewId ? { ...rv, likes } : rv) } : prev);
     } catch { /* ignore */ }
+  };
+
+  const toggleComments = async (reviewId: string) => {
+    const next = { ...expandedComments, [reviewId]: !expandedComments[reviewId] };
+    setExpandedComments(next);
+    if (next[reviewId] && !comments[reviewId]) {
+      const data = await reviewsApi.getComments(reviewId);
+      setComments((prev) => ({ ...prev, [reviewId]: data }));
+    }
+  };
+
+  const addComment = async (reviewId: string) => {
+    const text = commentInputs[reviewId]?.trim();
+    if (!text) return;
+    await reviewsApi.addComment(reviewId, text);
+    setCommentInputs((prev) => ({ ...prev, [reviewId]: '' }));
+    const data = await reviewsApi.getComments(reviewId);
+    setComments((prev) => ({ ...prev, [reviewId]: data }));
   };
 
   if (loading) return <LoadingSpinner fullPage/>;
@@ -153,6 +174,27 @@ const GameDetails: React.FC = () => {
                     <i className="fa-solid fa-heart" /> <span>{rv.likes}</span>
                   </button>
                 </div>
+                <button className="gd-comment-toggle" onClick={() => toggleComments(r.id)}>
+                  💬 {comments[r.id]?.length ?? 0} comments
+                </button>
+                {expandedComments[r.id] && (
+                  <div className="gd-comments">
+                    {(comments[r.id] || []).map((c: any) => (
+                      <div key={c.id} className="gd-comment">
+                        <div className="gd-comment__avatar">{c.user.avatarUrl ? <img src={c.user.avatarUrl} alt="" /> : <span>{c.user.displayName?.charAt(0) || c.user.username.charAt(0)}</span>}</div>
+                        <div className="gd-comment__body">
+                          <span className="gd-comment__user">{c.user.displayName || c.user.username}</span>
+                          <p className="gd-comment__text">{c.content}</p>
+                          <span className="gd-comment__time">{new Date(c.createdAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="gd-comment-input">
+                      <input value={commentInputs[r.id] || ''} onChange={(e) => setCommentInputs((prev) => ({ ...prev, [r.id]: e.target.value }))} placeholder="Write a comment..." className="gd-comment-input__field" />
+                      <button className="gd-comment-input__btn" onClick={() => addComment(r.id)} disabled={!commentInputs[r.id]?.trim()}><i className="fa-solid fa-paper-plane" /></button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

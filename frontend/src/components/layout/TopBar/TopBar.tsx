@@ -87,6 +87,9 @@ const TopBar: React.FC = () => {
             <Link to="/messages" className="topbar__msg-btn" title="Messages">
               <i className="fa-solid fa-envelope" />
             </Link>
+            <Link to="/trade" className="topbar__trade-btn" title="Trade Requests">
+              <i className="fa-solid fa-handshake" />
+            </Link>
             <Link to="/notifications">
               <NotificationBell />
             </Link>

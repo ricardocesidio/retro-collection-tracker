@@ -29,6 +29,7 @@ const Donate = lazy(() => import('./pages/Donate/Donate'));
 const Leaderboard = lazy(() => import('./pages/Leaderboard/Leaderboard'));
 const Messages = lazy(() => import('./pages/Messages/Messages'));
 const Admin = lazy(() => import('./pages/Admin/Admin'));
+const Trade = lazy(() => import('./pages/Trade/Trade'));
 
 const LazyRoute = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<LoadingSpinner fullPage />}>{children}</Suspense>
@@ -57,6 +58,7 @@ const App: React.FC = () => {
             <Route path="/genres" element={<LazyRoute><Genres /></LazyRoute>} />
             <Route path="/activity" element={<ProtectedRoute><LazyRoute><Activity /></LazyRoute></ProtectedRoute>} />
             <Route path="/messages" element={<ProtectedRoute><LazyRoute><Messages /></LazyRoute></ProtectedRoute>} />
+            <Route path="/trade" element={<ProtectedRoute><LazyRoute><Trade /></LazyRoute></ProtectedRoute>} />
             <Route path="/leaderboard" element={<LazyRoute><Leaderboard /></LazyRoute>} />
             <Route path="/friends" element={<ProtectedRoute><LazyRoute><Friends /></LazyRoute></ProtectedRoute>} />
             <Route path="/notifications" element={<ProtectedRoute><LazyRoute><Notifications /></LazyRoute></ProtectedRoute>} />

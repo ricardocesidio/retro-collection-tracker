@@ -14,6 +14,8 @@ import { UploadModule } from './upload/upload.module';
 import { NotificationPreferencesModule } from './notification-preferences/notification-preferences.module';
 import { AdminModule } from './admin/admin.module';
 import { MessagesModule } from './messages/messages.module';
+import { TradeModule } from './trade/trade.module';
+import { XpModule } from './xp/xp.module';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { CacheMiddleware } from './common/middleware/cache.middleware';
@@ -36,6 +38,8 @@ import { AppService } from './app.service';
     NotificationPreferencesModule,
     AdminModule,
     MessagesModule,
+    TradeModule,
+    XpModule,
   ],
   controllers: [AppController],
   providers: [

@@ -52,6 +52,13 @@ enum ActivityType {
   UPDATED_PROFILE
 }
 
+enum TradeStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  CANCELLED
+}
+
 enum NotificationType {
   NEW_FOLLOWER
   NEW_REVIEW
@@ -75,6 +82,7 @@ model User {
   isEmailVerified       Boolean   @default(false)
   emailVerificationToken String?
   emailChangeCount      Int       @default(0)
+  xp                Int       @default(0)
   lastLoginAt DateTime?
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())
@@ -84,12 +92,15 @@ model User {
   wishlists         Wishlist[]
   reviews           Review[]
   reviewLikes       ReviewLike[]
+  reviewComments    ReviewComment[] @relation("UserReviewComments")
   sentMessages      Message[]    @relation("sent_messages")
   receivedMessages  Message[]    @relation("received_messages")
   blocksInitiated   Block[]      @relation("blocker")
   blocksReceived    Block[]      @relation("blocked")
   reportsMade       Report[]     @relation("reporter")
   reportsReceived   Report[]     @relation("reported")
+  sentTrades        TradeRequest[] @relation("sent_trades")
+  receivedTrades    TradeRequest[] @relation("received_trades")
   followers         Follow[]     @relation("Following")
   following         Follow[]       @relation("Follower")
   activityLogs      ActivityLog[]
@@ -147,6 +158,8 @@ model Game {
   collections Collection[]
   wishlists   Wishlist[]
   reviews     Review[]
+  tradeOffers TradeRequest[] @relation("offered_game")
+  tradeWants  TradeRequest[] @relation("wanted_game")
 
   @@index([title])
   @@index([platformId])
@@ -211,6 +224,7 @@ model Review {
   user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   game       Game         @relation(fields: [gameId], references: [id], onDelete: Restrict)
   reviewLikes ReviewLike[]
+  comments      ReviewComment[] @relation("review_comments")
 
   @@unique([userId, gameId])
   @@index([gameId])
@@ -346,4 +360,41 @@ model Report {
   @@index([reporterId])
   @@index([reportedId])
   @@map("reports")
+}
+
+model ReviewComment {
+  id        String   @id @default(uuid())
+  reviewId  String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+
+  user   User   @relation("UserReviewComments", fields: [userId], references: [id], onDelete: Cascade)
+  review Review @relation("review_comments", fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId])
+  @@index([userId])
+  @@map("review_comments")
+}
+
+model TradeRequest {
+  id          String   @id @default(uuid())
+  senderId    String
+  receiverId  String
+  offeredGameId String?
+  wantedGameId String?
+  message     String?
+  status      TradeStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sender   User   @relation("sent_trades", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User   @relation("received_trades", fields: [receiverId], references: [id], onDelete: Cascade)
+  offered  Game?  @relation("offered_game", fields: [offeredGameId], references: [id], onDelete: SetNull)
+  wanted   Game?  @relation("wanted_game", fields: [wantedGameId], references: [id], onDelete: SetNull)
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([status])
+  @@map("trade_requests")
 }

@@ -1,0 +1,80 @@
+import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+
+@Injectable()
+export class TradeService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async createRequest(senderId: string, receiverId: string, offeredGameId?: string, wantedGameId?: string, message?: string) {
+    if (senderId === receiverId) throw new ForbiddenException('Cannot trade with yourself');
+
+    const request = await this.prisma.tradeRequest.create({
+      data: { senderId, receiverId, offeredGameId, wantedGameId, message },
+      include: {
+        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+        receiver: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+        offered: { select: { id: true, title: true, coverImageUrl: true } },
+        wanted: { select: { id: true, title: true, coverImageUrl: true } },
+      },
+    });
+    return request;
+  }
+
+  async getReceivedRequests(userId: string) {
+    return this.prisma.tradeRequest.findMany({
+      where: { receiverId: userId },
+      include: {
+        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+        offered: { select: { id: true, title: true, coverImageUrl: true } },
+        wanted: { select: { id: true, title: true, coverImageUrl: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async getSentRequests(userId: string) {
+    return this.prisma.tradeRequest.findMany({
+      where: { senderId: userId },
+      include: {
+        receiver: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+        offered: { select: { id: true, title: true, coverImageUrl: true } },
+        wanted: { select: { id: true, title: true, coverImageUrl: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async respondToRequest(userId: string, requestId: string, status: 'ACCEPTED' | 'DECLINED') {
+    const request = await this.prisma.tradeRequest.findUnique({ where: { id: requestId } });
+    if (!request) throw new NotFoundException('Trade request not found');
+    if (request.receiverId !== userId) throw new ForbiddenException('Not your trade request');
+    if (request.status !== 'PENDING') throw new ConflictException('Trade request is no longer pending');
+
+    return this.prisma.tradeRequest.update({
+      where: { id: requestId },
+      data: { status },
+      include: {
+        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+        offered: { select: { id: true, title: true, coverImageUrl: true } },
+        wanted: { select: { id: true, title: true, coverImageUrl: true } },
+      },
+    });
+  }
+
+  async cancelRequest(userId: string, requestId: string) {
+    const request = await this.prisma.tradeRequest.findUnique({ where: { id: requestId } });
+    if (!request) throw new NotFoundException('Trade request not found');
+    if (request.senderId !== userId) throw new ForbiddenException('Not your trade request');
+
+    return this.prisma.tradeRequest.update({
+      where: { id: requestId },
+      data: { status: 'CANCELLED' },
+    });
+  }
+
+  async getUnreadCount(userId: string) {
+    return this.prisma.tradeRequest.count({
+      where: { receiverId: userId, status: 'PENDING' },
+    });
+  }
+}

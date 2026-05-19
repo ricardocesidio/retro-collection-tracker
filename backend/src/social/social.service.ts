@@ -5,12 +5,14 @@ import {
 } from '@nestjs/common';
 import { ActivityType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { XpService } from '../xp/xp.service';
 import { NotificationsService } from './notifications.service';
 
 @Injectable()
 export class SocialService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly xpService: XpService,
     private readonly notificationsService: NotificationsService,
   ) {}
 
@@ -34,6 +36,8 @@ export class SocialService {
     });
 
     await this.notificationsService.notifyNewFollower(followerId, followingId);
+
+    this.xpService.award(followingId, 'GET_FOLLOWER').catch(() => {});
 
     const follower = await this.prisma.user.findUnique({
       where: { id: followerId },

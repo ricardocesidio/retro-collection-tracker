@@ -1,0 +1,117 @@
+@use '../../styles/variables' as *;
+
+.trade-list {
+  display: flex;
+  flex-direction: column;
+  gap: $sp3;
+}
+
+.trade-card {
+  background: $s2;
+  border: 1px solid $b1;
+  border-radius: $r2;
+  padding: $sp4;
+  display: flex;
+  flex-direction: column;
+  gap: $sp3;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: $sp2;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  &__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $a1, $a7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $tsm;
+    font-weight: $w7;
+    color: #fff;
+    overflow: hidden;
+    flex-shrink: 0;
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+
+  &__name {
+    font-size: $tsm;
+    font-weight: $w6;
+    color: $t1;
+  }
+
+  &__status {
+    font-size: $txs;
+    font-weight: $w7;
+    font-family: $mono;
+    padding: 2px 8px;
+    border-radius: 4px;
+
+    &--pending { background: $ad; color: $a2; }
+    &--accepted { background: rgba(52,211,153,.12); color: #34d399; }
+    &--declined { background: rgba(248,113,113,.12); color: #f87171; }
+    &--cancelled { background: rgba(100,116,139,.12); color: #64748b; }
+  }
+
+  &__games {
+    display: flex;
+    flex-direction: column;
+    gap: $sp1;
+    padding: $sp2;
+    background: $s3;
+    border-radius: $r1;
+  }
+
+  &__game {
+    display: flex;
+    gap: $sp2;
+    font-size: $tsm;
+    color: $t1;
+
+    &-label {
+      color: $t3;
+      font-family: $mono;
+      font-size: $txs;
+      min-width: 50px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+  }
+
+  &__message {
+    font-size: $tsm;
+    color: $t2;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: $sp2;
+    border-top: 1px solid $b1;
+  }
+
+  &__date {
+    font-size: $txs;
+    color: $t3;
+    font-family: $mono;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $sp2;
+  }
+}
