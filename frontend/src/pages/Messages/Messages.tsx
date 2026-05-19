@@ -94,6 +94,7 @@ const Messages: React.FC = () => {
     try {
       await messagesApi.unblockUser(userId);
       setBlockedUsers((prev) => prev.filter((id) => id !== userId));
+      messagesApi.getConversations().then(setConvos).catch(() => {});
     } catch (err: any) {
       setError(err.message || 'Failed to unblock user');
     }
