@@ -4,7 +4,6 @@ import Button from '../../components/ui/Button/Button';
 import Alert from '../../components/ui/Alert/Alert';
 import Input from '../../components/ui/Input/Input';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
-import StarRating from '../../components/ui/StarRating/StarRating';
 import { gamesApi, collectionApi } from '../../services/collections';
 import { apiRequest } from '../../services/api-client';
 import './AddGame.scss';
@@ -261,7 +260,7 @@ const AddGame: React.FC = () => {
                               <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{ext.title}</span>
                               {ext.rating && (
                                 <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
-                                  <StarRating rating={ext.rating} showValue={false} />
+                                  {ext.rating.toFixed(1)}
                                 </span>
                               )}
                             </span>

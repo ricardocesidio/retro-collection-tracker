@@ -5,7 +5,6 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import Alert from '../../components/ui/Alert/Alert';
 import Badge from '../../components/ui/Badge/Badge';
-import StarRating from '../../components/ui/StarRating/StarRating';
 import { usersApi, followApi, reviewsApi } from '../../services/social';
 import { collectionApi } from '../../services/collections';
 import { useAuth } from '../../context/AuthContext';
@@ -149,8 +148,8 @@ const Profile: React.FC = () => {
                     <div className="game-card-new__body">
                       <h3 className="game-card-new__title">
                         <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{item.game.title}</span>
-                        {item.personalRating && <span className={`ra-card__score ra-card__score--${item.personalRating >= 4 ? 'high' : item.personalRating >= 3 ? 'mid' : 'low'}`}><StarRating rating={item.personalRating} showValue={false} /></span>}
-                        {!item.personalRating && item.game.rawgRating ? <span className={`ra-card__score ra-card__score--${item.game.rawgRating >= 4 ? 'high' : item.game.rawgRating >= 3 ? 'mid' : 'low'}`}><StarRating rating={item.game.rawgRating} showValue={false} /></span> : null}
+                        {item.personalRating && <span className={`ra-card__score ra-card__score--${item.personalRating >= 4 ? 'high' : item.personalRating >= 3 ? 'mid' : 'low'}`}>{item.personalRating.toFixed(1)}</span>}
+                        {!item.personalRating && item.game.rawgRating ? <span className={`ra-card__score ra-card__score--${item.game.rawgRating >= 4 ? 'high' : item.game.rawgRating >= 3 ? 'mid' : 'low'}`}>{item.game.rawgRating.toFixed(1)}</span> : null}
                       </h3>
                       <p className="game-card-new__meta">{item.game.platform.name} · {item.game.genre.name}</p>
                     </div>

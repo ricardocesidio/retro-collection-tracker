@@ -5,7 +5,6 @@ import Input from '../../components/ui/Input/Input';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import Alert from '../../components/ui/Alert/Alert';
-import StarRating from '../../components/ui/StarRating/StarRating';
 import { apiRequest } from '../../services/api-client';
 import { wishlistApi } from '../../services/social';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -171,8 +170,8 @@ const Explore: React.FC = () => {
                   <h3 className="game-card-new__title">
                     <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{ext.title}</span>
                     {ext.rating && (
-                      <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
-                        <StarRating rating={ext.rating} showValue={false} />
+                        <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
+                          {ext.rating.toFixed(1)}
                       </span>
                     )}
                   </h3>

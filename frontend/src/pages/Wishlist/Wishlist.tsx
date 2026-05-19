@@ -5,7 +5,6 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import Alert from '../../components/ui/Alert/Alert';
 import Badge from '../../components/ui/Badge/Badge';
-import StarRating from '../../components/ui/StarRating/StarRating';
 import { wishlistApi } from '../../services/social';
 import type { WishlistEntry } from '../../services/social';
 import './Wishlist.scss';
@@ -41,7 +40,7 @@ const Wishlist: React.FC = () => {
               <div className="game-card-new__body">
                 <h3 className="game-card-new__title">
                   <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{w.game.title}</span>
-                  {w.game.rawgRating ? <span className={`ra-card__score ra-card__score--${w.game.rawgRating >= 4 ? 'high' : w.game.rawgRating >= 3 ? 'mid' : 'low'}`}><StarRating rating={w.game.rawgRating} showValue={false} /></span> : null}
+                  {w.game.rawgRating ? <span className={`ra-card__score ra-card__score--${w.game.rawgRating >= 4 ? 'high' : w.game.rawgRating >= 3 ? 'mid' : 'low'}`}>{w.game.rawgRating.toFixed(1)}</span> : null}
                 </h3>
                 <p className="game-card-new__meta">{w.game.platform.name} · {w.game.genre.name}</p>
                 {w.estimatedValue != null && <p className="game-card-new__meta" style={{color:'#34d399',fontWeight:700}}>${w.estimatedValue}</p>}

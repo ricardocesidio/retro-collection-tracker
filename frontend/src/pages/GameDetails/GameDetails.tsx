@@ -4,7 +4,6 @@ import Badge from '../../components/ui/Badge/Badge';
 import Button from '../../components/ui/Button/Button';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
-import StarRating from '../../components/ui/StarRating/StarRating';
 import { gamesApi, collectionApi } from '../../services/collections';
 import { wishlistApi, reviewsApi } from '../../services/social';
 import { useAuth } from '../../context/AuthContext';
@@ -73,14 +72,8 @@ const GameDetails: React.FC = () => {
           {game.description && <div className="gd-desc"><h3>About</h3><p>{game.description}</p></div>}
 
           <div className="gd-stats-row">
-            <div className="gd-stat">
-              <StarRating rating={avg??0} size="md" />
-              <span className="gd-stat__lbl">Community Rating</span>
-            </div>
-            {game.rawgRating ? <div className="gd-stat">
-              <StarRating rating={game.rawgRating} size="md" />
-              <span className="gd-stat__lbl"><Badge variant="default" style={{fontSize:'0.6rem',padding:'1px 6px'}}>RAWG</Badge></span>
-            </div> : null}
+            <div className="gd-stat"><span className="gd-stat__val">{avg?.toFixed(1)??'—'}</span><span className="gd-stat__lbl">Community Rating</span></div>
+            {game.rawgRating ? <div className="gd-stat"><span className="gd-stat__val">{game.rawgRating.toFixed(1)}</span><span className="gd-stat__lbl"><Badge variant="default" style={{fontSize:'0.6rem',padding:'1px 6px'}}>RAWG</Badge></span></div> : null}
             <div className="gd-stat"><span className="gd-stat__val">{game._count?.collections||0}</span><span className="gd-stat__lbl">In Collections</span></div>
             <div className="gd-stat"><span className="gd-stat__val">{game._count?.wishlists||0}</span><span className="gd-stat__lbl">Wishlisted</span></div>
             <div className="gd-stat"><span className="gd-stat__val">{game._count?.reviews||0}</span><span className="gd-stat__lbl">Reviews</span></div>
