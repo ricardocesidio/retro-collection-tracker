@@ -114,6 +114,10 @@
 
 .msg-chat-name {
   color: $t1;
+  text-decoration: none;
+  font-weight: $w6;
+  transition: color $fast;
+  &:hover { color: $a2; }
 }
 
 .msg-chat-profile {
