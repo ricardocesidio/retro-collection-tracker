@@ -1,7 +1,7 @@
 @use '../../styles/variables' as *;
 
 .msg-page {
-  max-width: 900px;
+  max-width: 950px;
 }
 
 .msg-layout {
@@ -12,8 +12,8 @@
   border: 1px solid $b1;
   border-radius: $r2;
   overflow: hidden;
-  height: calc(100vh - 220px);
-  min-height: 600px;
+  height: calc(100vh - 280px);
+  min-height: 450px;
 }
 
 .msg-sidebar {
