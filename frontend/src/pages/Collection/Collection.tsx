@@ -21,6 +21,9 @@ const Collection: React.FC = () => {
   const debounce = useDebounce(search, 300);
   const [plat, setPlat] = useState('');
   const [cond, setCond] = useState('');
+  const [sort, setSort] = useState('newest');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
 
@@ -29,13 +32,15 @@ const Collection: React.FC = () => {
     try {
       const p: Record<string,string> = {};
       if (debounce) p.search = debounce; if (plat) p.platform = plat; if (cond) p.condition = cond;
+      p.sort = sort; p.page = String(page);
       const r = await collectionApi.list(p);
-      setItems(r.data); setTotal(r.total); setTotalValue(r.totalValue||0);
+      setItems(r.data); setTotal(r.total); setTotalValue(r.totalValue||0); setTotalPages(r.totalPages);
     } catch (e: any) { setError(e.message); } finally { setLoading(false); }
-  }, [debounce, plat, cond]);
+  }, [debounce, plat, cond, sort, page]);
 
   useEffect(() => { fetch(); }, [fetch]);
   useEffect(() => { catalogApi.getPlatforms().then(setPlatforms).catch(()=>{}); }, []);
+  useEffect(() => { setPage(1); }, [debounce, plat, cond, sort]);
 
   const handleExport = async (format: 'csv' | 'json') => {
     try {
@@ -68,6 +73,15 @@ const Collection: React.FC = () => {
         <Input placeholder="Search collection..." value={search} onChange={(e) => setSearch(e.target.value)} />
         <select className="form-select" value={plat} onChange={(e) => setPlat(e.target.value)}><option value="">All Platforms</option>{platforms.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select>
         <select className="form-select" value={cond} onChange={(e) => setCond(e.target.value)}><option value="">All Conditions</option>{['MINT','NEAR_MINT','VERY_GOOD','GOOD','ACCEPTABLE','POOR'].map((c) => <option key={c} value={c}>{c.replace('_',' ')}</option>)}</select>
+        <select className="form-select" value={sort} onChange={(e) => setSort(e.target.value)}>
+          <option value="newest">Newest</option>
+          <option value="title_asc">Title A-Z</option>
+          <option value="title_desc">Title Z-A</option>
+          <option value="rating_desc">Rating (high)</option>
+          <option value="rating_asc">Rating (low)</option>
+          <option value="value_desc">Value (high)</option>
+          <option value="value_asc">Value (low)</option>
+        </select>
       </div>
 
       {error && <div style={{marginBottom:'1rem'}}><Alert variant="danger">{error}</Alert></div>}
@@ -99,6 +113,14 @@ const Collection: React.FC = () => {
           ))}
         </div>
       )}
+      {totalPages > 1 && (
+        <div className="pagination" style={{display:'flex',justifyContent:'center',alignItems:'center',gap:'1rem',marginTop:'2rem'}}>
+          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Prev</Button>
+          <span style={{color:'var(--t2, #c8cdd3)',fontSize:'0.875rem'}}>Page {page} of {totalPages}</span>
+          <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>Next</Button>
+        </div>
+      )}
+
       <ConfirmDialog
         open={confirmRemove !== null}
         title="Remove Game"

@@ -26,12 +26,26 @@ export class CollectionsService {
       search?: string;
       platform?: string;
       condition?: string;
+      sort?: string;
       page?: number;
       limit?: number;
     },
   ) {
     const { search, platform, condition, page = 1, limit = 20 } = query;
     const skip = (page - 1) * limit;
+
+    const sortMap: Record<string, any> = {
+      newest: { createdAt: 'desc' },
+      oldest: { createdAt: 'asc' },
+      title_asc: { game: { title: 'asc' } },
+      title_desc: { game: { title: 'desc' } },
+      rating_asc: { personalRating: { sort: 'asc', nulls: 'last' } },
+      rating_desc: { personalRating: { sort: 'desc', nulls: 'last' } },
+      value_asc: { estimatedValue: { sort: 'asc', nulls: 'last' } },
+      value_desc: { estimatedValue: { sort: 'desc', nulls: 'last' } },
+    };
+
+    const orderBy = query.sort && sortMap[query.sort] ? sortMap[query.sort] : { createdAt: 'desc' as const };
 
     const where: any = { userId };
     if (search)
@@ -45,7 +59,7 @@ export class CollectionsService {
         include: { game: { include: { platform: true, genre: true } } },
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
       }),
       this.prisma.collection.count({ where }),
     ]);

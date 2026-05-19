@@ -96,6 +96,34 @@ export class ReviewsService {
     return review;
   }
 
+  async toggleLike(userId: string, reviewId: string) {
+    const existing = await this.prisma.reviewLike.findUnique({
+      where: { userId_reviewId: { userId, reviewId } },
+    });
+
+    if (existing) {
+      await this.prisma.reviewLike.delete({ where: { id: existing.id } });
+      await this.prisma.review.update({
+        where: { id: reviewId },
+        data: { likes: { decrement: 1 } },
+      });
+    } else {
+      await this.prisma.reviewLike.create({
+        data: { userId, reviewId },
+      });
+      await this.prisma.review.update({
+        where: { id: reviewId },
+        data: { likes: { increment: 1 } },
+      });
+    }
+
+    const review = await this.prisma.review.findUnique({
+      where: { id: reviewId },
+      select: { likes: true },
+    });
+    return review?.likes ?? 0;
+  }
+
   async update(userId: string, id: string, dto: Partial<CreateReviewDto>) {
     const review = await this.prisma.review.findFirst({
       where: { id, userId },

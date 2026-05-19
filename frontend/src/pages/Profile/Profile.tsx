@@ -108,9 +108,12 @@ const Profile: React.FC = () => {
             ))}
           </div>
           {authState.user && authState.user.id !== user.id && (
-            <Button variant={isFollowing?'outline':'primary'} onClick={handleFollow} loading={followLoading}>
-              {isFollowing?'Following':'Follow'}
-            </Button>
+            <>
+              <Button variant={isFollowing?'outline':'primary'} onClick={handleFollow} loading={followLoading}>
+                {isFollowing?'Following':'Follow'}
+              </Button>
+              <Link to="/messages"><Button variant="outline" size="sm"><i className="fa-solid fa-envelope" /> Message</Button></Link>
+            </>
           )}
 
           <div className="prof-level-card">

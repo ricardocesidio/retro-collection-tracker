@@ -265,6 +265,39 @@ const Dashboard: React.FC = () => {
               ))}
             </div>
           </div>
+
+          {/* Highlights */}
+          {highlights.mostValuable && highlights.highestRated && (
+            <div className="panel" style={{ marginTop: '1rem' }}>
+              <div className="panel-header"><h3>Highlights</h3></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '0.5rem' }}>
+                {highlights.mostValuable && (
+                  <Link to={`/games/${highlights.mostValuable.gameId}`} className="dash-add-item">
+                    <div className="dash-add-item__thumb">
+                      <img src={highlights.mostValuable.coverImageUrl || `https://placehold.co/44x56/141829/f0f4ff?text=${encodeURIComponent(highlights.mostValuable.title.slice(0,4))}`} alt="" />
+                    </div>
+                    <div className="dash-add-item__info">
+                      <span className="dash-add-item__title">{highlights.mostValuable.title}</span>
+                      <span className="dash-add-item__meta">Most Valuable</span>
+                      <span className="dash-add-item__value">${highlights.mostValuable.value?.toLocaleString()}</span>
+                    </div>
+                  </Link>
+                )}
+                {highlights.highestRated && (
+                  <Link to={`/games/${highlights.highestRated.gameId}`} className="dash-add-item">
+                    <div className="dash-add-item__thumb">
+                      <img src={highlights.highestRated.coverImageUrl || `https://placehold.co/44x56/141829/f0f4ff?text=${encodeURIComponent(highlights.highestRated.title.slice(0,4))}`} alt="" />
+                    </div>
+                    <div className="dash-add-item__info">
+                      <span className="dash-add-item__title">{highlights.highestRated.title}</span>
+                      <span className="dash-add-item__meta">Highest Rated</span>
+                      <span className="dash-add-item__rating">★ {highlights.highestRated.rating?.toFixed(1)}</span>
+                    </div>
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

@@ -11,6 +11,7 @@ import './Wishlist.scss';
 
 const Wishlist: React.FC = () => {
   const [items, setItems] = useState<WishlistEntry[]>([]);
+  const [sortBy, setSortBy] = useState('priority');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [removing, setRemoving] = useState<string|null>(null);
@@ -24,14 +25,37 @@ const Wishlist: React.FC = () => {
     <div className="page-shell">
       <div className="page-shell-header">
         <div><h1 className="page-title">Wishlist</h1><p className="page-sub">{items.length} games you want to collect</p></div>
-        <Link to="/explore"><Button variant="outline">Browse Catalog</Button></Link>
+        <div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
+          <select className="form-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{ minWidth: 'auto', fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
+            <option value="priority">Priority</option>
+            <option value="title_asc">Title A-Z</option>
+            <option value="title_desc">Title Z-A</option>
+            <option value="date_desc">Newest</option>
+            <option value="date_asc">Oldest</option>
+            <option value="value_desc">Value ↓</option>
+            <option value="value_asc">Value ↑</option>
+          </select>
+          <Link to="/explore"><Button variant="outline">Browse Catalog</Button></Link>
+        </div>
       </div>
       {error && <div style={{marginBottom:'1rem'}}><Alert variant="danger">{error}</Alert></div>}
       {loading ? <LoadingSpinner/> : items.length===0 ? (
         <EmptyState icon="⭐" title="Your wishlist is empty" message="Explore the catalog and save games for later."><Link to="/explore"><Button variant="primary">Explore Catalog</Button></Link></EmptyState>
       ) : (
         <div className="page-grid">
-          {items.map((w) => (
+          {(() => {
+            const sorted = [...items].sort((a, b) => {
+              switch (sortBy) {
+                case 'title_asc': return a.game.title.localeCompare(b.game.title);
+                case 'title_desc': return b.game.title.localeCompare(a.game.title);
+                case 'date_desc': return new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime();
+                case 'date_asc': return new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime();
+                case 'value_desc': return (b.estimatedValue || 0) - (a.estimatedValue || 0);
+                case 'value_asc': return (a.estimatedValue || 0) - (b.estimatedValue || 0);
+                default: return a.priority - b.priority;
+              }
+            });
+            return sorted.map((w) => (
             <div key={w.id} className="game-card-new">
               <div className="game-card-new__img">
                 <img src={w.game.coverImageUrl||`https://placehold.co/400x300/181c28/f1f5f9?text=${encodeURIComponent(w.game.title.slice(0,6))}`} alt="" loading="lazy"/>
@@ -53,7 +77,8 @@ const Wishlist: React.FC = () => {
                 <Button variant="ghost" size="sm" onClick={()=>remove(w.id)} loading={removing===w.id}>Remove</Button>
               </div>
             </div>
-          ))}
+            ));
+          })()}
         </div>
       )}
     </div>

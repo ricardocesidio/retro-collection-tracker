@@ -27,6 +27,10 @@ const GameDetails: React.FC = () => {
   const [addingColl, setAddingColl] = useState(false);
   const [addingWish, setAddingWish] = useState(false);
   const [actionMsg, setActionMsg] = useState('');
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewTitle, setReviewTitle] = useState('');
+  const [reviewBody, setReviewBody] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     if (!id) return; let c = false; setLoading(true);
@@ -36,6 +40,24 @@ const GameDetails: React.FC = () => {
 
   const addColl = async () => { if(!id)return; setAddingColl(true); try{await collectionApi.create({gameId:id});setActionMsg('Added to collection!');}catch(e:any){setActionMsg(e.message);}finally{setAddingColl(false);}};
   const addWish = async () => { if(!id)return; setAddingWish(true); try{await wishlistApi.add(id);setActionMsg('Added to wishlist!');}catch(e:any){setActionMsg(e.message);}finally{setAddingWish(false);}};
+
+  const submitReview = async () => {
+    if (!id || !reviewRating) return;
+    setSubmittingReview(true);
+    try {
+      const r = await reviewsApi.create(id, reviewRating, reviewTitle || undefined, reviewBody || undefined);
+      setGame((prev) => prev ? { ...prev, reviews: [r, ...(prev.reviews || [])] } : prev);
+      setReviewRating(0); setReviewTitle(''); setReviewBody('');
+      setActionMsg('Review submitted!');
+    } catch (e: any) { setActionMsg(e.message); } finally { setSubmittingReview(false); }
+  };
+
+  const handleToggleLike = async (reviewId: string) => {
+    try {
+      const { likes } = await reviewsApi.toggleLike(reviewId);
+      setGame((prev) => prev ? { ...prev, reviews: prev.reviews?.map((rv) => rv.id === reviewId ? { ...rv, likes } : rv) } : prev);
+    } catch { /* ignore */ }
+  };
 
   if (loading) return <LoadingSpinner fullPage/>;
   if (error||!game) return <div className="page-shell"><EmptyState icon="🎮" title="Game not found" message="This game doesn't exist."><Link to="/explore"><Button variant="primary">Browse Catalog</Button></Link></EmptyState></div>;
@@ -87,7 +109,54 @@ const GameDetails: React.FC = () => {
             </div>
           )}
           {actionMsg && <p className="gd-action-msg">{actionMsg}</p>}
+
+          {authState.user && (
+            <div className="gd-review-form">
+              <h3 className="gd-section-title">Write a Review</h3>
+              <div className="gd-review-form__stars">
+                {[1,2,3,4,5].map((s) => (
+                  <i key={s} className={`fa-${s <= reviewRating ? 'solid' : 'regular'} fa-star`} onClick={() => setReviewRating(s)} style={{cursor:'pointer', color: s <= reviewRating ? '#f59e0b' : undefined}} />
+                ))}
+              </div>
+              <input className="form-input" placeholder="Title (optional)" value={reviewTitle} onChange={(e) => setReviewTitle(e.target.value)} style={{marginTop:'0.5rem'}} />
+              <textarea className="form-input" placeholder="Your review (optional)" value={reviewBody} onChange={(e) => setReviewBody(e.target.value)} rows={4} style={{marginTop:'0.5rem',resize:'vertical'}} />
+              <Button variant="primary" onClick={submitReview} loading={submittingReview} disabled={!reviewRating} style={{marginTop:'0.5rem'}}>Submit Review</Button>
+            </div>
+          )}
         </div>
+      </div>
+
+      <div className="gd-reviews" style={{marginTop:'3rem'}}>
+        <h2 className="gd-section-title">Reviews ({game.reviews?.length ?? game._count?.reviews ?? 0})</h2>
+        {(!game.reviews || game.reviews.length === 0) ? (
+          <p style={{color:'var(--t4, #8892a4)'}}>No reviews yet. Be the first!</p>
+        ) : (
+          <div className="gd-reviews__list">
+            {game.reviews.map((rv) => (
+              <div key={rv.id} className="gd-review-card">
+                <div className="gd-review-card__header">
+                  <div className="gd-review-card__user">
+                    {rv.user.avatarUrl ? <img src={rv.user.avatarUrl} alt="" className="gd-review-card__avatar" /> : <div className="gd-review-card__avatar gd-review-card__avatar--placeholder"><i className="fa-solid fa-user" /></div>}
+                    <span className="gd-review-card__username">{rv.user.displayName || rv.user.username}</span>
+                    <span className="gd-review-card__date">{new Date(rv.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <div className="gd-review-card__stars">
+                    {[1,2,3,4,5].map((s) => (
+                      <i key={s} className={`fa-${s <= rv.rating ? 'solid' : 'regular'} fa-star`} style={{color: s <= rv.rating ? '#f59e0b' : undefined, fontSize:'0.8rem'}} />
+                    ))}
+                  </div>
+                </div>
+                {rv.title && <h4 className="gd-review-card__title">{rv.title}</h4>}
+                {rv.body && <p className="gd-review-card__body">{rv.body}</p>}
+                <div className="gd-review-card__footer">
+                  <button className="gd-review-card__like" onClick={() => handleToggleLike(rv.id)}>
+                    <i className="fa-solid fa-heart" /> <span>{rv.likes}</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -64,6 +64,14 @@ export class ReviewsController {
     return this.reviewsService.update(req.user.id, id, dto);
   }
 
+  @Post(':id/like')
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { ttl: 60000, limit: 30 } })
+  async toggleLike(@Request() req: any, @Param('id') id: string) {
+    const likes = await this.reviewsService.toggleLike(req.user.id, id);
+    return { likes };
+  }
+
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @Throttle({ default: { ttl: 60000, limit: 20 } })

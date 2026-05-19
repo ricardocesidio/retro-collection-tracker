@@ -153,3 +153,110 @@
   margin-bottom: $sp5;
   color: $t1;
 }
+
+.gd-review-form {
+  border-top: 1px solid $b1;
+  padding-top: $sp5;
+
+  &__stars {
+    display: flex;
+    gap: $sp1;
+    font-size: $tlg;
+  }
+}
+
+.gd-reviews__list {
+  display: flex;
+  flex-direction: column;
+  gap: $sp4;
+}
+
+.gd-review-card {
+  background: $s2;
+  border: 1px solid $b1;
+  border-radius: $r2;
+  padding: $sp5;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $sp3;
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: $sp2;
+  }
+
+  &__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+
+    &--placeholder {
+      background: $b1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $t4;
+      font-size: $tsm;
+    }
+  }
+
+  &__username {
+    font-size: $tsm;
+    font-weight: $w5;
+    color: $t1;
+  }
+
+  &__date {
+    font-size: $txs;
+    color: $t4;
+  }
+
+  &__title {
+    font-size: $tlg;
+    font-weight: $w6;
+    color: $t1;
+    margin-bottom: $sp1;
+  }
+
+  &__body {
+    font-size: $tsm;
+    color: $t2;
+    line-height: 1.6;
+  }
+
+  &__footer {
+    margin-top: $sp3;
+    display: flex;
+    gap: $sp3;
+  }
+
+  &__like {
+    display: inline-flex;
+    align-items: center;
+    gap: $sp1;
+    background: none;
+    border: 1px solid $b1;
+    border-radius: $r1;
+    padding: $sp1 $sp3;
+    color: $t3;
+    font-size: $tsm;
+    cursor: pointer;
+    transition: all $fast;
+
+    &:hover {
+      color: $a3;
+      border-color: $a3;
+      background: rgba($a3, 0.08);
+    }
+
+    i {
+      font-size: 0.8rem;
+    }
+  }
+}

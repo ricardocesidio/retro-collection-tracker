@@ -84,6 +84,8 @@ export const reviewsApi = {
     apiRequest(`/reviews/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id: string): Promise<void> =>
     apiRequest(`/reviews/${id}`, { method: 'DELETE' }),
+  toggleLike: (reviewId: string): Promise<{ likes: number }> =>
+    apiRequest(`/reviews/${reviewId}/like`, { method: 'POST' }),
 };
 
 export const followApi = {
