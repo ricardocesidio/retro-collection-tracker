@@ -109,7 +109,7 @@ const Explore: React.FC = () => {
   };
 
   const totalPages = Math.ceil(total / 24);
-  const filteredResults = starFilter ? results.filter(r => r.rating && Math.floor(r.rating) === starFilter) : results;
+  const filteredResults = starFilter ? results.filter(r => r.rating && Math.round(r.rating) === starFilter) : results;
 
   return (
     <div className="page-shell">
