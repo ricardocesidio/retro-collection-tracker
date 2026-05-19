@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
@@ -21,6 +21,7 @@ const Profile: React.FC = () => {
   const { state: authState } = useAuth();
   const [user, setUser] = useState<ProfileWithLevel|null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const [error, setError] = useState('');
   const [tab, setTab] = useState<'collection'|'reviews'|'followers'|'following'>('collection');
   const [collection, setCollection] = useState<CollectionEntry[]>([]);
@@ -113,8 +114,8 @@ const Profile: React.FC = () => {
               <Button variant={isFollowing?'outline':'primary'} size="sm" onClick={handleFollow} loading={followLoading}>
                 {isFollowing?'Following':'Follow'}
               </Button>
-              <Link to="/messages"><Button variant="outline" size="sm"><i className="fa-solid fa-envelope" /> Message</Button></Link>
-              <Link to={`/trade?with=${user.username}`}><Button variant="outline" size="sm"><i className="fa-solid fa-handshake" /> Trade</Button></Link>
+              <Button variant="outline" size="sm" onClick={() => navigate('/messages')}><i className="fa-solid fa-envelope" /> Message</Button>
+              <Button variant="outline" size="sm" onClick={() => navigate(`/trade?with=${user.username}`)}><i className="fa-solid fa-handshake" /> Trade</Button>
             </div>
           )}
 

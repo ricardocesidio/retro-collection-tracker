@@ -20,6 +20,11 @@
   font-family: $font;
   letter-spacing: .01em;
   @include foc;
+  margin-right: $sp2;
+
+  &:last-child {
+    margin-right: 0;
+  }
 
   &:disabled {
     opacity: .35;
