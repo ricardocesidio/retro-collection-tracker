@@ -174,8 +174,8 @@ const GameDetails: React.FC = () => {
                     <i className="fa-solid fa-heart" /> <span>{rv.likes}</span>
                   </button>
                 </div>
-                <button className="gd-comment-toggle" onClick={() => toggleComments(r.id)}>
-                  💬 {comments[r.id]?.length ?? 0} comments
+                <button className="gd-comment-toggle" onClick={() => toggleComments(rv.id)}>
+                  💬 {comments[rv.id]?.length ?? 0} comments
                 </button>
                 {expandedComments[r.id] && (
                   <div className="gd-comments">
