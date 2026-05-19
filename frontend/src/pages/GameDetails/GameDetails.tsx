@@ -12,7 +12,8 @@ import type { ReviewEntry } from '../../services/social';
 import './GameDetails.scss';
 
 interface GameFull extends GameData {
-  avgRating?: number|null;
+  communityRatingAverage?: number|null;
+  communityRatingCount?: number;
   related?: GameData[];
   reviews?: ReviewEntry[];
 }
@@ -39,7 +40,7 @@ const GameDetails: React.FC = () => {
   if (loading) return <LoadingSpinner fullPage/>;
   if (error||!game) return <div className="page-shell"><EmptyState icon="🎮" title="Game not found" message="This game doesn't exist."><Link to="/explore"><Button variant="primary">Browse Catalog</Button></Link></EmptyState></div>;
 
-  const avg = game.avgRating ? parseFloat(game.avgRating.toFixed(1)) : null;
+  const avg = game.communityRatingAverage ?? null;
   const fmt = (v:number) => '$'+v.toLocaleString();
 
   return (
@@ -72,7 +73,8 @@ const GameDetails: React.FC = () => {
           {game.description && <div className="gd-desc"><h3>About</h3><p>{game.description}</p></div>}
 
           <div className="gd-stats-row">
-            <div className="gd-stat"><span className="gd-stat__val">{game.rawgRating ? game.rawgRating.toFixed(1) : avg?.toFixed(1) ?? '—'}</span><span className="gd-stat__lbl">RAWG Rating{avg ? ` · ${avg.toFixed(1)} from collectors` : ''}</span></div>
+            {game.rawgRating ? <div className="gd-stat"><span className="gd-stat__val">{game.rawgRating.toFixed(1)}</span><span className="gd-stat__lbl"><Badge variant="default" style={{fontSize:'0.6rem',padding:'1px 6px'}}>RAWG</Badge></span></div> : null}
+            <div className="gd-stat"><span className="gd-stat__val">{avg?.toFixed(1) ?? '—'}</span><span className="gd-stat__lbl">Community{game.communityRatingCount ? ` (${game.communityRatingCount})` : ''}</span></div>
             <div className="gd-stat"><span className="gd-stat__val">{game._count?.collections||0}</span><span className="gd-stat__lbl">In Collections</span></div>
             <div className="gd-stat"><span className="gd-stat__val">{game._count?.wishlists||0}</span><span className="gd-stat__lbl">Wishlisted</span></div>
             <div className="gd-stat"><span className="gd-stat__val">{game._count?.reviews||0}</span><span className="gd-stat__lbl">Reviews</span></div>

@@ -99,9 +99,10 @@ export class GamesService {
     });
     if (!game) throw new NotFoundException('Game not found');
 
-    const avgRating = await this.prisma.collection.aggregate({
+    const communityRating = await this.prisma.collection.aggregate({
       where: { gameId: id, personalRating: { not: null } },
       _avg: { personalRating: true },
+      _count: { personalRating: true },
     });
 
     // Get related games (same platform or genre)
@@ -115,7 +116,13 @@ export class GamesService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return { ...game, avgRating: avgRating._avg.personalRating || null, related };
+    return {
+      ...game,
+      rawgRating: game.rawgRating || null,
+      communityRatingAverage: communityRating._avg.personalRating ? parseFloat(communityRating._avg.personalRating.toFixed(1)) : null,
+      communityRatingCount: communityRating._count.personalRating || 0,
+      related,
+    };
   }
 
   async getRelated(id: string) {
