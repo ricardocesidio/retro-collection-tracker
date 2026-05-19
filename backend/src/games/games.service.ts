@@ -115,7 +115,7 @@ export class GamesService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return { ...game, avgRating: avgRating._avg.rating || null, related };
+    return { ...game, avgRating: avgRating._avg.personalRating || null, related };
   }
 
   async getRelated(id: string) {
