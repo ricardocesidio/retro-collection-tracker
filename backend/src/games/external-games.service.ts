@@ -61,11 +61,43 @@ export class ExternalGamesService {
     query: string,
     page: number,
   ): Promise<{ results: ExternalGameResult[]; total: number }> {
-    const randomPage = !query ? Math.max(1, Math.floor(Math.random() * 50) + 1) : page;
-    const baseUrl = query
-      ? `https://api.rawg.io/api/games?key=${this.rawgKey}&search=${encodeURIComponent(query)}&page_size=40&page=${page}`
-      : `https://api.rawg.io/api/games?key=${this.rawgKey}&page_size=40&page=${randomPage}&ordering=-added`;
-    const url = baseUrl;
+    if (!query) {
+      const pages = [Math.max(1, Math.floor(Math.random() * 50) + 1), Math.max(1, Math.floor(Math.random() * 50) + 1)];
+      const shuffled = pages.sort(() => Math.random() - 0.5);
+      const [res1, res2] = await Promise.all([
+        fetch(`https://api.rawg.io/api/games?key=${this.rawgKey}&page_size=40&page=${shuffled[0]}&ordering=-added`, { headers: { Accept: 'application/json' } }),
+        fetch(`https://api.rawg.io/api/games?key=${this.rawgKey}&page_size=40&page=${shuffled[1]}&ordering=-rating`, { headers: { Accept: 'application/json' } }),
+      ]);
+      if (!res1.ok) throw new Error(`RAWG API returned ${res1.status}`);
+      if (!res2.ok) throw new Error(`RAWG API returned ${res2.status}`);
+      const d1 = await res1.json();
+      const d2 = await res2.json();
+      const merged = [...(d1.results || []), ...(d2.results || [])];
+      const seen = new Set<string>();
+      const unique = merged.filter((g: any) => {
+        const key = String(g.id);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      return {
+        total: unique.length,
+        results: unique.map((g: any) => ({
+          source: 'rawg' as const,
+          sourceId: String(g.id),
+          title: g.name,
+          releaseYear: g.released ? parseInt(g.released.slice(0, 4)) : undefined,
+          platform: g.platforms?.[0]?.platform?.name || undefined,
+          genre: g.genres?.[0]?.name || undefined,
+          description: g.description_raw?.slice(0, 500) || undefined,
+          coverImageUrl: g.background_image || undefined,
+          rating: g.rating != null ? g.rating : undefined,
+          metacritic: g.metacritic != null ? g.metacritic : undefined,
+        })),
+      };
+    }
+
+    const url = `https://api.rawg.io/api/games?key=${this.rawgKey}&search=${encodeURIComponent(query)}&page_size=40&page=${page}`;
     const res = await fetch(url, { headers: { Accept: 'application/json' } });
     if (!res.ok) throw new Error(`RAWG API returned ${res.status}`);
     const data = await res.json();

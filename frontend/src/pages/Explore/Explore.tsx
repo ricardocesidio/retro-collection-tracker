@@ -110,16 +110,7 @@ const Explore: React.FC = () => {
 
   const totalPages = Math.ceil(total / 40);
   const filteredResults = starFilter
-    ? results.filter(r => {
-        if (!r.rating) return false;
-        const star = starFilter;
-        if (star === 5) return r.rating >= 4.0;
-        if (star === 4) return r.rating >= 3.5 && r.rating < 4.0;
-        if (star === 3) return r.rating >= 3.0 && r.rating < 3.5;
-        if (star === 2) return r.rating >= 2.5 && r.rating < 3.0;
-        if (star === 1) return r.rating < 2.5;
-        return true;
-      })
+    ? results.filter(r => r.rating && Math.round(r.rating) === starFilter)
     : results;
 
   return (
