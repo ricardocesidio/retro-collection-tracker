@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Input from '../../components/ui/Input/Input';
 import Button from '../../components/ui/Button/Button';
@@ -6,6 +6,7 @@ import Alert from '../../components/ui/Alert/Alert';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
 import { apiRequest } from '../../services/api-client';
+import { countries } from '../../data/countries';
 import './Settings.scss';
 
 const Settings: React.FC = () => {
@@ -19,15 +20,50 @@ const Settings: React.FC = () => {
   const [profile, setProfile] = useState({ username:'', displayName:'', bio:'', avatarUrl:'', location:'' });
   const [pw, setPw] = useState({ current:'', newPw:'', confirm:'' });
   const [emailChange, setEmailChange] = useState({ current:'', newEmail:'', confirm:'' });
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+  const inited = useRef(false);
   const [notifs, setNotifs] = useState({ email:true, push:false, follows:true, reviews:true, wishlist:true });
   const [notifsLoaded, setNotifsLoaded] = useState(false);
 
   useEffect(() => {
-    if (state.user) {
-      setProfile({ username:state.user.username||'', displayName:state.user.displayName||'', bio:state.user.bio||'', avatarUrl:state.user.avatarUrl||'', location:state.user.location||'' });
+    if (state.user && !inited.current) {
+      const loc = state.user.location || '';
+      let country = '';
+      let city = '';
+      if (loc.includes(', ')) {
+        const parts = loc.split(', ');
+        city = parts[0];
+        country = parts.slice(1).join(', ');
+      }
+      if (country && countries[country] && countries[country].includes(city)) {
+        setSelectedCountry(country);
+        setSelectedCity(city);
+      }
+      setProfile({ username:state.user.username||'', displayName:state.user.displayName||'', bio:state.user.bio||'', avatarUrl:state.user.avatarUrl||'', location: loc });
       setLoading(false);
+      inited.current = true;
     }
   }, [state.user]);
+
+  useEffect(() => {
+    if (inited.current) {
+      if (selectedCountry && selectedCity) {
+        setProfile(p => ({ ...p, location: `${selectedCity}, ${selectedCountry}` }));
+      } else if (!selectedCountry && !selectedCity) {
+        setProfile(p => ({ ...p, location: '' }));
+      }
+    }
+  }, [selectedCountry, selectedCity]);
+
+  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCountry(e.target.value);
+    setSelectedCity('');
+  };
+
+  const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCity(e.target.value);
+  };
 
   useEffect(() => {
     if (!state.user) return;
@@ -168,7 +204,34 @@ const Settings: React.FC = () => {
             <Input label="Username" value={profile.username} onChange={(e)=>setProfile({...profile,username:e.target.value})} required maxLength={20} />
             <Input label="Display Name" value={profile.displayName} onChange={(e)=>setProfile({...profile,displayName:e.target.value})} />
             <Input label="Bio" type="textarea" value={profile.bio} onChange={(e)=>setProfile({...profile,bio:e.target.value})} rows={3} placeholder="Tell other collectors about yourself..." maxLength={100} />
-            <Input label="Location" value={profile.location} onChange={(e)=>setProfile({...profile,location:e.target.value})} placeholder="City, Country (e.g. London, UK)" />
+            <div className="input-group">
+              <label className="input-group__label">Location</label>
+              <div style={{display:'flex', gap:'0.5rem'}}>
+                <select
+                  className="input-group__control"
+                  value={selectedCountry}
+                  onChange={handleCountryChange}
+                  style={{flex:1}}
+                >
+                  <option value="">Select country</option>
+                  {Object.keys(countries).sort().map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <select
+                  className="input-group__control"
+                  value={selectedCity}
+                  onChange={handleCityChange}
+                  disabled={!selectedCountry}
+                  style={{flex:1}}
+                >
+                  <option value="">Select city</option>
+                  {selectedCountry && countries[selectedCountry]?.map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
             <div style={{display:'flex',justifyContent:'center'}}>
               <Button type="submit" variant="primary" loading={saving}>Save Changes</Button>
             </div>
