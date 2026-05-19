@@ -37,6 +37,7 @@ const Sidebar: React.FC = () => {
     ]},
     { label: 'Social', items: [
       { icon:'fa-solid fa-clock', label:'Activity', path:'/activity' },
+      { icon:'fa-solid fa-envelope', label:'Messages', path:'/messages' },
       { icon:'fa-solid fa-trophy', label:'Leaderboard', path:'/leaderboard' },
       { icon:'fa-solid fa-users', label:'Friends', path:'/friends' },
       { icon:'fa-solid fa-bell', label:'Notifications', path:'/notifications' },

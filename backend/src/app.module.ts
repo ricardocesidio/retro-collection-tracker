@@ -13,6 +13,7 @@ import { SocialModule } from './social/social.module';
 import { UploadModule } from './upload/upload.module';
 import { NotificationPreferencesModule } from './notification-preferences/notification-preferences.module';
 import { AdminModule } from './admin/admin.module';
+import { MessagesModule } from './messages/messages.module';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { CacheMiddleware } from './common/middleware/cache.middleware';
@@ -34,6 +35,7 @@ import { AppService } from './app.service';
     UploadModule,
     NotificationPreferencesModule,
     AdminModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [

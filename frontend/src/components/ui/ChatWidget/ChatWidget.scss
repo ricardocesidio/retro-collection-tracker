@@ -1,0 +1,268 @@
+@use '../../../styles/variables' as *;
+
+.chat-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: $z4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  &__toggle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: $a1;
+    border: none;
+    color: #fff;
+    font-size: 1.3rem;
+    cursor: pointer;
+    box-shadow: 0 4px 20px $ad, 0 0 0 1px $b3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all $fast;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 30px $gv;
+    }
+  }
+
+  &__toggle-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 20px;
+    height: 20px;
+    border-radius: $rf;
+    background: $a6;
+    color: #fff;
+    font-size: $txs;
+    font-weight: $w8;
+    font-family: $mono;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    box-shadow: 0 0 10px rgba(248,113,113,.4);
+  }
+
+  &__box {
+    width: 340px;
+    height: 460px;
+    background: $s2;
+    border: 1px solid $b2;
+    border-radius: $r3;
+    overflow: hidden;
+    box-shadow: 0 8px 48px rgba(0,0,0,.5), 0 0 0 1px $b3;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: $sp3;
+    animation: chatIn .2s $e1;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $sp3 $sp4;
+    border-bottom: 1px solid $b1;
+    font-size: $tsm;
+    font-weight: $w7;
+    color: $t1;
+  }
+
+  &__full-link {
+    font-size: $txs;
+    color: $a2;
+    font-weight: $w6;
+    text-decoration: none;
+    &:hover { color: $a1; }
+  }
+
+  &__body {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #5a6480;
+    font-size: $tsm;
+  }
+
+  &__convos {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__convo-btn {
+    display: flex;
+    align-items: center;
+    gap: $sp3;
+    padding: $sp3 $sp4;
+    background: none;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    cursor: pointer;
+    text-align: left;
+    font-family: $font;
+    width: 100%;
+    transition: background $fast;
+    &:hover { background: rgba(255,255,255,.03); }
+  }
+
+  &__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $a1, $a7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $tsm;
+    font-weight: $w7;
+    color: #fff;
+    flex-shrink: 0;
+    overflow: hidden;
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+
+  &__convo-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  &__convo-name {
+    font-size: $tsm;
+    font-weight: $w6;
+    color: $t1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__convo-preview {
+    font-size: $txs;
+    color: $t3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__badge {
+    min-width: 18px;
+    height: 18px;
+    border-radius: $rf;
+    background: $a1;
+    color: #fff;
+    font-size: $txs;
+    font-weight: $w7;
+    font-family: $mono;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+
+  &__chat { display: flex; flex-direction: column; height: 100%; }
+
+  &__chat-header {
+    display: flex;
+    align-items: center;
+    gap: $sp2;
+    padding: $sp2 $sp3;
+    border-bottom: 1px solid $b1;
+    font-size: $tsm;
+    font-weight: $w6;
+    color: $t1;
+  }
+
+  &__back {
+    background: none;
+    border: none;
+    color: $a2;
+    cursor: pointer;
+    font-size: .85rem;
+    padding: 4px;
+    border-radius: 4px;
+    &:hover { background: $ad; }
+  }
+
+  &__msgs {
+    flex: 1;
+    overflow-y: auto;
+    padding: $sp3;
+    display: flex;
+    flex-direction: column;
+    gap: $sp2;
+  }
+
+  &__bubble {
+    max-width: 85%;
+    padding: $sp2;
+    border-radius: $r1;
+    font-size: $tsm;
+    line-height: 1.4;
+    align-self: flex-start;
+    background: $s3;
+    border: 1px solid $b1;
+    color: $t1;
+
+    &--me {
+      align-self: flex-end;
+      background: $ad;
+      border-color: $b3;
+    }
+  }
+
+  &__input-bar {
+    display: flex;
+    gap: $sp2;
+    padding: $sp2;
+    border-top: 1px solid $b1;
+  }
+
+  &__input {
+    flex: 1;
+    padding: $sp2;
+    background: $s3;
+    border: 1px solid $b1;
+    border-radius: $r1;
+    color: $t1;
+    font-size: $tsm;
+    font-family: $font;
+    outline: none;
+    &:focus { border-color: $a1; box-shadow: 0 0 0 3px $ad; }
+  }
+
+  &__send {
+    width: 36px;
+    height: 36px;
+    border-radius: $r1;
+    background: $a1;
+    border: none;
+    color: #fff;
+    font-size: .9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:disabled { opacity: .35; cursor: default; }
+  }
+}
+
+@keyframes chatIn {
+  from { opacity: 0; transform: translateY(12px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

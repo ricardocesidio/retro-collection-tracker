@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import TopBar from '../TopBar/TopBar';
+import ChatWidget from '../../ui/ChatWidget/ChatWidget';
 import './AppLayout.scss';
 
 const AppLayout: React.FC = () => {
@@ -15,6 +16,7 @@ const AppLayout: React.FC = () => {
       <main className={`app-layout__content${visible ? ' app-layout__content--visible' : ''}`}>
         <Outlet />
       </main>
+      <ChatWidget />
     </div>
   );
 };

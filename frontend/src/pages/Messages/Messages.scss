@@ -1,0 +1,174 @@
+@use '../../styles/variables' as *;
+
+.msg-page {
+  max-width: 900px;
+}
+
+.msg-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 0;
+  background: $s2;
+  border: 1px solid $b1;
+  border-radius: $r2;
+  overflow: hidden;
+  min-height: 500px;
+}
+
+.msg-sidebar {
+  border-right: 1px solid $b1;
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+.msg-convo-btn {
+  display: flex;
+  align-items: center;
+  gap: $sp3;
+  width: 100%;
+  padding: $sp3;
+  background: none;
+  border: none;
+  border-bottom: 1px solid $b1;
+  cursor: pointer;
+  text-align: left;
+  font-family: $font;
+  transition: background $fast;
+
+  &:hover { background: rgba(255,255,255,.03); }
+  &--active { background: $ad; }
+
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $a1, $a7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $tsm;
+    font-weight: $w7;
+    color: #fff;
+    flex-shrink: 0;
+    overflow: hidden;
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__name {
+    font-size: $tsm;
+    font-weight: $w6;
+    color: $t1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__preview {
+    font-size: $txs;
+    color: $t3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__badge {
+    min-width: 20px;
+    height: 20px;
+    border-radius: $rf;
+    background: $a1;
+    color: #fff;
+    font-size: $txs;
+    font-weight: $w7;
+    font-family: $mono;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    flex-shrink: 0;
+  }
+}
+
+.msg-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.msg-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 420px;
+  padding: $sp4;
+  display: flex;
+  flex-direction: column;
+  gap: $sp2;
+}
+
+.msg-bubble {
+  max-width: 75%;
+  padding: $sp2 $sp3;
+  border-radius: $r2;
+  font-size: $tsm;
+  line-height: 1.4;
+
+  &--other {
+    align-self: flex-start;
+    background: $s3;
+    border: 1px solid $b1;
+    color: $t1;
+  }
+
+  &--me {
+    align-self: flex-end;
+    background: $ad;
+    border: 1px solid $b3;
+    color: $t1;
+  }
+
+  &__text { margin-bottom: 2px; }
+  &__time { font-size: $txs; color: $t3; font-family: $mono; }
+}
+
+.msg-input-bar {
+  display: flex;
+  gap: $sp2;
+  padding: $sp3;
+  border-top: 1px solid $b1;
+}
+
+.msg-input {
+  flex: 1;
+  padding: $sp2 $sp3;
+  background: $s3;
+  border: 1px solid $b1;
+  border-radius: $r1;
+  color: $t1;
+  font-size: $tsm;
+  font-family: $font;
+  outline: none;
+  &:focus { border-color: $a1; box-shadow: 0 0 0 3px $ad; }
+}
+
+.msg-send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: $r1;
+  background: $a1;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity $fast;
+  &:disabled { opacity: .35; cursor: default; }
+  &:hover:not(:disabled) { background: darken($a1, 5%); }
+}
