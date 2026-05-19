@@ -6,6 +6,8 @@ import ProgressCard from '../../components/ui/ProgressCard/ProgressCard';
 import { collectionApi } from '../../services/collections';
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
+
+const CVR = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="260" viewBox="0 0 200 260"><rect fill="#1e1b4b" width="200" height="260"/><text x="100" y="130" text-anchor="middle" fill="#4c1d95" font-size="48" font-family="sans-serif">🎮</text></svg>');
 import './Dashboard.scss';
 
 interface DashboardData {
@@ -133,7 +135,7 @@ const Dashboard: React.FC = () => {
               {recentAdditions.slice(0, 4).map((g) => (
                 <Link to={`/games/${g.gameId}`} key={g.id} className="ra-card">
                   <div className="ra-card__img">
-                    <img src={g.coverImageUrl || `https://placehold.co/400x240/181d30/f0f4ff?text=${encodeURIComponent(g.title.slice(0,8))}`} alt="" loading="lazy" />
+                    <img src={g.coverImageUrl || CVR} alt="" loading="lazy" />
                   </div>
                   <div className="ra-card__body">
                     <div className="ra-card__text">
@@ -191,7 +193,7 @@ const Dashboard: React.FC = () => {
                 {recentReviews.slice(0, 3).map((r) => (
                   <Link to={`/games/${r.gameId}`} key={r.id} className="rev-card">
                     <div className="rev-card__img">
-                      <img src={r.coverImageUrl || `https://placehold.co/80x56/141829/f0f4ff?text=${encodeURIComponent(r.gameTitle.slice(0, 4))}`} alt="" loading="lazy" />
+                      <img src={r.coverImageUrl || CVR} alt="" loading="lazy" />
                     </div>
                     <div className="rev-card__info">
                       <span className="rev-card__title">{r.gameTitle}</span>
@@ -214,7 +216,7 @@ const Dashboard: React.FC = () => {
                 {highlights.mostValuable && (
                   <Link to={`/games/${highlights.mostValuable.gameId}`} className="dash-add-item">
                     <div className="dash-add-item__thumb">
-                      <img src={highlights.mostValuable.coverImageUrl || `https://placehold.co/44x56/141829/f0f4ff?text=${encodeURIComponent(highlights.mostValuable.title.slice(0,4))}`} alt="" />
+                      <img src={highlights.mostValuable.coverImageUrl || CVR} alt="" />
                     </div>
                     <div className="dash-add-item__info">
                       <span className="dash-add-item__title">{highlights.mostValuable.title}</span>
@@ -226,7 +228,7 @@ const Dashboard: React.FC = () => {
                 {highlights.highestRated && (
                   <Link to={`/games/${highlights.highestRated.gameId}`} className="dash-add-item">
                     <div className="dash-add-item__thumb">
-                      <img src={highlights.highestRated.coverImageUrl || `https://placehold.co/44x56/141829/f0f4ff?text=${encodeURIComponent(highlights.highestRated.title.slice(0,4))}`} alt="" />
+                      <img src={highlights.highestRated.coverImageUrl || CVR} alt="" />
                     </div>
                     <div className="dash-add-item__info">
                       <span className="dash-add-item__title">{highlights.highestRated.title}</span>
@@ -309,7 +311,7 @@ const Dashboard: React.FC = () => {
           <div className="dash-wishlist-strip">
             {wishlistSpotlight.map((w) => (
               <Link to={`/games/${w.gameId}`} key={w.id} className="dash-wish-item">
-                <div className="dash-wish-item__img"><img src={w.coverImageUrl || `https://placehold.co/80x100/141829/f0f4ff?text=${encodeURIComponent(w.title.slice(0,3))}`} alt="" loading="lazy" /></div>
+                <div className="dash-wish-item__img"><img src={w.coverImageUrl || CVR} alt="" loading="lazy" /></div>
                 <div className="dash-wish-item__body"><span className="dash-wish-item__title">{w.title}</span><span className="dash-wish-item__meta">{w.platform} · {w.genre}</span><span className="dash-wish-item__priority">P{w.priority + 1}{w.estimatedValue != null ? ` · $${w.estimatedValue}` : ''}</span></div>
               </Link>
             ))}
