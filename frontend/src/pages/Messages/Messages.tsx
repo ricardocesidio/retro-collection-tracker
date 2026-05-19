@@ -1,14 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
-import Input from '../../components/ui/Input/Input';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import Alert from '../../components/ui/Alert/Alert';
+import ConfirmDialog from '../../components/ui/ConfirmDialog/ConfirmDialog';
 import { messagesApi } from '../../services/messages';
-import { connectSocket, getSocket } from '../../services/socket';
+import { connectSocket } from '../../services/socket';
 import type { MessageData, ConversationData } from '../../services/messages';
 import './Messages.scss';
+
+const REPORT_REASONS = ['Harassment', 'Racism', 'Bullying', 'Spam', 'Threats', 'Inappropriate Content', 'Fraud / Scam', 'Other'];
 
 const Messages: React.FC = () => {
   const [convos, setConvos] = useState<ConversationData[]>([]);
@@ -18,11 +20,17 @@ const Messages: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
+  const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
+  const [showReport, setShowReport] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [blockTarget, setBlockTarget] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     messagesApi.getConversations().then(setConvos).catch(() => {}).finally(() => setLoading(false));
+    messagesApi.getBlocked().then((users) => setBlockedUsers(users.map((u: any) => u.id))).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -48,6 +56,7 @@ const Messages: React.FC = () => {
 
   const send = async (imageUrl?: string) => {
     if ((!input.trim() && !imageUrl) || !activeConvo || sending) return;
+    if (blockedUsers.includes(activeConvo)) { setError('You cannot message a blocked user.'); return; }
     setSending(true);
     setError('');
     try {
@@ -69,25 +78,40 @@ const Messages: React.FC = () => {
     e.target.value = '';
   };
 
-  const blockUser = async (userId: string) => {
+  const handleBlock = async () => {
+    if (!blockTarget) return;
     try {
-      await messagesApi.blockUser(userId);
-      setActiveConvo(null);
+      await messagesApi.blockUser(blockTarget);
+      setBlockedUsers((prev) => [...prev, blockTarget]);
+      setBlockTarget(null);
       messagesApi.getConversations().then(setConvos).catch(() => {});
     } catch (err: any) {
       setError(err.message || 'Failed to block user');
     }
   };
 
-  const reportUser = async (userId: string) => {
+  const handleUnblock = async (userId: string) => {
     try {
-      await messagesApi.reportUser(userId);
-      setError('');
-      alert('User has been reported.');
+      await messagesApi.unblockUser(userId);
+      setBlockedUsers((prev) => prev.filter((id) => id !== userId));
+    } catch (err: any) {
+      setError(err.message || 'Failed to unblock user');
+    }
+  };
+
+  const handleReport = async () => {
+    if (!activeConvo || !reportReason) return;
+    try {
+      await messagesApi.reportUser(activeConvo, reportReason);
+      setShowReport(false);
+      setReportReason('');
     } catch (err: any) {
       setError(err.message || 'Failed to report user');
     }
   };
+
+  const isBlocked = activeConvo ? blockedUsers.includes(activeConvo) : false;
+  const activeUser = convos.find((c) => c.user.id === activeConvo)?.user;
 
   if (loading) return <LoadingSpinner fullPage />;
 
@@ -122,10 +146,19 @@ const Messages: React.FC = () => {
           {activeConvo ? (
             <>
               <div className="msg-chat-header">
-                <button className="msg-header-btn" onClick={() => reportUser(activeConvo)} title="Report"><i className="fa-solid fa-flag" /></button>
-                <button className="msg-header-btn" onClick={() => blockUser(activeConvo)} title="Block"><i className="fa-solid fa-ban" /></button>
-                <span>{convos.find((c) => c.user.id === activeConvo)?.user.displayName || convos.find((c) => c.user.id === activeConvo)?.user.username || 'Chat'}</span>
+                <span className="msg-chat-name">{activeUser?.displayName || activeUser?.username || 'Chat'}</span>
+                <div className="msg-chat-actions">
+                  {isBlocked ? (
+                    <button className="msg-action-btn msg-action-btn--unblock" onClick={() => handleUnblock(activeConvo)} title="Unblock"><i className="fa-solid fa-check" /> Unblock</button>
+                  ) : (
+                    <>
+                      <button className="msg-action-btn msg-action-btn--report" onClick={() => setShowReport(true)} title="Report"><i className="fa-solid fa-flag" /></button>
+                      <button className="msg-action-btn msg-action-btn--block" onClick={() => setBlockTarget(activeConvo)} title="Block"><i className="fa-solid fa-ban" /></button>
+                    </>
+                  )}
+                </div>
               </div>
+              {isBlocked && <div className="msg-blocked-banner"><i className="fa-solid fa-lock" /> You blocked {activeUser?.displayName || activeUser?.username}. <button onClick={() => handleUnblock(activeConvo)}>Unblock</button> to message again.</div>}
               <div className="msg-list">
                 {messages.map((m) => {
                   const isMe = m.senderId !== activeConvo;
@@ -161,6 +194,38 @@ const Messages: React.FC = () => {
           )}
         </div>
       </div>
+
+      {showReport && (
+        <div className="msg-overlay" onClick={() => setShowReport(false)}>
+          <div className="msg-modal msg-modal--report" onClick={(e) => e.stopPropagation()}>
+            <h3 className="msg-modal__title"><i className="fa-solid fa-flag" style={{color:'#f87171'}} /> Report User</h3>
+            <p className="msg-modal__desc">Why are you reporting {activeUser?.displayName || activeUser?.username}?</p>
+            <div className="msg-report-reasons">
+              {REPORT_REASONS.map((r) => (
+                <button
+                  key={r}
+                  className={`msg-report-reason${reportReason === r ? ' msg-report-reason--active' : ''}`}
+                  onClick={() => setReportReason(r)}
+                >{r}</button>
+              ))}
+            </div>
+            <div className="msg-modal__actions">
+              <Button variant="ghost" onClick={() => { setShowReport(false); setReportReason(''); }}>Cancel</Button>
+              <Button variant="danger" onClick={handleReport} disabled={!reportReason}>Submit Report</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={blockTarget !== null}
+        title="Block User"
+        message={`Are you sure you want to block ${activeUser?.displayName || activeUser?.username || 'this user'}? They will not be able to message you, and their messages will be hidden. You can unblock them later.`}
+        confirmLabel="Block"
+        variant="danger"
+        onConfirm={handleBlock}
+        onCancel={() => setBlockTarget(null)}
+      />
     </div>
   );
 };

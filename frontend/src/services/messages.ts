@@ -30,6 +30,9 @@ export const messagesApi = {
   getUnreadCount: (): Promise<{ count: number }> =>
     apiRequest('/messages/unread-count'),
 
+  getBlocked: (): Promise<any[]> =>
+    apiRequest('/messages/blocked'),
+
   blockUser: (userId: string): Promise<void> =>
     apiRequest(`/messages/block/${userId}`, { method: 'POST' }),
 
