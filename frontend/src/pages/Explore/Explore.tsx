@@ -42,7 +42,6 @@ const Explore: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState<string | null>(null);
   const [wishlisted, setWishlisted] = useState<Map<string, string>>(new Map());
-  const [starFilter, setStarFilter] = useState<number | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -109,26 +108,6 @@ const Explore: React.FC = () => {
   };
 
   const totalPages = Math.ceil(total / 40);
-  const filteredResults = starFilter
-    ? results.filter(r => {
-        if (!r.rating) return false;
-        const sorted = [...results].filter(x => x.rating != null).map(x => x.rating!).sort((a, b) => a - b);
-        const n = sorted.length;
-        if (n === 0) return false;
-        const thresholds = [
-          sorted[Math.floor(n * 0.2)],   // bottom 20% → 1★
-          sorted[Math.floor(n * 0.4)],   // 20-40% → 2★
-          sorted[Math.floor(n * 0.6)],   // 40-60% → 3★
-          sorted[Math.floor(n * 0.8)],   // 60-80% → 4★
-        ];
-        if (starFilter === 1) return r.rating < thresholds[0];
-        if (starFilter === 2) return r.rating >= thresholds[0] && r.rating < thresholds[1];
-        if (starFilter === 3) return r.rating >= thresholds[1] && r.rating < thresholds[2];
-        if (starFilter === 4) return r.rating >= thresholds[2] && r.rating < thresholds[3];
-        if (starFilter === 5) return r.rating >= thresholds[3];
-        return true;
-      })
-    : results;
 
   return (
     <div className="page-shell">
@@ -142,18 +121,6 @@ const Explore: React.FC = () => {
         </p>
         <div className="explore-hero__search">
           <Input placeholder="Search RAWG database for any game..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
-        </div>
-        <div className="explore-stars">
-          {[5,4,3,2,1].map((s) => (
-            <button
-              key={s}
-              className={`explore-stars__btn${starFilter === s ? ' explore-stars__btn--active' : ''}`}
-              onClick={() => { setStarFilter(starFilter === s ? null : s); setPage(1); }}
-            >
-              {s}<i className="fa-solid fa-star" />
-            </button>
-          ))}
-          {starFilter && <button className="explore-stars__clear" onClick={() => setStarFilter(null)}>Clear</button>}
         </div>
         <div className="explore-alpha">
           <span className="explore-alpha__label">A–Z</span>
@@ -171,12 +138,12 @@ const Explore: React.FC = () => {
 
       {loading ? (
         <LoadingSpinner />
-      ) : filteredResults.length === 0 ? (
-        <EmptyState icon="🔍" title="No games found" message={starFilter ? `No ${starFilter}-star games found. Try a different rating.` : debounce ? `No RAWG results for "${debounce}". Try a different search term.` : 'No popular games loaded. Try searching for something.'} />
+      ) : results.length === 0 ? (
+        <EmptyState icon="🔍" title="No games found" message={debounce ? `No RAWG results for "${debounce}". Try a different search term.` : 'No popular games loaded. Try searching for something.'} />
       ) : (
         <>
           <div className="page-grid">
-            {filteredResults.map((ext) => (
+            {results.map((ext) => (
               <div
                 key={`${ext.source}-${ext.sourceId}`}
                 className="game-card-new"
