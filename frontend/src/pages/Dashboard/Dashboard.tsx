@@ -247,7 +247,7 @@ const Dashboard: React.FC = () => {
                       message={parsed.text}
                       highlight={parsed.highlight || undefined}
                       timestamp={relTime(a.createdAt)}
-                      to={a.targetType === 'Game' && a.targetId ? `/games/${a.targetId}` : a.targetType === 'User' ? `/profile/${a.metadata?.username || (a.message ? a.message.replace(' started following you', '') : '')}` : undefined}
+                      to={a.targetType === 'Game' || a.type === 'ADDED_GAME' && a.targetId ? `/games/${a.targetId}` : a.targetType === 'User' || a.type === 'FOLLOWED_USER' ? `/profile/${a.metadata?.username || (a.message ? a.message.replace(' started following you', '') : '')}` : undefined}
                     />
                   );
                 })}

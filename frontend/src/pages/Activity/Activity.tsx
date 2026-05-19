@@ -1,16 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import ActivityItem from '../../components/ui/ActivityItem/ActivityItem';
 import { followApi } from '../../services/social';
 
 const Activity: React.FC = () => {
-  const navigate = useNavigate();
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { followApi.getActivity({ limit: '50' }).then((r) => setLogs(r.data)).catch(() => {}).finally(() => setLoading(false)); }, []);
+  useEffect(() => {
+    followApi.getActivity({ limit: '50' }).then((r) => {
+      const seen = new Set<string>();
+      const deduped = r.data.filter((log: any) => {
+        const key = `${log.type}-${log.message}-${new Date(log.createdAt).toLocaleDateString()}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      setLogs(deduped);
+    }).catch(() => {}).finally(() => setLoading(false));
+  }, []);
 
   const icons: Record<string, string> = { ADDED_GAME: 'fa-solid fa-plus', ADDED_REVIEW: 'fa-solid fa-star', ADDED_WISHLIST: 'fa-solid fa-bookmark', CREATED_ACCOUNT: 'fa-solid fa-user-plus', FOLLOWED_USER: 'fa-solid fa-user-plus' };
   const bg: Record<string, string> = { ADDED_GAME: '#059669', ADDED_REVIEW: '#d97706', ADDED_WISHLIST: '#3b82f6', CREATED_ACCOUNT: '#7c3aed', FOLLOWED_USER: '#ec4899' };
@@ -30,7 +40,7 @@ const Activity: React.FC = () => {
               iconBg={bg[log.type] || '#6366f1'}
               message={log.message || log.type.replace('_', ' ')}
               timestamp={new Date(log.createdAt).toLocaleDateString()}
-              to={log.targetType === 'Game' && log.targetId ? `/games/${log.targetId}` : log.targetType === 'User' ? `/profile/${log.metadata?.username || (log.message ? log.message.replace(' started following you', '') : '')}` : undefined}
+              to={log.targetType === 'Game' || log.type === 'ADDED_GAME' && log.targetId ? `/games/${log.targetId}` : log.targetType === 'User' || log.type === 'FOLLOWED_USER' ? `/profile/${log.metadata?.username || (log.message ? log.message.replace(' started following you', '') : '')}` : undefined}
             />
           ))}
         </div>
