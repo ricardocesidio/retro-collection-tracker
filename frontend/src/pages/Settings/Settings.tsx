@@ -206,12 +206,12 @@ const Settings: React.FC = () => {
             <Input label="Bio" type="textarea" value={profile.bio} onChange={(e)=>setProfile({...profile,bio:e.target.value})} rows={3} placeholder="Tell other collectors about yourself..." maxLength={100} />
             <div className="input-group">
               <label className="input-group__label">Location</label>
-              <div style={{display:'flex', gap:'0.5rem'}}>
+              <div style={{display:'flex', gap:'0.5rem', marginTop:'0.25rem'}}>
                 <select
-                  className="input-group__control"
+                  className="form-select"
                   value={selectedCountry}
                   onChange={handleCountryChange}
-                  style={{flex:1}}
+                  style={{flex:1, minWidth:0, padding:'0.625rem 0.875rem'}}
                 >
                   <option value="">Select country</option>
                   {Object.keys(countries).sort().map(c => (
@@ -219,11 +219,11 @@ const Settings: React.FC = () => {
                   ))}
                 </select>
                 <select
-                  className="input-group__control"
+                  className="form-select"
                   value={selectedCity}
                   onChange={handleCityChange}
                   disabled={!selectedCountry}
-                  style={{flex:1}}
+                  style={{flex:1, minWidth:0, padding:'0.625rem 0.875rem'}}
                 >
                   <option value="">Select city</option>
                   {selectedCountry && countries[selectedCountry]?.map(city => (
