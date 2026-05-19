@@ -31,7 +31,7 @@ const sections = [
     id: 'trades',
     icon: 'fa-solid fa-handshake',
     title: 'Trade Requests',
-    content: 'Propose trades with other collectors from their profile page. Specify which game you\'re offering and which you want. The other user can accept or decline. Trades are agreements — the actual exchange happens between collectors. Location badges help determine shipping feasibility.',
+    content: 'Propose trades with other collectors from their profile page. Once accepted, the trade goes through a full shipping workflow: both parties submit their shipping method (DPD, InPost, UPS, FedEx, USPS, Royal Mail, DHL, or Local Pickup) and address. Once both have confirmed, addresses are exchanged and the sender marks the item as shipped with a tracking number — this generates a QR code for the tracking. The receiver confirms receipt to complete the trade. Statuses: PENDING → ACCEPTED → SHIPPED (with QR) → COMPLETED. Location badges help determine shipping feasibility.',
   },
   {
     id: 'chat',
