@@ -270,7 +270,7 @@ const Dashboard: React.FC = () => {
           {highlights.mostValuable && highlights.highestRated && (
             <div className="panel" style={{ marginTop: '1rem' }}>
               <div className="panel-header"><h3>Highlights</h3></div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '0.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.75rem', marginTop: '0.5rem' }}>
                 {highlights.mostValuable && (
                   <Link to={`/games/${highlights.mostValuable.gameId}`} className="dash-add-item">
                     <div className="dash-add-item__thumb">
