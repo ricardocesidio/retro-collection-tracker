@@ -107,7 +107,7 @@ const Explore: React.FC = () => {
     }
   };
 
-  const totalPages = Math.ceil(total / 40);
+  const totalPages = Math.ceil(total / 20);
 
   return (
     <div className="page-shell">
