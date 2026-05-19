@@ -226,6 +226,31 @@
     }
   }
 
+  &__bubble-img {
+    max-width: 100%;
+    max-height: 180px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  &__img-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: $r1;
+    background: none;
+    border: 1px solid $b1;
+    color: $t3;
+    font-size: .9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: color $fast, background $fast;
+    &:hover { color: $t1; background: rgba(255,255,255,.05); }
+  }
+
   &__input-bar {
     display: flex;
     gap: $sp2;

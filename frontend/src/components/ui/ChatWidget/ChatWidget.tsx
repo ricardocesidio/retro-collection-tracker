@@ -14,6 +14,7 @@ const ChatWidget: React.FC = () => {
   const [unread, setUnread] = useState(0);
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     messagesApi.getUnreadCount().then((r) => setUnread(r.count)).catch(() => {});
@@ -47,14 +48,23 @@ const ChatWidget: React.FC = () => {
     messagesApi.getUnreadCount().then((r) => setUnread(r.count)).catch(() => {});
   };
 
-  const send = async () => {
-    if (!input.trim() || !activeConvo) return;
+  const send = async (imageUrl?: string) => {
+    if ((!input.trim() && !imageUrl) || !activeConvo) return;
     const text = input.trim();
     setInput('');
     try {
-      const msg = await messagesApi.send(activeConvo, text);
+      const msg = await messagesApi.send(activeConvo, text, imageUrl);
       setMessages((prev) => [...prev, msg]);
     } catch {}
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => send(reader.result as string);
+    reader.readAsDataURL(file);
+    e.target.value = '';
   };
 
   useEffect(() => {
@@ -100,13 +110,16 @@ const ChatWidget: React.FC = () => {
                     const isMe = m.senderId !== activeConvo;
                     return (
                       <div key={m.id} className={`chat-widget__bubble${isMe ? ' chat-widget__bubble--me' : ''}`}>
-                        {m.content}
+                        {m.imageUrl && <img className="chat-widget__bubble-img" src={m.imageUrl} alt="" />}
+                        {m.content && <div>{m.content}</div>}
                       </div>
                     );
                   })}
                   <div ref={messagesEndRef} />
                 </div>
                 <div className="chat-widget__input-bar">
+                  <input type="file" ref={fileInputRef} accept="image/*" style={{ display: 'none' }} onChange={handleImageSelect} />
+                  <button className="chat-widget__img-btn" onClick={() => fileInputRef.current?.click()}><i className="fa-solid fa-camera" /></button>
                   <input className="chat-widget__input" placeholder="Type..." value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} />
                   <button className="chat-widget__send" onClick={send} disabled={!input.trim()}><i className="fa-solid fa-paper-plane" /></button>
                 </div>
