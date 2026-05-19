@@ -81,6 +81,9 @@ const TopBar: React.FC = () => {
             <Link to="/add-game" className="topbar__add-btn" title="Add to Collection">
               <i className="fa-solid fa-plus" />
             </Link>
+            <Link to="/wishlist" className="topbar__wishlist-btn" title="Wishlist">
+              <i className="fa-solid fa-star" />
+            </Link>
             <Link to="/notifications">
               <NotificationBell />
             </Link>
