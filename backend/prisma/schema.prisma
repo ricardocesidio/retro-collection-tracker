@@ -386,6 +386,11 @@ model TradeRequest {
   wantedGameId String?
   message     String?
   status      TradeStatus @default(PENDING)
+  shippingMethod String?
+  senderAddress  String?
+  receiverAddress String?
+  trackingNumber String?
+  shippingNotes  String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

@@ -31,5 +31,8 @@ export const tradeApi = {
   cancelTrade: (id: string): Promise<TradeRequestData> =>
     apiRequest(`/trade/${id}/cancel`, { method: 'POST' }),
 
+  updateShipping: (id: string, data: { shippingMethod?: string; senderAddress?: string; shippingNotes?: string }): Promise<TradeRequestData> =>
+    apiRequest(`/trade/${id}/shipping`, { method: 'POST', body: JSON.stringify(data) }),
+
   getUnreadCount: (): Promise<{ count: number }> => apiRequest('/trade/unread-count'),
 };

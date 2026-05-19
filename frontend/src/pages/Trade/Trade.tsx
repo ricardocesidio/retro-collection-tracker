@@ -14,6 +14,8 @@ const Trade: React.FC = () => {
   const [tab, setTab] = useState<'received' | 'sent'>('received');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [shippingForm, setShippingForm] = useState<Record<string, { method: string; address: string; notes: string }>>({});
+  const [shippingSaving, setShippingSaving] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([tradeApi.getReceived(), tradeApi.getSent()])
@@ -30,6 +32,18 @@ const Trade: React.FC = () => {
       const [r, s] = await Promise.all([tradeApi.getReceived(), tradeApi.getSent()]);
       setReceived(r); setSent(s);
     } catch (e: any) { setError(e.message); }
+  };
+
+  const handleShippingSave = async (id: string) => {
+    const data = shippingForm[id];
+    if (!data?.method || !data?.address) return;
+    setShippingSaving(id);
+    try {
+      await tradeApi.updateShipping(id, { shippingMethod: data.method, senderAddress: data.address, shippingNotes: data.notes });
+      const [r, s] = await Promise.all([tradeApi.getReceived(), tradeApi.getSent()]);
+      setReceived(r); setSent(s);
+    } catch (e: any) { setError(e.message); }
+    finally { setShippingSaving(null); }
   };
 
   if (loading) return <LoadingSpinner fullPage />;
@@ -83,6 +97,37 @@ const Trade: React.FC = () => {
                     <Button variant="ghost" size="sm" onClick={() => handleAction(t.id, 'cancel')}>Cancel</Button>
                   )}
                 </div>
+                {t.status === 'ACCEPTED' && (
+                  <div className="trade-shipping">
+                    {t.shippingMethod ? (
+                      <div className="trade-shipping__info">
+                        <div className="trade-shipping__row"><span className="trade-shipping__label">Shipping:</span><span>{t.shippingMethod}</span></div>
+                        {t.senderAddress && <div className="trade-shipping__row"><span className="trade-shipping__label">Address:</span><span>{t.senderAddress}</span></div>}
+                        {t.shippingNotes && <div className="trade-shipping__row"><span className="trade-shipping__label">Notes:</span><span>{t.shippingNotes}</span></div>}
+                        {t.trackingNumber && <div className="trade-shipping__row"><span className="trade-shipping__label">Tracking:</span><span>{t.trackingNumber}</span></div>}
+                      </div>
+                    ) : (
+                      <div className="trade-shipping__form">
+                        <h4 className="trade-shipping__title">Arrange Shipping</h4>
+                        <select className="form-select trade-shipping__select" value={shippingForm[t.id]?.method || ''} onChange={(e) => setShippingForm((p) => ({ ...p, [t.id]: { ...p[t.id], method: e.target.value, address: p[t.id]?.address || '', notes: p[t.id]?.notes || '' } }))}>
+                          <option value="">Select shipping method</option>
+                          <option value="DPD">DPD</option>
+                          <option value="InPost">InPost</option>
+                          <option value="UPS">UPS</option>
+                          <option value="FedEx">FedEx</option>
+                          <option value="USPS">USPS</option>
+                          <option value="Royal Mail">Royal Mail</option>
+                          <option value="DHL">DHL</option>
+                          <option value="Local pickup">Local Pickup</option>
+                          <option value="Other">Other</option>
+                        </select>
+                        <input className="trade-shipping__input" placeholder="Your shipping address" value={shippingForm[t.id]?.address || ''} onChange={(e) => setShippingForm((p) => ({ ...p, [t.id]: { ...p[t.id], address: e.target.value, method: p[t.id]?.method || '', notes: p[t.id]?.notes || '' } }))} />
+                        <input className="trade-shipping__input" placeholder="Additional notes (optional)" value={shippingForm[t.id]?.notes || ''} onChange={(e) => setShippingForm((p) => ({ ...p, [t.id]: { ...p[t.id], notes: e.target.value, method: p[t.id]?.method || '', address: p[t.id]?.address || '' } }))} />
+                        <Button variant="primary" size="sm" onClick={() => handleShippingSave(t.id)} loading={shippingSaving === t.id} disabled={!shippingForm[t.id]?.method || !shippingForm[t.id]?.address}>Submit Shipping Details</Button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}

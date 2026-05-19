@@ -40,6 +40,11 @@ export class TradeController {
     return this.tradeService.cancelRequest(req.user.id, id);
   }
 
+  @Post(':id/shipping')
+  async updateShipping(@Request() req: any, @Param('id') id: string, @Body() body: { shippingMethod?: string; senderAddress?: string; shippingNotes?: string }) {
+    return this.tradeService.updateShipping(req.user.id, id, body);
+  }
+
   @Get('unread-count')
   async getUnreadCount(@Request() req: any) {
     const count = await this.tradeService.getUnreadCount(req.user.id);

@@ -124,3 +124,73 @@
     gap: $sp2;
   }
 }
+
+.trade-shipping {
+  border-top: 1px solid $b1;
+  padding-top: $sp3;
+  margin-top: $sp1;
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: $sp1;
+    font-size: $tsm;
+  }
+
+  &__row {
+    display: flex;
+    gap: $sp2;
+
+    span:last-child {
+      color: $t1;
+    }
+  }
+
+  &__label {
+    color: $t3;
+    font-family: $mono;
+    font-size: $txs;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    min-width: 70px;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $sp2;
+  }
+
+  &__title {
+    font-size: $tsm;
+    font-weight: $w6;
+    color: $t1;
+    margin: 0;
+  }
+
+  &__select {
+    width: 100%;
+  }
+
+  &__input {
+    width: 100%;
+    padding: $sp2 $sp3;
+    background: $s3;
+    border: 1px solid $b1;
+    border-radius: $r1;
+    color: $t1;
+    font-size: $tsm;
+    font-family: $font;
+    outline: none;
+    box-sizing: border-box;
+
+    &:focus {
+      border-color: $a1;
+      box-shadow: 0 0 0 3px $ad;
+    }
+
+    &::placeholder {
+      color: $t4;
+    }
+  }
+}
