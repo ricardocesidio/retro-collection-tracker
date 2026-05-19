@@ -26,7 +26,6 @@ export class MessagesService {
     const messages = await this.prisma.message.findMany({
       where: {
         OR: [{ senderId: userId }, { receiverId: userId }],
-        NOT: { senderId: { in: blockedIds } },
       },
       include: {
         sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
