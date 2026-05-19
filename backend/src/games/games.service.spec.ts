@@ -42,8 +42,8 @@ describe('GamesService', () => {
             { id: 'action', name: 'Action', slug: 'action' },
           ]),
       },
-      review: {
-        aggregate: jest.fn().mockResolvedValue({ _avg: { rating: 4.5 } }),
+      collection: {
+        aggregate: jest.fn().mockResolvedValue({ _avg: { personalRating: 4.5 }, _count: { personalRating: 3 } }),
       },
     };
 
@@ -60,10 +60,10 @@ describe('GamesService', () => {
     expect(result.total).toBe(30);
   });
 
-  it('should return game by id with avg rating', async () => {
+  it('should return game by id with community rating', async () => {
     const result = await service.findById('game-1');
     expect(result.title).toBe('Super Metroid');
-    expect(result.avgRating).toBe(4.5);
+    expect(result.communityRatingAverage).toBe(4.5);
   });
 
   it('should throw NotFoundException for missing game', async () => {
