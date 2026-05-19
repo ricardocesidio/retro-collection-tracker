@@ -109,13 +109,13 @@ const Profile: React.FC = () => {
             ))}
           </div>
           {authState.user && authState.user.id !== user.id && (
-            <>
-              <Button variant={isFollowing?'outline':'primary'} onClick={handleFollow} loading={followLoading}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <Button variant={isFollowing?'outline':'primary'} size="sm" onClick={handleFollow} loading={followLoading}>
                 {isFollowing?'Following':'Follow'}
               </Button>
               <Link to="/messages"><Button variant="outline" size="sm"><i className="fa-solid fa-envelope" /> Message</Button></Link>
               <Link to={`/trade?with=${user.username}`}><Button variant="outline" size="sm"><i className="fa-solid fa-handshake" /> Trade</Button></Link>
-            </>
+            </div>
           )}
 
           {user.level && (
