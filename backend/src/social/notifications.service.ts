@@ -59,17 +59,21 @@ export class NotificationsService {
       where: { id: notificationId, recipientId: userId },
     });
     if (!notif) return null;
-    return this.prisma.notification.update({
+    const result = await this.prisma.notification.update({
       where: { id: notificationId },
       data: { isRead: true },
     });
+    await this.emitUnreadCount(userId);
+    return result;
   }
 
   async markAllAsRead(userId: string) {
-    return this.prisma.notification.updateMany({
+    const result = await this.prisma.notification.updateMany({
       where: { recipientId: userId, isRead: false },
       data: { isRead: true },
     });
+    await this.emitUnreadCount(userId);
+    return result;
   }
 
   async create(data: {

@@ -6,6 +6,7 @@ import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import { notificationsApi } from '../../services/social';
 import { connectSocket } from '../../services/socket';
 import type { NotificationEntry } from '../../services/social';
+import './Notifications.scss';
 
 const Notifications: React.FC = () => {
   const [items, setItems] = useState<NotificationEntry[]>([]);
@@ -23,6 +24,7 @@ const Notifications: React.FC = () => {
 
   const mark = async (id: string) => { await notificationsApi.markAsRead(id); setItems((p)=>p.map((n)=>n.id===id?{...n,isRead:true}:n)); };
   const getIcon = (t:string)=>({NEW_FOLLOWER:'fa-solid fa-user-group',NEW_REVIEW:'fa-solid fa-star',WISHLIST_AVAILABLE:'fa-solid fa-bookmark',SYSTEM:'fa-solid fa-bell'} as any)[t]||'fa-solid fa-crown';
+  const iconBg = (t:string)=>({NEW_FOLLOWER:'#7c3aed',NEW_REVIEW:'#d97706',WISHLIST_AVAILABLE:'#3b82f6',SYSTEM:'#6366f1'} as any)[t]||'#6366f1';
 
   const unread = items.filter((n)=>!n.isRead).length;
 
@@ -35,21 +37,21 @@ const Notifications: React.FC = () => {
       {loading ? <LoadingSpinner/> : items.length===0 ? (
         <EmptyState icon="🔔" title="No notifications" message="When someone follows you or reviews a game, you'll see it here."/>
       ) : (
-        <div style={{display:'flex',flexDirection:'column',gap:'2px'}}>
+        <div className="notif-list">
           {items.map((n) => (
-            <div key={n.id} className={`panel prof-notif${!n.isRead?' prof-notif--unread':''}`} style={{padding:'.75rem 1rem',cursor:'pointer'}} onClick={()=>!n.isRead&&mark(n.id)}>
-              <div style={{display:'flex',gap:'.75rem',alignItems:'flex-start'}}>
-                <span style={{fontSize:'1.25rem'}}>{getIcon(n.type)}</span>
-                <div style={{flex:1}}>
-                  <div style={{display:'flex',justifyContent:'space-between'}}>
-                    <strong style={{fontSize:'.875rem'}}>{n.title}</strong>
-                    <span style={{fontSize:'.6875rem',color:'#6b7280'}}>{new Date(n.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  {n.body && <p style={{fontSize:'.8125rem',color:'#9ca3af',marginTop:'.25rem'}}>{n.body}</p>}
-                  {n.link && <Link to={n.link} style={{fontSize:'.75rem',color:'#a78bfa',marginTop:'.25rem',display:'inline-block'}}>View →</Link>}
-                </div>
-                {!n.isRead && <span style={{width:8,height:8,background:'#7c3aed',borderRadius:'50%',flexShrink:0,marginTop:4}}/>}
+            <div key={n.id} className={`notif-item${!n.isRead?' notif-item--unread':''}`} onClick={()=>!n.isRead&&mark(n.id)} style={{position:'relative'}}>
+              <div className="notif-item__icon" style={{background:`${iconBg(n.type)}20`,color:iconBg(n.type)}}>
+                <i className={getIcon(n.type)} />
               </div>
+              <div className="notif-item__content">
+                <div className="notif-item__header">
+                  <span className="notif-item__title">{n.title}</span>
+                  <span className="notif-item__date">{new Date(n.createdAt).toLocaleDateString()}</span>
+                </div>
+                {n.body && <p className="notif-item__body">{n.body}</p>}
+                {n.link && <Link to={n.link} className="notif-item__link" onClick={(e)=>e.stopPropagation()}>View →</Link>}
+              </div>
+              {!n.isRead && <span className="notif-item__dot" />}
             </div>
           ))}
         </div>

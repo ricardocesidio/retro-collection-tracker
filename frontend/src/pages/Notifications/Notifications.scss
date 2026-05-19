@@ -1,0 +1,112 @@
+@use '../../styles/variables' as *;
+
+.notif-list {
+  display: flex;
+  flex-direction: column;
+  gap: $sp2;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $sp4;
+  padding: $sp4;
+  background: $s2;
+  border: 1px solid $b1;
+  border-radius: $r2;
+  transition: all $fast;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $b2;
+    background: $s3;
+  }
+
+  &--unread {
+    border-color: $b2;
+    background: linear-gradient(135deg, rgba(139,92,246,.06), $s2);
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 20%;
+      bottom: 20%;
+      width: 3px;
+      background: linear-gradient(180deg, $a1, $a7);
+      border-radius: 0 2px 2px 0;
+    }
+  }
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: $r1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    background: $ad;
+    color: $a2;
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $sp2;
+  }
+
+  &__title {
+    font-size: $tsm;
+    font-weight: $w6;
+    color: $t1;
+  }
+
+  &__date {
+    font-size: $txs;
+    color: $t3;
+    font-family: $mono;
+    white-space: nowrap;
+  }
+
+  &__body {
+    font-size: $tsm;
+    color: $t2;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  &__link {
+    font-size: $txs;
+    color: $a2;
+    font-weight: $w6;
+    margin-top: $sp2;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color $fast;
+
+    &:hover {
+      color: $a1;
+    }
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $a1;
+    flex-shrink: 0;
+    margin-top: 4px;
+    box-shadow: 0 0 8px $ad;
+  }
+}
