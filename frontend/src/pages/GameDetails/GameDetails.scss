@@ -107,20 +107,20 @@
 
 .gd-stats-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: $sp2;
 }
 
 .gd-stat {
   text-align: center;
-  padding: $sp3;
+  padding: $sp2;
   background: $s2;
   border-radius: $r1;
   border: 1px solid $b1;
 
   &__val {
     display: block;
-    font-size: $txl;
+    font-size: $tbs;
     font-weight: $w7;
     color: $a2;
   }
