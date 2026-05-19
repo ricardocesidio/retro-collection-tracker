@@ -28,6 +28,7 @@ export default defineConfig({
       '/notification-preferences': { target: 'http://localhost:3000', bypass: skipHtml },
       '/activity': { target: 'http://localhost:3000', bypass: skipHtml },
       '/messages': { target: 'http://localhost:3000', bypass: skipHtml },
+      '/trade': { target: 'http://localhost:3000', bypass: skipHtml },
       '/stats': { target: 'http://localhost:3000', bypass: skipHtml },
       '/admin': { target: 'http://localhost:3000', bypass: skipHtml },
     },
