@@ -7,7 +7,7 @@ export interface TradeRequestData {
   offeredGameId?: string;
   wantedGameId?: string;
   message?: string;
-  status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'CANCELLED' | 'SHIPPED';
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'CANCELLED' | 'SHIPPED' | 'COMPLETED';
   createdAt: string;
   sender?: { id: string; username: string; displayName?: string; avatarUrl?: string };
   receiver?: { id: string; username: string; displayName?: string; avatarUrl?: string };
@@ -36,6 +36,9 @@ export const tradeApi = {
 
   markAsShipped: (id: string, trackingNumber: string): Promise<TradeRequestData> =>
     apiRequest(`/trade/${id}/ship`, { method: 'POST', body: JSON.stringify({ trackingNumber }) }),
+
+  markAsReceived: (id: string): Promise<TradeRequestData> =>
+    apiRequest(`/trade/${id}/received`, { method: 'POST' }),
 
   getUnreadCount: (): Promise<{ count: number }> => apiRequest('/trade/unread-count'),
 };

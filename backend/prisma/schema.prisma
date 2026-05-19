@@ -58,6 +58,7 @@ enum TradeStatus {
   DECLINED
   CANCELLED
   SHIPPED
+  COMPLETED
 }
 
 enum NotificationType {

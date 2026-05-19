@@ -115,6 +115,23 @@ export class TradeService {
     });
   }
 
+  async markAsReceived(userId: string, requestId: string) {
+    const request = await this.prisma.tradeRequest.findUnique({ where: { id: requestId } });
+    if (!request) throw new NotFoundException('Trade request not found');
+    if (request.receiverId !== userId) throw new ForbiddenException('Only the receiver can confirm receipt');
+
+    return this.prisma.tradeRequest.update({
+      where: { id: requestId },
+      data: { status: 'COMPLETED' },
+      include: {
+        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true, location: true } },
+        receiver: { select: { id: true, username: true, displayName: true, avatarUrl: true, location: true } },
+        offered: { select: { id: true, title: true, coverImageUrl: true } },
+        wanted: { select: { id: true, title: true, coverImageUrl: true } },
+      },
+    });
+  }
+
   async getUnreadCount(userId: string) {
     return this.prisma.tradeRequest.count({
       where: { receiverId: userId, status: 'PENDING' },

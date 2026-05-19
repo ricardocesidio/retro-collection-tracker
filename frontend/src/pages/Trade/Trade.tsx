@@ -152,9 +152,25 @@ const Trade: React.FC = () => {
                   <div className="trade-shipping">
                     <div className="trade-shipping__info">
                       <h4 className="trade-shipping__title">📦 Item Shipped</h4>
-                      <div className="trade-shipping__detail"><span className="trade-shipping__label">Method:</span><span>{t.shippingMethod || 'N/A'}</span></div>
-                      <div className="trade-shipping__detail"><span className="trade-shipping__label">Tracking:</span><span className="trade-shipping__tracking">{t.trackingNumber}</span></div>
-                      {t.shippingNotes && <div className="trade-shipping__detail"><span className="trade-shipping__label">Notes:</span><span>{t.shippingNotes}</span></div>}
+                      <div className="trade-shipping__qr">
+                        <img src={'https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=' + encodeURIComponent('TRACK:' + (t.trackingNumber || 'N/A'))} alt="QR" />
+                        <div className="trade-shipping__qr-info">
+                          <span className="trade-shipping__detail"><span className="trade-shipping__label">Tracking:</span><span className="trade-shipping__tracking">{t.trackingNumber}</span></span>
+                          {t.shippingMethod && <span className="trade-shipping__detail"><span className="trade-shipping__label">Method:</span><span>{t.shippingMethod}</span></span>}
+                        </div>
+                      </div>
+                      {t.receiverId === currentUserId && (
+                        <Button variant="primary" size="sm" onClick={async () => { try { await tradeApi.markAsReceived(t.id); const [r, s] = await Promise.all([tradeApi.getReceived(), tradeApi.getSent()]); setReceived(r); setSent(s); } catch (e: any) { setError(e.message); } }}>Confirm Receipt — Complete Trade</Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {t.status === 'COMPLETED' && (
+                  <div className="trade-shipping">
+                    <div className="trade-shipping__completed">
+                      <div className="trade-shipping__completed-icon"><i className="fa-solid fa-check" /></div>
+                      <h4 className="trade-shipping__title">✅ Trade Completed</h4>
+                      <p className="trade-shipping__sub">Both parties have fulfilled the trade. Thank you for trading on Retro Collection Tracker!</p>
                     </div>
                   </div>
                 )}
