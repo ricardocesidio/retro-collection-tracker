@@ -157,11 +157,42 @@
 .gd-review-form {
   border-top: 1px solid $b1;
   padding-top: $sp5;
+  display: flex;
+  flex-direction: column;
+  gap: $sp3;
 
   &__stars {
     display: flex;
     gap: $sp1;
     font-size: $tlg;
+  }
+
+  &__star {
+    cursor: pointer;
+    color: $t3;
+    transition: color $fast, transform $fast;
+
+    &:hover {
+      transform: scale(1.15);
+    }
+
+    &--active {
+      color: $a5;
+    }
+  }
+
+  &__input {
+    margin-top: 0 !important;
+  }
+}
+
+.gd-reviews {
+  margin-top: 3rem;
+
+  &__empty {
+    color: $t3;
+    font-size: $tsm;
+    font-style: italic;
   }
 }
 
@@ -217,6 +248,20 @@
     color: $t4;
   }
 
+  &__stars {
+    display: flex;
+    gap: 2px;
+  }
+
+  &__star {
+    font-size: 0.8rem;
+    color: $t4;
+
+    &--active {
+      color: $a5;
+    }
+  }
+
   &__title {
     font-size: $tlg;
     font-weight: $w6;
@@ -250,9 +295,9 @@
     transition: all $fast;
 
     &:hover {
-      color: $a3;
-      border-color: $a3;
-      background: rgba($a3, 0.08);
+      color: $a6;
+      border-color: $a6;
+      background: rgba($a6, 0.08);
     }
 
     i {

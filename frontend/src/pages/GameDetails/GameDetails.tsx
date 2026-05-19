@@ -136,21 +136,21 @@ const GameDetails: React.FC = () => {
               <h3 className="gd-section-title">Write a Review</h3>
               <div className="gd-review-form__stars">
                 {[1,2,3,4,5].map((s) => (
-                  <i key={s} className={`fa-${s <= reviewRating ? 'solid' : 'regular'} fa-star`} onClick={() => setReviewRating(s)} style={{cursor:'pointer', color: s <= reviewRating ? '#f59e0b' : undefined}} />
+                  <i key={s} className={`fa-${s <= reviewRating ? 'solid' : 'regular'} fa-star gd-review-form__star${s <= reviewRating ? ' gd-review-form__star--active' : ''}`} onClick={() => setReviewRating(s)} />
                 ))}
               </div>
-              <input className="form-input" placeholder="Title (optional)" value={reviewTitle} onChange={(e) => setReviewTitle(e.target.value)} style={{marginTop:'0.5rem'}} />
-              <textarea className="form-input" placeholder="Your review (optional)" value={reviewBody} onChange={(e) => setReviewBody(e.target.value)} rows={4} style={{marginTop:'0.5rem',resize:'vertical'}} />
-              <Button variant="primary" onClick={submitReview} loading={submittingReview} disabled={!reviewRating} style={{marginTop:'0.5rem'}}>Submit Review</Button>
+              <input className="form-input gd-review-form__input" placeholder="Title (optional)" value={reviewTitle} onChange={(e) => setReviewTitle(e.target.value)} />
+              <textarea className="form-input gd-review-form__input" placeholder="Your review (optional)" value={reviewBody} onChange={(e) => setReviewBody(e.target.value)} rows={4} />
+              <Button variant="primary" onClick={submitReview} loading={submittingReview} disabled={!reviewRating}>Submit Review</Button>
             </div>
           )}
         </div>
       </div>
 
-      <div className="gd-reviews" style={{marginTop:'3rem'}}>
+      <div className="gd-reviews">
         <h2 className="gd-section-title">Reviews ({game.reviews?.length ?? game._count?.reviews ?? 0})</h2>
         {(!game.reviews || game.reviews.length === 0) ? (
-          <p style={{color:'var(--t4, #8892a4)'}}>No reviews yet. Be the first!</p>
+          <p className="gd-reviews__empty">No reviews yet. Be the first!</p>
         ) : (
           <div className="gd-reviews__list">
             {game.reviews.map((rv) => (
@@ -163,7 +163,7 @@ const GameDetails: React.FC = () => {
                   </div>
                   <div className="gd-review-card__stars">
                     {[1,2,3,4,5].map((s) => (
-                      <i key={s} className={`fa-${s <= rv.rating ? 'solid' : 'regular'} fa-star`} style={{color: s <= rv.rating ? '#f59e0b' : undefined, fontSize:'0.8rem'}} />
+                      <i key={s} className={`fa-${s <= rv.rating ? 'solid' : 'regular'} fa-star gd-review-card__star${s <= rv.rating ? ' gd-review-card__star--active' : ''}`} />
                     ))}
                   </div>
                 </div>
