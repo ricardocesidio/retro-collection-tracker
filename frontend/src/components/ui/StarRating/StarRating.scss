@@ -1,0 +1,36 @@
+@use '../../../styles/variables' as *;
+
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: $a5;
+
+  i {
+    line-height: 1;
+  }
+
+  &--sm {
+    font-size: 0.75rem;
+    gap: 1px;
+  }
+
+  &--md {
+    font-size: 1rem;
+    gap: 3px;
+  }
+
+  &__value {
+    font-family: $mono;
+    color: $t2;
+    margin-left: 4px;
+  }
+
+  &--md &__value {
+    font-size: 0.875rem;
+  }
+
+  &--sm &__value {
+    font-size: 0.6875rem;
+  }
+}
