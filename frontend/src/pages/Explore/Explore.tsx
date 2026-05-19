@@ -110,7 +110,24 @@ const Explore: React.FC = () => {
 
   const totalPages = Math.ceil(total / 40);
   const filteredResults = starFilter
-    ? results.filter(r => r.rating && Math.round(r.rating) === starFilter)
+    ? results.filter(r => {
+        if (!r.rating) return false;
+        const sorted = [...results].filter(x => x.rating != null).map(x => x.rating!).sort((a, b) => a - b);
+        const n = sorted.length;
+        if (n === 0) return false;
+        const thresholds = [
+          sorted[Math.floor(n * 0.2)],   // bottom 20% → 1★
+          sorted[Math.floor(n * 0.4)],   // 20-40% → 2★
+          sorted[Math.floor(n * 0.6)],   // 40-60% → 3★
+          sorted[Math.floor(n * 0.8)],   // 60-80% → 4★
+        ];
+        if (starFilter === 1) return r.rating < thresholds[0];
+        if (starFilter === 2) return r.rating >= thresholds[0] && r.rating < thresholds[1];
+        if (starFilter === 3) return r.rating >= thresholds[1] && r.rating < thresholds[2];
+        if (starFilter === 4) return r.rating >= thresholds[2] && r.rating < thresholds[3];
+        if (starFilter === 5) return r.rating >= thresholds[3];
+        return true;
+      })
     : results;
 
   return (
