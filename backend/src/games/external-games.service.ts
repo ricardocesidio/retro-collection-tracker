@@ -66,7 +66,8 @@ export class ExternalGamesService {
     if (query) {
       url = `https://api.rawg.io/api/games?key=${this.rawgKey}&search=${encodeURIComponent(query)}&page_size=${PAGE_SIZE}&page=${page}`;
     } else {
-      url = `https://api.rawg.io/api/games?key=${this.rawgKey}&page_size=${PAGE_SIZE}&page=${page}&ordering=-rating`;
+      const randomPage = Math.max(1, Math.floor(Math.random() * 100) + 1);
+      url = `https://api.rawg.io/api/games?key=${this.rawgKey}&page_size=${PAGE_SIZE}&page=${randomPage}&ordering=-rating`;
     }
     const res = await fetch(url, { headers: { Accept: 'application/json' } });
     if (!res.ok) throw new Error(`RAWG API returned ${res.status}`);
