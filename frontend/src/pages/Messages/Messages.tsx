@@ -20,6 +20,7 @@ const Messages: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
   const [showReport, setShowReport] = useState(false);
   const [reportReason, setReportReason] = useState('');
@@ -109,6 +110,8 @@ const Messages: React.FC = () => {
       setShowReport(false);
       setReportReason('');
       setReportText('');
+      setSuccess('Report submitted successfully.');
+      setTimeout(() => setSuccess(''), 4000);
     } catch (err: any) {
       setError(err.message || 'Failed to report user');
     }
@@ -123,6 +126,7 @@ const Messages: React.FC = () => {
     <div className="page-shell msg-page">
       <h1 className="page-title">Messages</h1>
       {error && <div style={{ marginBottom: '1rem' }}><Alert variant="danger">{error}</Alert></div>}
+      {success && <div style={{ marginBottom: '1rem' }}><Alert variant="success">{success}</Alert></div>}
       <div className="msg-layout">
         <div className="msg-sidebar">
           {convos.length === 0 ? (
