@@ -23,6 +23,7 @@ const Messages: React.FC = () => {
   const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
   const [showReport, setShowReport] = useState(false);
   const [reportReason, setReportReason] = useState('');
+  const [reportText, setReportText] = useState('');
   const [blockTarget, setBlockTarget] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -102,10 +103,12 @@ const Messages: React.FC = () => {
 
   const handleReport = async () => {
     if (!activeConvo || !reportReason) return;
+    if (reportReason === 'Other' && !reportText.trim()) return;
     try {
-      await messagesApi.reportUser(activeConvo, reportReason);
+      await messagesApi.reportUser(activeConvo, reportReason + (reportText.trim() ? `: ${reportText.trim()}` : ''));
       setShowReport(false);
       setReportReason('');
+      setReportText('');
     } catch (err: any) {
       setError(err.message || 'Failed to report user');
     }
@@ -206,13 +209,22 @@ const Messages: React.FC = () => {
                 <button
                   key={r}
                   className={`msg-report-reason${reportReason === r ? ' msg-report-reason--active' : ''}`}
-                  onClick={() => setReportReason(r)}
+                  onClick={() => { setReportReason(r); if (r !== 'Other') setReportText(''); }}
                 >{r}</button>
               ))}
             </div>
+            {reportReason === 'Other' && (
+              <textarea
+                className="msg-report-text"
+                placeholder="Describe the issue..."
+                value={reportText}
+                onChange={(e) => setReportText(e.target.value)}
+                rows={3}
+              />
+            )}
             <div className="msg-modal__actions">
-              <Button variant="ghost" onClick={() => { setShowReport(false); setReportReason(''); }}>Cancel</Button>
-              <Button variant="danger" onClick={handleReport} disabled={!reportReason}>Submit Report</Button>
+              <Button variant="ghost" onClick={() => { setShowReport(false); setReportReason(''); setReportText(''); }}>Cancel</Button>
+              <Button variant="danger" onClick={handleReport} disabled={!reportReason || (reportReason === 'Other' && !reportText.trim())}>Submit Report</Button>
             </div>
           </div>
         </div>

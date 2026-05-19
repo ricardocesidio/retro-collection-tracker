@@ -357,6 +357,30 @@
   }
 }
 
+.msg-report-text {
+  width: 100%;
+  margin-top: $sp3;
+  padding: $sp2 $sp3;
+  background: $s3;
+  border: 1px solid $b1;
+  border-radius: $r1;
+  color: $t1;
+  font-size: $tsm;
+  font-family: $font;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: $a1;
+    box-shadow: 0 0 0 3px $ad;
+  }
+
+  &::placeholder {
+    color: $t4;
+  }
+}
+
 @keyframes msgFade {
   from { opacity: 0; }
   to { opacity: 1; }
