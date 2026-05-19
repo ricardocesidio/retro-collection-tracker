@@ -257,7 +257,7 @@ const Dashboard: React.FC = () => {
           </div>
 
           {/* Top Genres */}
-          <div className="panel">
+          <div className="panel" id="top-genres-panel">
             <div className="panel-header"><h3>Top Genres</h3></div>
             <div className="dash-bars">
               {genreSlices.map((g) => (
