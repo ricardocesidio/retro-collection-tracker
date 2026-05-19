@@ -108,8 +108,19 @@ const Explore: React.FC = () => {
     }
   };
 
-  const totalPages = Math.ceil(total / 24);
-  const filteredResults = starFilter ? results.filter(r => r.rating && Math.round(r.rating) === starFilter) : results;
+  const totalPages = Math.ceil(total / 40);
+  const filteredResults = starFilter
+    ? results.filter(r => {
+        if (!r.rating) return false;
+        const star = starFilter;
+        if (star === 5) return r.rating >= 4.5;
+        if (star === 4) return r.rating >= 3.5 && r.rating < 4.5;
+        if (star === 3) return r.rating >= 2.5 && r.rating < 3.5;
+        if (star === 2) return r.rating >= 1.5 && r.rating < 2.5;
+        if (star === 1) return r.rating >= 0 && r.rating < 1.5;
+        return true;
+      })
+    : results;
 
   return (
     <div className="page-shell">
@@ -124,18 +135,6 @@ const Explore: React.FC = () => {
         <div className="explore-hero__search">
           <Input placeholder="Search RAWG database for any game..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
         </div>
-        <div className="explore-alpha">
-          <span className="explore-alpha__label">A–Z</span>
-          {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((letter) => (
-            <button
-              key={letter}
-              className={`explore-alpha__letter${debounce.toUpperCase() === letter ? ' explore-alpha__letter--active' : ''}`}
-              onClick={() => { setSearch(letter); setPage(1); }}
-            >
-              {letter}
-            </button>
-          ))}
-        </div>
         <div className="explore-stars">
           {[5,4,3,2,1].map((s) => (
             <button
@@ -147,6 +146,18 @@ const Explore: React.FC = () => {
             </button>
           ))}
           {starFilter && <button className="explore-stars__clear" onClick={() => setStarFilter(null)}>Clear</button>}
+        </div>
+        <div className="explore-alpha">
+          <span className="explore-alpha__label">A–Z</span>
+          {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((letter) => (
+            <button
+              key={letter}
+              className={`explore-alpha__letter${debounce.toUpperCase() === letter ? ' explore-alpha__letter--active' : ''}`}
+              onClick={() => { setSearch(letter); setPage(1); }}
+            >
+              {letter}
+            </button>
+          ))}
         </div>
       </section>
 

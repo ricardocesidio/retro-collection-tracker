@@ -63,8 +63,8 @@ export class ExternalGamesService {
   ): Promise<{ results: ExternalGameResult[]; total: number }> {
     const randomPage = !query ? Math.max(1, Math.floor(Math.random() * 50) + 1) : page;
     const baseUrl = query
-      ? `https://api.rawg.io/api/games?key=${this.rawgKey}&search=${encodeURIComponent(query)}&page_size=24&page=${page}`
-      : `https://api.rawg.io/api/games?key=${this.rawgKey}&page_size=24&page=${randomPage}&ordering=-added`;
+      ? `https://api.rawg.io/api/games?key=${this.rawgKey}&search=${encodeURIComponent(query)}&page_size=40&page=${page}`
+      : `https://api.rawg.io/api/games?key=${this.rawgKey}&page_size=40&page=${randomPage}&ordering=-added`;
     const url = baseUrl;
     const res = await fetch(url, { headers: { Accept: 'application/json' } });
     if (!res.ok) throw new Error(`RAWG API returned ${res.status}`);
