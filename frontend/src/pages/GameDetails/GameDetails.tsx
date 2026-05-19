@@ -177,9 +177,9 @@ const GameDetails: React.FC = () => {
                 <button className="gd-comment-toggle" onClick={() => toggleComments(rv.id)}>
                   💬 {comments[rv.id]?.length ?? 0} comments
                 </button>
-                {expandedComments[r.id] && (
+                {expandedComments[rv.id] && (
                   <div className="gd-comments">
-                    {(comments[r.id] || []).map((c: any) => (
+                    {(comments[rv.id] || []).map((c: any) => (
                       <div key={c.id} className="gd-comment">
                         <div className="gd-comment__avatar">{c.user.avatarUrl ? <img src={c.user.avatarUrl} alt="" /> : <span>{c.user.displayName?.charAt(0) || c.user.username.charAt(0)}</span>}</div>
                         <div className="gd-comment__body">
@@ -190,8 +190,8 @@ const GameDetails: React.FC = () => {
                       </div>
                     ))}
                     <div className="gd-comment-input">
-                      <input value={commentInputs[r.id] || ''} onChange={(e) => setCommentInputs((prev) => ({ ...prev, [r.id]: e.target.value }))} placeholder="Write a comment..." className="gd-comment-input__field" />
-                      <button className="gd-comment-input__btn" onClick={() => addComment(r.id)} disabled={!commentInputs[r.id]?.trim()}><i className="fa-solid fa-paper-plane" /></button>
+                      <input value={commentInputs[rv.id] || ''} onChange={(e) => setCommentInputs((prev) => ({ ...prev, [rv.id]: e.target.value }))} placeholder="Write a comment..." className="gd-comment-input__field" />
+                      <button className="gd-comment-input__btn" onClick={() => addComment(rv.id)} disabled={!commentInputs[rv.id]?.trim()}><i className="fa-solid fa-paper-plane" /></button>
                     </div>
                   </div>
                 )}
