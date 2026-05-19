@@ -98,6 +98,7 @@ const Profile: React.FC = () => {
             {user.level && <span className={`prof-hero__level prof-hero__level--t${user.level.tier}`}>{user.level.name}</span>}
           </h1>
           <p className="prof-hero__handle">@{user.username}</p>
+          {user.location && <p className="prof-hero__location"><i className="fa-solid fa-location-dot" /> {user.location}</p>}
           {user.bio && <p className="prof-hero__bio">{user.bio}</p>}
           <div className="prof-hero__stats">
             {stats.map((s) => (

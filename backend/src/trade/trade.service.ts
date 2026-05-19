@@ -11,8 +11,8 @@ export class TradeService {
     const request = await this.prisma.tradeRequest.create({
       data: { senderId, receiverId, offeredGameId, wantedGameId, message },
       include: {
-        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
-        receiver: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+        sender: { select: { id: true, username: true, displayName: true,         avatarUrl: true, location: true } },
+        receiver: { select: { id: true, username: true, displayName: true, avatarUrl: true, location: true } },
         offered: { select: { id: true, title: true, coverImageUrl: true } },
         wanted: { select: { id: true, title: true, coverImageUrl: true } },
       },
@@ -24,7 +24,7 @@ export class TradeService {
     return this.prisma.tradeRequest.findMany({
       where: { receiverId: userId },
       include: {
-        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true, location: true } },
         offered: { select: { id: true, title: true, coverImageUrl: true } },
         wanted: { select: { id: true, title: true, coverImageUrl: true } },
       },
@@ -36,7 +36,7 @@ export class TradeService {
     return this.prisma.tradeRequest.findMany({
       where: { senderId: userId },
       include: {
-        receiver: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+        receiver: { select: { id: true, username: true, displayName: true, avatarUrl: true, location: true } },
         offered: { select: { id: true, title: true, coverImageUrl: true } },
         wanted: { select: { id: true, title: true, coverImageUrl: true } },
       },
@@ -54,7 +54,7 @@ export class TradeService {
       where: { id: requestId },
       data: { status },
       include: {
-        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true, location: true } },
         offered: { select: { id: true, title: true, coverImageUrl: true } },
         wanted: { select: { id: true, title: true, coverImageUrl: true } },
       },

@@ -16,7 +16,7 @@ const Settings: React.FC = () => {
   const [msg, setMsg] = useState<{type:'success'|'danger';text:string}|null>(null);
   const [uploading, setUploading] = useState(false);
 
-  const [profile, setProfile] = useState({ username:'', displayName:'', bio:'', avatarUrl:'' });
+  const [profile, setProfile] = useState({ username:'', displayName:'', bio:'', avatarUrl:'', location:'' });
   const [pw, setPw] = useState({ current:'', newPw:'', confirm:'' });
   const [emailChange, setEmailChange] = useState({ current:'', newEmail:'', confirm:'' });
   const [notifs, setNotifs] = useState({ email:true, push:false, follows:true, reviews:true, wishlist:true });
@@ -24,7 +24,7 @@ const Settings: React.FC = () => {
 
   useEffect(() => {
     if (state.user) {
-      setProfile({ username:state.user.username||'', displayName:state.user.displayName||'', bio:state.user.bio||'', avatarUrl:state.user.avatarUrl||'' });
+      setProfile({ username:state.user.username||'', displayName:state.user.displayName||'', bio:state.user.bio||'', avatarUrl:state.user.avatarUrl||'', location:state.user.location||'' });
       setLoading(false);
     }
   }, [state.user]);
@@ -64,7 +64,7 @@ const Settings: React.FC = () => {
     if (profile.bio && profile.bio.length > 100) { setMsg({type:'danger',text:'Bio must be 100 characters or less'}); setSaving(false); return; }
     const avatarVal = profile.avatarUrl?.trim() || undefined;
     try {
-      await apiRequest('/auth/me', { method:'PUT', body:JSON.stringify({ username:uname||undefined, displayName:profile.displayName.trim()||undefined, bio:profile.bio.trim()||undefined, avatarUrl: avatarVal }) });
+      await apiRequest('/auth/me', { method:'PUT', body:JSON.stringify({ username:uname||undefined, displayName:profile.displayName.trim()||undefined, bio:profile.bio.trim()||undefined, avatarUrl: avatarVal, location: profile.location.trim()||undefined }) });
       setMsg({type:'success',text:'Profile updated successfully'});
     } catch (err:any) { setMsg({type:'danger',text:err.message||'Failed to update'}); }
     finally { setSaving(false); }
@@ -168,6 +168,7 @@ const Settings: React.FC = () => {
             <Input label="Username" value={profile.username} onChange={(e)=>setProfile({...profile,username:e.target.value})} required maxLength={20} />
             <Input label="Display Name" value={profile.displayName} onChange={(e)=>setProfile({...profile,displayName:e.target.value})} />
             <Input label="Bio" type="textarea" value={profile.bio} onChange={(e)=>setProfile({...profile,bio:e.target.value})} rows={3} placeholder="Tell other collectors about yourself..." maxLength={100} />
+            <Input label="Location" value={profile.location} onChange={(e)=>setProfile({...profile,location:e.target.value})} placeholder="City, Country (e.g. London, UK)" />
             <div style={{display:'flex',justifyContent:'center'}}>
               <Button type="submit" variant="primary" loading={saving}>Save Changes</Button>
             </div>

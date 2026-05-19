@@ -29,4 +29,9 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   avatarUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  location?: string;
 }

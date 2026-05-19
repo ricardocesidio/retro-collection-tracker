@@ -77,7 +77,21 @@
     font-size: $tsm;
     color: $t4;
     font-family: $mono;
+    margin-bottom: $sp1;
+  }
+
+  &__location {
+    font-size: $tsm;
+    color: $a2;
     margin-bottom: $sp3;
+    display: flex;
+    align-items: center;
+    gap: $sp1;
+
+    i {
+      font-size: .85rem;
+      opacity: .7;
+    }
   }
 
   &__bio {

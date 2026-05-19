@@ -139,6 +139,7 @@ export class AuthService {
           }),
           ...(dto.bio !== undefined && { bio: dto.bio }),
           ...(dto.avatarUrl !== undefined && { avatarUrl: dto.avatarUrl }),
+          ...(dto.location !== undefined && { location: dto.location }),
         },
       });
       return this.sanitizeUser(user);

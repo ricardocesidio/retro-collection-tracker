@@ -62,6 +62,7 @@ const Trade: React.FC = () => {
                       {user?.avatarUrl ? <img src={user.avatarUrl} alt="" /> : <span>{user?.displayName?.charAt(0) || user?.username?.charAt(0) || '?'}</span>}
                     </div>
                     <span className="trade-card__name">{user?.displayName || user?.username}</span>
+                    {(user as any)?.location && <span className="trade-card__location"><i className="fa-solid fa-location-dot" /> {(user as any).location}</span>}
                   </Link>
                   <span className={`trade-card__status trade-card__status--${t.status.toLowerCase()}`}>{t.status}</span>
                 </div>

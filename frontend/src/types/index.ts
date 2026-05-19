@@ -62,6 +62,7 @@ export interface User {
   displayName?: string;
   bio?: string;
   avatarUrl?: string;
+  location?: string;
   role: string;
   isActive: boolean;
   isEmailVerified: boolean;

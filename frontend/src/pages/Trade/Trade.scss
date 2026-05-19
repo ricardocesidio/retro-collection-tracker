@@ -51,6 +51,15 @@
     color: $t1;
   }
 
+  &__location {
+    font-size: $txs;
+    color: $a2;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    i { font-size: .65rem; opacity: .7; }
+  }
+
   &__status {
     font-size: $txs;
     font-weight: $w7;
