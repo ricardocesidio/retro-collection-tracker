@@ -45,6 +45,11 @@ export class TradeController {
     return this.tradeService.updateShipping(req.user.id, id, body);
   }
 
+  @Post(':id/ship')
+  async markAsShipped(@Request() req: any, @Param('id') id: string, @Body() body: { trackingNumber: string }) {
+    return this.tradeService.markAsShipped(req.user.id, id, body.trackingNumber);
+  }
+
   @Get('unread-count')
   async getUnreadCount(@Request() req: any) {
     const count = await this.tradeService.getUnreadCount(req.user.id);

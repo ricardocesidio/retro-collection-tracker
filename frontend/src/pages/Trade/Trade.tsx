@@ -6,9 +6,12 @@ import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import Alert from '../../components/ui/Alert/Alert';
 import { tradeApi } from '../../services/trade';
 import type { TradeRequestData } from '../../services/trade';
+import { useAuth } from '../../context/AuthContext';
 import './Trade.scss';
 
 const Trade: React.FC = () => {
+  const { state: authState } = useAuth();
+  const currentUserId = authState.user?.id;
   const [received, setReceived] = useState<TradeRequestData[]>([]);
   const [sent, setSent] = useState<TradeRequestData[]>([]);
   const [tab, setTab] = useState<'received' | 'sent'>('received');
@@ -99,17 +102,34 @@ const Trade: React.FC = () => {
                 </div>
                 {t.status === 'ACCEPTED' && (
                   <div className="trade-shipping">
-                    {t.shippingMethod ? (
+                    {t.senderAddress && t.receiverAddress ? (
                       <div className="trade-shipping__info">
-                        <div className="trade-shipping__row"><span className="trade-shipping__label">Shipping:</span><span>{t.shippingMethod}</span></div>
-                        {t.senderAddress && <div className="trade-shipping__row"><span className="trade-shipping__label">Address:</span><span>{t.senderAddress}</span></div>}
-                        {t.shippingNotes && <div className="trade-shipping__row"><span className="trade-shipping__label">Notes:</span><span>{t.shippingNotes}</span></div>}
-                        {t.trackingNumber && <div className="trade-shipping__row"><span className="trade-shipping__label">Tracking:</span><span>{t.trackingNumber}</span></div>}
+                        <h4 className="trade-shipping__title">Trade Confirmed — Ship Your Game</h4>
+                        <div className="trade-shipping__cards">
+                          <div className="trade-shipping__card">
+                            <span className="trade-shipping__card-label">Your Address</span>
+                            <span className="trade-shipping__card-value">{t.senderId === currentUserId ? t.senderAddress : t.receiverAddress}</span>
+                          </div>
+                          <div className="trade-shipping__card">
+                            <span className="trade-shipping__card-label">Ship To</span>
+                            <span className="trade-shipping__card-value">{t.senderId === currentUserId ? t.receiverAddress : t.senderAddress}</span>
+                          </div>
+                        </div>
+                        {t.shippingMethod && <div className="trade-shipping__detail"><span className="trade-shipping__label">Method:</span><span>{t.shippingMethod}</span></div>}
+                        {t.shippingNotes && <div className="trade-shipping__detail"><span className="trade-shipping__label">Notes:</span><span>{t.shippingNotes}</span></div>}
+                        {t.senderId === currentUserId && !t.trackingNumber && (
+                          <div className="trade-shipping__tracking-form">
+                            <input className="trade-shipping__input" placeholder="Enter tracking number..." value={shippingForm[t.id]?.notes || ''} onChange={(e) => setShippingForm((p) => ({ ...p, [t.id]: { ...p[t.id] || {}, notes: e.target.value, method: '', address: '' } }))} />
+                            <Button variant="primary" size="sm" onClick={async () => { try { await tradeApi.markAsShipped(t.id, shippingForm[t.id]?.notes || ''); const [r, s] = await Promise.all([tradeApi.getReceived(), tradeApi.getSent()]); setReceived(r); setSent(s); } catch (e: any) { setError(e.message); } }} disabled={!shippingForm[t.id]?.notes}>Mark as Shipped</Button>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="trade-shipping__form">
-                        <h4 className="trade-shipping__title">Arrange Shipping</h4>
-                        <select className="form-select trade-shipping__select" value={shippingForm[t.id]?.method || ''} onChange={(e) => setShippingForm((p) => ({ ...p, [t.id]: { ...p[t.id], method: e.target.value, address: p[t.id]?.address || '', notes: p[t.id]?.notes || '' } }))}>
+                        <h4 className="trade-shipping__title">Arrange Shipping — Send Your Address</h4>
+                        <p className="trade-shipping__sub">Once both parties submit their addresses, the trade is confirmed and you can ship your game.</p>
+                        <p className="trade-shipping__sent">{t.senderAddress ? '✅ You submitted your address' : t.receiverAddress ? '✅ You submitted your address' : ''}</p>
+                        <select className="form-select trade-shipping__select" value={shippingForm[t.id]?.method || ''} onChange={(e) => setShippingForm((p) => ({ ...p, [t.id]: { ...p[t.id] || {}, method: e.target.value, address: p[t.id]?.address || '', notes: p[t.id]?.notes || '' } }))}>
                           <option value="">Select shipping method</option>
                           <option value="DPD">DPD</option>
                           <option value="InPost">InPost</option>
@@ -121,11 +141,21 @@ const Trade: React.FC = () => {
                           <option value="Local pickup">Local Pickup</option>
                           <option value="Other">Other</option>
                         </select>
-                        <input className="trade-shipping__input" placeholder="Your shipping address" value={shippingForm[t.id]?.address || ''} onChange={(e) => setShippingForm((p) => ({ ...p, [t.id]: { ...p[t.id], address: e.target.value, method: p[t.id]?.method || '', notes: p[t.id]?.notes || '' } }))} />
-                        <input className="trade-shipping__input" placeholder="Additional notes (optional)" value={shippingForm[t.id]?.notes || ''} onChange={(e) => setShippingForm((p) => ({ ...p, [t.id]: { ...p[t.id], notes: e.target.value, method: p[t.id]?.method || '', address: p[t.id]?.address || '' } }))} />
+                        <input className="trade-shipping__input" placeholder="Your full shipping address" value={shippingForm[t.id]?.address || ''} onChange={(e) => setShippingForm((p) => ({ ...p, [t.id]: { ...p[t.id] || {}, address: e.target.value, method: p[t.id]?.method || '', notes: p[t.id]?.notes || '' } }))} />
+                        <input className="trade-shipping__input" placeholder="Additional notes (optional)" value={shippingForm[t.id]?.notes || ''} onChange={(e) => setShippingForm((p) => ({ ...p, [t.id]: { ...p[t.id] || {}, notes: e.target.value, method: p[t.id]?.method || '', address: p[t.id]?.address || '' } }))} />
                         <Button variant="primary" size="sm" onClick={() => handleShippingSave(t.id)} loading={shippingSaving === t.id} disabled={!shippingForm[t.id]?.method || !shippingForm[t.id]?.address}>Submit Shipping Details</Button>
                       </div>
                     )}
+                  </div>
+                )}
+                {t.status === 'SHIPPED' && (
+                  <div className="trade-shipping">
+                    <div className="trade-shipping__info">
+                      <h4 className="trade-shipping__title">📦 Item Shipped</h4>
+                      <div className="trade-shipping__detail"><span className="trade-shipping__label">Method:</span><span>{t.shippingMethod || 'N/A'}</span></div>
+                      <div className="trade-shipping__detail"><span className="trade-shipping__label">Tracking:</span><span className="trade-shipping__tracking">{t.trackingNumber}</span></div>
+                      {t.shippingNotes && <div className="trade-shipping__detail"><span className="trade-shipping__label">Notes:</span><span>{t.shippingNotes}</span></div>}
+                    </div>
                   </div>
                 )}
               </div>

@@ -71,6 +71,7 @@
     &--accepted { background: rgba(52,211,153,.12); color: #34d399; }
     &--declined { background: rgba(248,113,113,.12); color: #f87171; }
     &--cancelled { background: rgba(100,116,139,.12); color: #64748b; }
+    &--shipped { background: rgba(96,165,250,.15); color: #60a5fa; }
   }
 
   &__games {
@@ -130,67 +131,21 @@
   padding-top: $sp3;
   margin-top: $sp1;
 
-  &__info {
-    display: flex;
-    flex-direction: column;
-    gap: $sp1;
-    font-size: $tsm;
-  }
+  &__info { display: flex; flex-direction: column; gap: $sp2; }
+  &__detail { display: flex; gap: $sp2; font-size: $tsm; align-items: center; }
+  &__label { color: $t3; font-family: $mono; font-size: $txs; text-transform: uppercase; letter-spacing: .04em; min-width: 70px; }
+  &__tracking { color: $a2; font-family: $mono; font-weight: $w6; }
 
-  &__row {
-    display: flex;
-    gap: $sp2;
+  &__cards { display: grid; grid-template-columns: 1fr 1fr; gap: $sp2; }
+  &__card { background: $s3; border: 1px solid $b1; border-radius: $r1; padding: $sp3; display: flex; flex-direction: column; gap: $sp1; }
+  &__card-label { font-size: $txs; color: $t3; font-family: $mono; text-transform: uppercase; letter-spacing: .04em; }
+  &__card-value { font-size: $tsm; color: $t1; line-height: 1.4; }
 
-    span:last-child {
-      color: $t1;
-    }
-  }
-
-  &__label {
-    color: $t3;
-    font-family: $mono;
-    font-size: $txs;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    min-width: 70px;
-  }
-
-  &__form {
-    display: flex;
-    flex-direction: column;
-    gap: $sp2;
-  }
-
-  &__title {
-    font-size: $tsm;
-    font-weight: $w6;
-    color: $t1;
-    margin: 0;
-  }
-
-  &__select {
-    width: 100%;
-  }
-
-  &__input {
-    width: 100%;
-    padding: $sp2 $sp3;
-    background: $s3;
-    border: 1px solid $b1;
-    border-radius: $r1;
-    color: $t1;
-    font-size: $tsm;
-    font-family: $font;
-    outline: none;
-    box-sizing: border-box;
-
-    &:focus {
-      border-color: $a1;
-      box-shadow: 0 0 0 3px $ad;
-    }
-
-    &::placeholder {
-      color: $t4;
-    }
-  }
+  &__form { display: flex; flex-direction: column; gap: $sp2; }
+  &__title { font-size: $tsm; font-weight: $w6; color: $t1; margin: 0; }
+  &__sub { font-size: $txs; color: $t3; margin: 0 0 $sp1; line-height: 1.4; }
+  &__sent { font-size: $txs; color: $a4; font-weight: $w6; }
+  &__select { width: 100%; }
+  &__input { width: 100%; padding: $sp2 $sp3; background: $s3; border: 1px solid $b1; border-radius: $r1; color: $t1; font-size: $tsm; font-family: $font; outline: none; box-sizing: border-box; &:focus { border-color: $a1; box-shadow: 0 0 0 3px $ad; } &::placeholder { color: $t4; } }
+  &__tracking-form { display: flex; gap: $sp2; margin-top: $sp2; align-items: center; }
 }

@@ -78,13 +78,34 @@ export class TradeService {
     if (request.senderId !== userId && request.receiverId !== userId) throw new ForbiddenException('Not your trade');
 
     const update: any = {};
+    const isSender = request.senderId === userId;
     if (data.shippingMethod !== undefined) update.shippingMethod = data.shippingMethod;
-    if (data.senderAddress !== undefined) update.senderAddress = data.senderAddress;
+    if (data.senderAddress !== undefined) {
+      if (isSender) update.senderAddress = data.senderAddress;
+      else update.receiverAddress = data.senderAddress;
+    }
     if (data.shippingNotes !== undefined) update.shippingNotes = data.shippingNotes;
 
     return this.prisma.tradeRequest.update({
       where: { id: requestId },
       data: update,
+      include: {
+        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true, location: true } },
+        receiver: { select: { id: true, username: true, displayName: true, avatarUrl: true, location: true } },
+        offered: { select: { id: true, title: true, coverImageUrl: true } },
+        wanted: { select: { id: true, title: true, coverImageUrl: true } },
+      },
+    });
+  }
+
+  async markAsShipped(userId: string, requestId: string, trackingNumber: string) {
+    const request = await this.prisma.tradeRequest.findUnique({ where: { id: requestId } });
+    if (!request) throw new NotFoundException('Trade request not found');
+    if (request.senderId !== userId) throw new ForbiddenException('Only the sender can mark as shipped');
+
+    return this.prisma.tradeRequest.update({
+      where: { id: requestId },
+      data: { trackingNumber, status: 'SHIPPED' },
       include: {
         sender: { select: { id: true, username: true, displayName: true, avatarUrl: true, location: true } },
         receiver: { select: { id: true, username: true, displayName: true, avatarUrl: true, location: true } },
