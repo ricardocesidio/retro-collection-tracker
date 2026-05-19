@@ -19,6 +19,7 @@ const Messages: React.FC = () => {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     messagesApi.getConversations().then(setConvos).catch(() => {}).finally(() => setLoading(false));
@@ -45,17 +46,46 @@ const Messages: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const send = async () => {
-    if (!input.trim() || !activeConvo || sending) return;
+  const send = async (imageUrl?: string) => {
+    if ((!input.trim() && !imageUrl) || !activeConvo || sending) return;
     setSending(true);
     setError('');
     try {
-      await messagesApi.send(activeConvo, input.trim());
+      await messagesApi.send(activeConvo, input.trim(), imageUrl);
       setInput('');
     } catch (err: any) {
       setError(err.message || 'Failed to send');
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => send(reader.result as string);
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const blockUser = async (userId: string) => {
+    try {
+      await messagesApi.blockUser(userId);
+      setActiveConvo(null);
+      messagesApi.getConversations().then(setConvos).catch(() => {});
+    } catch (err: any) {
+      setError(err.message || 'Failed to block user');
+    }
+  };
+
+  const reportUser = async (userId: string) => {
+    try {
+      await messagesApi.reportUser(userId);
+      setError('');
+      alert('User has been reported.');
+    } catch (err: any) {
+      setError(err.message || 'Failed to report user');
     }
   };
 
@@ -81,7 +111,7 @@ const Messages: React.FC = () => {
                 </div>
                 <div className="msg-convo-btn__info">
                   <span className="msg-convo-btn__name">{c.user.displayName || c.user.username}</span>
-                  <span className="msg-convo-btn__preview">{c.lastMessage.content.slice(0, 40)}</span>
+                  <span className="msg-convo-btn__preview">{c.lastMessage.content.slice(0, 40) || (c.lastMessage.imageUrl ? '[Photo]' : '')}</span>
                 </div>
                 {c.unreadCount > 0 && <span className="msg-convo-btn__badge">{c.unreadCount}</span>}
               </button>
@@ -91,12 +121,18 @@ const Messages: React.FC = () => {
         <div className="msg-main">
           {activeConvo ? (
             <>
+              <div className="msg-chat-header">
+                <button className="msg-header-btn" onClick={() => reportUser(activeConvo)} title="Report"><i className="fa-solid fa-flag" /></button>
+                <button className="msg-header-btn" onClick={() => blockUser(activeConvo)} title="Block"><i className="fa-solid fa-ban" /></button>
+                <span>{convos.find((c) => c.user.id === activeConvo)?.user.displayName || convos.find((c) => c.user.id === activeConvo)?.user.username || 'Chat'}</span>
+              </div>
               <div className="msg-list">
                 {messages.map((m) => {
-                  const isMe = m.senderId === activeConvo;
+                  const isMe = m.senderId !== activeConvo;
                   return (
                     <div key={m.id} className={`msg-bubble${isMe ? ' msg-bubble--me' : ' msg-bubble--other'}`}>
-                      <div className="msg-bubble__text">{m.content}</div>
+                      {m.imageUrl && <img className="msg-bubble__img" src={m.imageUrl} alt="" />}
+                      {m.content && <div className="msg-bubble__text">{m.content}</div>}
                       <span className="msg-bubble__time">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                   );
@@ -104,6 +140,10 @@ const Messages: React.FC = () => {
                 <div ref={messagesEndRef} />
               </div>
               <div className="msg-input-bar">
+                <input type="file" ref={fileInputRef} accept="image/*" style={{ display: 'none' }} onChange={handleImageSelect} />
+                <button className="msg-img-btn" onClick={() => fileInputRef.current?.click()} title="Send photo">
+                  <i className="fa-solid fa-camera" />
+                </button>
                 <input
                   className="msg-input"
                   placeholder="Type a message..."
@@ -111,7 +151,7 @@ const Messages: React.FC = () => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && send()}
                 />
-                <button className="msg-send-btn" onClick={send} disabled={sending || !input.trim()}>
+                <button className="msg-send-btn" onClick={() => send()} disabled={sending || !input.trim()}>
                   <i className="fa-solid fa-paper-plane" />
                 </button>
               </div>

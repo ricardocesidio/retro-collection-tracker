@@ -12,13 +12,14 @@
   border: 1px solid $b1;
   border-radius: $r2;
   overflow: hidden;
-  min-height: 500px;
+  height: calc(100vh - 220px);
+  min-height: 600px;
 }
 
 .msg-sidebar {
   border-right: 1px solid $b1;
   overflow-y: auto;
-  max-height: 500px;
+  max-height: none;
 }
 
 .msg-convo-btn {
@@ -101,10 +102,39 @@
   flex-direction: column;
 }
 
+.msg-chat-header {
+  display: flex;
+  align-items: center;
+  gap: $sp2;
+  padding: $sp2 $sp3;
+  border-bottom: 1px solid $b1;
+  font-size: $tsm;
+  font-weight: $w6;
+
+  span { flex: 1; }
+}
+
+.msg-header-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: $r1;
+  background: none;
+  border: none;
+  color: $t3;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color $fast, background $fast;
+
+  &:hover { color: $t1; background: rgba(255,255,255,.05); }
+}
+
 .msg-list {
   flex: 1;
   overflow-y: auto;
-  max-height: 420px;
+  max-height: none;
   padding: $sp4;
   display: flex;
   flex-direction: column;
@@ -132,6 +162,14 @@
     color: $t1;
   }
 
+  &__img {
+    max-width: 100%;
+    max-height: 240px;
+    border-radius: $r1;
+    margin-bottom: $sp1;
+    display: block;
+  }
+
   &__text { margin-bottom: 2px; }
   &__time { font-size: $txs; color: $t3; font-family: $mono; }
 }
@@ -154,6 +192,23 @@
   font-family: $font;
   outline: none;
   &:focus { border-color: $a1; box-shadow: 0 0 0 3px $ad; }
+}
+
+.msg-img-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: $r1;
+  background: none;
+  border: 1px solid $b1;
+  color: $t3;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color $fast, background $fast;
+
+  &:hover { color: $t1; background: rgba(255,255,255,.05); }
 }
 
 .msg-send-btn {

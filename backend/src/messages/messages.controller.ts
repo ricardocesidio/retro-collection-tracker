@@ -11,8 +11,8 @@ export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Post()
-  async send(@Request() req: any, @Body() body: { receiverId: string; content: string }) {
-    return this.messagesService.send(req.user.id, body.receiverId, body.content);
+  async send(@Request() req: any, @Body() body: { receiverId: string; content: string; imageUrl?: string }) {
+    return this.messagesService.send(req.user.id, body.receiverId, body.content || '', body.imageUrl);
   }
 
   @Get('conversations')
@@ -29,5 +29,25 @@ export class MessagesController {
   async getUnreadCount(@Request() req: any) {
     const count = await this.messagesService.getUnreadCount(req.user.id);
     return { count };
+  }
+
+  @Post('block/:userId')
+  async blockUser(@Request() req: any, @Param('userId') blockedId: string) {
+    return this.messagesService.blockUser(req.user.id, blockedId);
+  }
+
+  @Post('unblock/:userId')
+  async unblockUser(@Request() req: any, @Param('userId') blockedId: string) {
+    return this.messagesService.unblockUser(req.user.id, blockedId);
+  }
+
+  @Get('blocked')
+  async getBlocked(@Request() req: any) {
+    return this.messagesService.getBlockedUsers(req.user.id);
+  }
+
+  @Post('report/:userId')
+  async reportUser(@Request() req: any, @Param('userId') reportedId: string, @Body() body: { reason?: string }) {
+    return this.messagesService.reportUser(req.user.id, reportedId, body.reason);
   }
 }

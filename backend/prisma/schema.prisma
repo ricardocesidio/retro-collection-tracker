@@ -86,6 +86,10 @@ model User {
   reviewLikes       ReviewLike[]
   sentMessages      Message[]    @relation("sent_messages")
   receivedMessages  Message[]    @relation("received_messages")
+  blocksInitiated   Block[]      @relation("blocker")
+  blocksReceived    Block[]      @relation("blocked")
+  reportsMade       Report[]     @relation("reporter")
+  reportsReceived   Report[]     @relation("reported")
   followers         Follow[]     @relation("Following")
   following         Follow[]       @relation("Follower")
   activityLogs      ActivityLog[]
@@ -301,6 +305,7 @@ model Message {
   senderId   String
   receiverId String
   content    String
+  imageUrl   String?
   readAt     DateTime?
   createdAt  DateTime @default(now())
 
@@ -311,4 +316,34 @@ model Message {
   @@index([receiverId])
   @@index([senderId, receiverId])
   @@map("messages")
+}
+
+model Block {
+  id        String   @id @default(uuid())
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+
+  blocker User @relation("blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+  @@index([blockedId])
+  @@map("blocks")
+}
+
+model Report {
+  id         String   @id @default(uuid())
+  reporterId String
+  reportedId String
+  reason     String?
+  createdAt  DateTime @default(now())
+
+  reporter User @relation("reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reported User @relation("reported", fields: [reportedId], references: [id], onDelete: Cascade)
+
+  @@index([reporterId])
+  @@index([reportedId])
+  @@map("reports")
 }
