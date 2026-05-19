@@ -37,11 +37,11 @@ export class MessagesService {
       user: { id: string; username: string; displayName?: string; avatarUrl?: string };
       lastMessage: { content: string; createdAt: string; senderId: string; imageUrl?: string };
       unreadCount: number;
+      blocked: boolean;
     }>();
 
     for (const msg of messages) {
       const otherUserId = msg.senderId === userId ? msg.receiverId : msg.senderId;
-      if (blockedIds.includes(otherUserId)) continue;
 
       if (!conversationMap.has(otherUserId)) {
         const otherUserData = await this.prisma.user.findUnique({
@@ -58,6 +58,7 @@ export class MessagesService {
           },
           lastMessage: { content: msg.content, createdAt: msg.createdAt.toISOString(), senderId: msg.senderId, imageUrl: msg.imageUrl || undefined },
           unreadCount: msg.senderId !== userId && !msg.readAt ? 1 : 0,
+          blocked: blockedIds.includes(otherUserId),
         });
       } else {
         const entry = conversationMap.get(otherUserId)!;

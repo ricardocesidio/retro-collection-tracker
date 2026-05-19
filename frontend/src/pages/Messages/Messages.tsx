@@ -135,7 +135,7 @@ const Messages: React.FC = () => {
                 </div>
                 <div className="msg-convo-btn__info">
                   <span className="msg-convo-btn__name">{c.user.displayName || c.user.username}</span>
-                  <span className="msg-convo-btn__preview">{c.lastMessage.content.slice(0, 40) || (c.lastMessage.imageUrl ? '[Photo]' : '')}</span>
+                  <span className="msg-convo-btn__preview">{c.blocked ? '🚫 Blocked' : c.lastMessage.content.slice(0, 40) || (c.lastMessage.imageUrl ? '[Photo]' : '')}</span>
                 </div>
                 {c.unreadCount > 0 && <span className="msg-convo-btn__badge">{c.unreadCount}</span>}
               </button>
