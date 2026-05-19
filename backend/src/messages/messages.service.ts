@@ -36,18 +36,20 @@ export class MessagesService {
 
     for (const msg of messages) {
       const otherUserId = msg.senderId === userId ? msg.receiverId : msg.senderId;
-      const otherUser = msg.senderId === userId
-        ? null
-        : msg.sender;
 
       if (!conversationMap.has(otherUserId)) {
-        const otherUserData = otherUser || await this.prisma.user.findUnique({
+        const otherUserData = await this.prisma.user.findUnique({
           where: { id: otherUserId },
           select: { id: true, username: true, displayName: true, avatarUrl: true },
-        });
+        }) as { id: string; username: string; displayName?: string | null; avatarUrl?: string | null } | null;
         if (!otherUserData) continue;
         conversationMap.set(otherUserId, {
-          user: otherUserData,
+          user: {
+            id: otherUserData.id,
+            username: otherUserData.username,
+            displayName: otherUserData.displayName || undefined,
+            avatarUrl: otherUserData.avatarUrl || undefined,
+          },
           lastMessage: { content: msg.content, createdAt: msg.createdAt.toISOString(), senderId: msg.senderId },
           unreadCount: msg.senderId !== userId && !msg.readAt ? 1 : 0,
         });
