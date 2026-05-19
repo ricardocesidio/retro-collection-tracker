@@ -42,6 +42,7 @@ const Explore: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState<string | null>(null);
   const [wishlisted, setWishlisted] = useState<Map<string, string>>(new Map());
+  const [starFilter, setStarFilter] = useState<number | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -108,6 +109,7 @@ const Explore: React.FC = () => {
   };
 
   const totalPages = Math.ceil(total / 24);
+  const filteredResults = starFilter ? results.filter(r => r.rating && Math.floor(r.rating) === starFilter) : results;
 
   return (
     <div className="page-shell">
@@ -134,16 +136,28 @@ const Explore: React.FC = () => {
             </button>
           ))}
         </div>
+        <div className="explore-stars">
+          {[5,4,3,2,1].map((s) => (
+            <button
+              key={s}
+              className={`explore-stars__btn${starFilter === s ? ' explore-stars__btn--active' : ''}`}
+              onClick={() => { setStarFilter(starFilter === s ? null : s); setPage(1); }}
+            >
+              {s}<i className="fa-solid fa-star" />
+            </button>
+          ))}
+          {starFilter && <button className="explore-stars__clear" onClick={() => setStarFilter(null)}>Clear</button>}
+        </div>
       </section>
 
       {loading ? (
         <LoadingSpinner />
-      ) : results.length === 0 ? (
-        <EmptyState icon="🔍" title="No games found" message={debounce ? `No RAWG results for "${debounce}". Try a different search term.` : 'No popular games loaded. Try searching for something.'} />
+      ) : filteredResults.length === 0 ? (
+        <EmptyState icon="🔍" title="No games found" message={starFilter ? `No ${starFilter}-star games found. Try a different rating.` : debounce ? `No RAWG results for "${debounce}". Try a different search term.` : 'No popular games loaded. Try searching for something.'} />
       ) : (
         <>
           <div className="page-grid">
-            {results.map((ext) => (
+            {filteredResults.map((ext) => (
               <div
                 key={`${ext.source}-${ext.sourceId}`}
                 className="game-card-new"
