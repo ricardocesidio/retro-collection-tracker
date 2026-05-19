@@ -116,6 +116,24 @@
   color: $t1;
 }
 
+.msg-chat-profile {
+  width: 28px;
+  height: 28px;
+  border-radius: $r1;
+  background: none;
+  border: 1px solid $b1;
+  color: $t3;
+  font-size: .75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all $fast;
+  margin-left: $sp1;
+  &:hover { color: $a2; background: $ad; border-color: $b3; }
+}
+
 .msg-chat-actions {
   display: flex;
   align-items: center;

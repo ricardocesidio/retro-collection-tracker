@@ -155,6 +155,7 @@ const Messages: React.FC = () => {
             <>
               <div className="msg-chat-header">
                 <span className="msg-chat-name">{activeUser?.displayName || activeUser?.username || 'Chat'}</span>
+                {activeUser && <Link to={`/profile/${activeUser.username}`} className="msg-chat-profile"><i className="fa-solid fa-arrow-up-right-from-square" /></Link>}
                 <div className="msg-chat-actions">
                   {isBlocked ? (
                     <button className="msg-action-btn msg-action-btn--unblock" onClick={() => handleUnblock(activeConvo)} title="Unblock"><i className="fa-solid fa-check" /> Unblock</button>
