@@ -99,9 +99,9 @@ export class GamesService {
     });
     if (!game) throw new NotFoundException('Game not found');
 
-    const avgRating = await this.prisma.review.aggregate({
-      where: { gameId: id },
-      _avg: { rating: true },
+    const avgRating = await this.prisma.collection.aggregate({
+      where: { gameId: id, personalRating: { not: null } },
+      _avg: { personalRating: true },
     });
 
     // Get related games (same platform or genre)
