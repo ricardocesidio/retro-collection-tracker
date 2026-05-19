@@ -40,6 +40,7 @@ const Sidebar: React.FC = () => {
       { icon:'fa-solid fa-envelope', label:'Messages', path:'/messages' },
       { icon:'fa-solid fa-handshake', label:'Trade', path:'/trade' },
       { icon:'fa-solid fa-trophy', label:'Leaderboard', path:'/leaderboard' },
+      { icon:'fa-solid fa-circle-question', label:'How It Works', path:'/how-it-works' },
       { icon:'fa-solid fa-users', label:'Friends', path:'/friends' },
       { icon:'fa-solid fa-bell', label:'Notifications', path:'/notifications' },
       { icon:'fa-solid fa-circle-user', label:'Profile', path: user ? `/profile/${user.username}` : '/login' },

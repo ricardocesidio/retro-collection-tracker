@@ -1,0 +1,70 @@
+@use '../../styles/variables' as *;
+
+.hiw-grid {
+  display: flex;
+  flex-direction: column;
+  gap: $sp4;
+}
+
+.hiw-card {
+  background: $s2;
+  border: 1px solid $b1;
+  border-radius: $r2;
+  padding: $sp5;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $sp3;
+    margin-bottom: $sp3;
+  }
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: $r1;
+    background: $ad;
+    color: $a2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-size: $tlg;
+    font-weight: $w7;
+    color: $t1;
+    margin: 0;
+  }
+
+  &__text {
+    font-size: $tsm;
+    color: $t2;
+    line-height: 1.7;
+    margin: 0;
+  }
+}
+
+.hiw-footer {
+  text-align: center;
+  margin-top: $sp6;
+  padding: $sp5;
+  background: $s2;
+  border: 1px solid $b1;
+  border-radius: $r2;
+
+  p {
+    font-size: $tsm;
+    color: $t2;
+    margin: 0;
+  }
+
+  a {
+    color: $a2;
+    font-weight: $w6;
+    text-decoration: none;
+    &:hover { color: $a1; }
+  }
+}
