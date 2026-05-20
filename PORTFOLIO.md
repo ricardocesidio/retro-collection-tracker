@@ -1,97 +1,67 @@
-# Portfolio Materials — Retro Collection Tracker
+# Retro Collection Tracker — Portfolio Materials
+
+## Project Type
+Full-stack web application — retro game collection management platform
+
+## Role
+Solo developer — full-stack architecture, design, implementation
 
 ---
 
 ## LinkedIn Summary
 
-**Headline-friendly version (for experience section):**
-
-> Built **Retro Collection Tracker**, a full-stack React + NestJS web application for retro gaming collectors to catalog, rate, follow, and analyze their personal game libraries. Architected a normalized PostgreSQL database with 10 tables and 30+ REST endpoints. Implemented JWT authentication, social features (follows, reviews, notifications), and a real-time analytics dashboard. Built with TypeScript end-to-end, featuring lazy-loaded pages, responsive dark-themed UI, and production-ready error handling.
-
-**Long-form post version:**
-
-> I built **Retro Collection Tracker** — a full-stack platform for retro gaming collectors.
->
-> **Stack:** React 19 + TypeScript (frontend) · NestJS (backend) · PostgreSQL + Prisma (database)
->
-> **What it does:** Users create accounts, build their retro game collection with detailed metadata, browse a searchable public catalog, write reviews, follow other collectors, and track analytics on a dashboard.
->
-> **Technical highlights:**
-> - 14 lazy-loaded React pages with a custom dark-themed component library (8 reusable components)
-> - 30+ REST API endpoints with JWT auth, class-validator DTOs, and Passport strategies
-> - Normalized relational schema (10 tables, 6 enums) with cascade deletes and composite unique constraints
-> - Real-time notification system auto-triggered on follows, reviews, and wishlist events
-> - Aggregated analytics: platform distribution, condition breakdown, collection valuation
-> - TypeScript across the entire stack — zero `any` types in critical paths
->
-> **Why it matters:** This isn't a tutorial CRUD app. It's a real product with auth, social features, analytics, and a production-grade architecture. It demonstrates the kind of full-stack thinking that goes into building real software.
->
-> Repo: github.com/ricardocesidio/retro-collection-tracker
+> Architected and built a full-stack retro game collection platform from the ground up. Features include RAWG API integration (800K+ games), real-time WebSocket chat, a complete trade system with QR code shipping workflow, gamified XP progression, community reviews with comments/likes, and a premium dark-theme dashboard with interactive charts. Backend: NestJS + Prisma + PostgreSQL. Frontend: React 19 + TypeScript + SCSS. Real-time: Socket.IO. 25 pages, 17 database models, 14 migrations, 12 tests passing.
 
 ---
 
-## Portfolio Website Summary
+## Key Technical Highlights
 
-**For a personal portfolio / project card:**
-
-### Retro Collection Tracker
-*Full-Stack Web Application*
-
-A collector platform for retro gaming enthusiasts. Users build their personal game libraries, browse a searchable catalog, write reviews, follow other collectors, and track analytics.
-
-**Role:** Solo developer — full-stack architecture, design, and implementation
-
-**Tech:** React · TypeScript · NestJS · PostgreSQL · Prisma · JWT · SCSS
-
-**Highlights:**
-- 14-page SPA with lazy loading and responsive dark UI
-- 30+ REST endpoints with validated DTOs and role-based guards
-- Normalized 10-table schema with cascading relations
-- Real-time notification pipeline triggered by social events
-- Analytics dashboard with aggregated collection stats
-
-[View on GitHub →](https://github.com/ricardocesidio/retro-collection-tracker)
+| Achievement | Details |
+|-------------|---------|
+| **Full-stack from scratch** | NestJS backend + React 19 frontend + PostgreSQL database |
+| **RAWG API integration** | Real-time search across 800K+ games with import, covers, ratings |
+| **Real-time WebSocket** | Chat widget, notifications, all live via Socket.IO |
+| **Trade system** | Two-party address exchange, QR tracking codes, DPD/UPS/FedEx |
+| **XP progression** | 4 collector levels, 5 action types, real XP tracking |
+| **Community features** | Reviews, comments, likes, follows, activity feeds |
+| **Premium UI** | Dark theme, responsive, 25 pages, consistent design system |
+| **25 pages** | Dashboard, Explore, Collection, Messages, Trade, Admin, etc. |
+| **17 database models** | User, Game, Collection, Trade, Message, Review, etc. |
+| **Backend tests** | 12 tests, 3 suites — all passing |
 
 ---
 
-## Interview Talking Points
+## Architecture Overview
 
-**If asked "Tell me about a project you're proud of":**
-
-> I built Retro Collection Tracker, a full-stack platform for retro game collectors. It's a React frontend with a NestJS backend and PostgreSQL database.
->
-> The project has 14 pages — everything from authentication to a public catalog, personal collection management, social features like follows and reviews, and a real analytics dashboard.
->
-> What I'm most proud of is the architecture. The database has 10 normalized tables with proper foreign keys and cascading deletes. The API has 30+ endpoints with DTO validation and JWT guards. The frontend uses lazy loading so the initial bundle is under 300 kB.
->
-> I built it to simulate a real production environment — not just a simple CRUD demo. There's a notification system that auto-generates alerts when someone follows you or reviews a game, and the dashboard aggregates stats from multiple tables in real time.
-
-**If asked about technical decisions:**
-
-> I chose React with Vite because it's fast and modern. NestJS on the backend because its module system makes the codebase scalable — each feature (auth, games, collections, social) is its own module with clear boundaries.
->
-> For the database, I normalized platform and genre into separate tables rather than using string columns. This makes filtering and analytics much cleaner, and it prevents data inconsistency.
->
-> I used JWT for auth because it's stateless and works well with a SPA. The token is stored in localStorage and validated on every API request through a Passport strategy.
-
-**If asked about challenges:**
-
-> The biggest challenge was keeping the architecture clean while adding features. When I added notifications, I had to wire them into three different services (follows, reviews, wishlists) without creating circular dependencies. I solved this by making the NotificationsService a standalone provider that gets injected into other modules.
->
-> Another challenge was the SCSS build setup. Vite handles CSS differently than Angular, so I had to configure `additionalData` to auto-inject design tokens into every SCSS file, avoiding manual imports across 30+ component files.
-
-**If asked "What would you improve?":**
-
-> I'd add end-to-end tests with Playwright, set up a CI/CD pipeline with GitHub Actions, add image upload for game covers, and implement real-time WebSocket notifications instead of polling. The architecture supports all of these — they're just the next logical steps.
+```
+React 19 SPA (Vite) ──proxy──▶ NestJS API ──Prisma──▶ PostgreSQL
+                                    │
+                              Socket.IO (WebSocket)
+                                    │
+                              RAWG API (external)
+```
 
 ---
 
-## Quick Stats (for resume bullet points)
+## Skills Demonstrated
 
-- **2,800+** lines of TypeScript across frontend and backend
-- **30+** REST API endpoints
-- **10** normalized PostgreSQL tables with **6** enums
-- **14** lazy-loaded React pages
-- **8** reusable UI components with dark theme design system
-- **0** production dependencies on frontend beyond React and React Router
-- **95+** files in the repository
+- **Backend**: NestJS, TypeScript, REST APIs, Prisma ORM, PostgreSQL, JWT auth, WebSocket, rate limiting, file upload
+- **Frontend**: React 19, TypeScript, SCSS, Vite, React Router, lazy loading, real-time updates, responsive design
+- **Architecture**: Modular monolith, clean architecture, DTO validation, guard-based auth, service layer
+- **DevOps**: Git, migrations, seeding, environment config, CORS, deployment-ready
+- **External APIs**: RAWG video games database (800K+ games), Wikipedia fallback, QR code generation
+
+---
+
+## Live Demo
+
+Demo accounts available with pre-seeded data:
+- `retro_alice` / `password123` — full collection, trades, reviews
+- `bob_collector` / `password123` — Genesis collector
+- `retro_charlie` / `password123` — JRPG enthusiast
+
+---
+
+## GitHub
+
+[github.com/ricardocesidio/retro-collection-tracker](https://github.com/ricardocesidio/retro-collection-tracker)
