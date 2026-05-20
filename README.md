@@ -1,277 +1,773 @@
-# Retro Collection Tracker 🎮
+# 🎮 Retro Collection Tracker
 
-A full-stack retro game collection management platform with social features, RAWG integration, real-time chat, trade system with QR codes, XP progression, and community reviews.
+> **A full-stack retro game collection management platform** — track your physical game collection, discover new titles via RAWG, trade with collectors worldwide, earn XP, and connect with a community of retro gaming enthusiasts.
 
-Built with **NestJS** (backend), **React** (frontend), **PostgreSQL** (database), **Prisma** (ORM), and **Socket.IO** (real-time).
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | React 19, TypeScript, SCSS, Vite, React Router |
-| **Backend** | NestJS 11, TypeScript, Prisma ORM |
-| **Database** | PostgreSQL (via Prisma) |
-| **Real-time** | Socket.IO (WebSocket) |
-| **External API** | RAWG Video Games Database (800K+ games) |
-| **Auth** | JWT (access tokens), bcryptjs |
+[![NestJS](https://img.shields.io/badge/NestJS-11-EA2845?style=flat&logo=nestjs)](https://nestjs.com)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql)](https://www.postgresql.org)
+[![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?style=flat&logo=prisma)](https://www.prisma.io)
+[![Socket.IO](https://img.shields.io/badge/Socket.IO-4-010101?style=flat&logo=socket.io)](https://socket.io)
+[![RAWG](https://img.shields.io/badge/RAWG-API-662D91?style=flat)](https://rawg.io/apidocs)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE)
 
 ---
 
-## Features
+## 📋 Table of Contents
 
-### 🎮 Game Catalog
-- Browse 800K+ games from the RAWG database
-- Search by title with debounced autocomplete
-- A-Z quick filter letters
-- Paginated results (20 per page)
-- Import any game with one click — covers, ratings, platforms, genres
+- [Overview](#-overview)
+- [Tech Stack](#-tech-stack)
+- [Architecture](#-architecture)
+- [Features](#-features)
+- [Pages](#-pages)
+- [API Reference](#-api-reference)
+- [Database Schema](#-database-schema)
+- [Real-time Architecture](#-real-time-architecture)
+- [Authentication & Authorization](#-authentication--authorization)
+- [Installation](#-installation)
+- [Demo Accounts](#-demo-accounts)
+- [Environment Variables](#-environment-variables)
+- [Development Guide](#-development-guide)
+- [Deployment](#-deployment)
+- [Project Structure](#-project-structure)
+- [FAQ](#-faq)
+- [License](#-license)
+
+---
+
+## 📖 Overview
+
+Retro Collection Tracker is a production-grade web application designed for retro video game collectors. It combines a personal collection tracker, community features, and external game database integration into a cohesive, premium experience.
+
+**Who it's for:** Retro game collectors who want to catalog their physical collection (cartridges, discs, boxes), discover games, trade with other collectors, and engage with a community.
+
+**What makes it unique:**
+- **RAWG integration** — search & import from 800K+ games with real cover art
+- **Full trade workflow** — two-party shipping, QR codes, tracking numbers
+- **XP progression** — gamified collector levels (New Collector → Museum Curator)
+- **Community ratings** — separate from RAWG scores, transparent labeling
+- **Real-time everything** — WebSocket-powered chat, notifications, messaging
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| React | 19 | UI framework with concurrent features |
+| TypeScript | 5 | Type-safe development |
+| Vite | 8 | Fast dev server & bundler |
+| React Router | 7 | Client-side routing with lazy loading |
+| SCSS | — | Custom theming with CSS variables |
+| Socket.IO Client | 4 | Real-time WebSocket communication |
+
+### Backend
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| NestJS | 11 | Progressive Node.js framework |
+| TypeScript | 5 | Type-safe server development |
+| Prisma | 6 | Type-safe ORM with migrations |
+| PostgreSQL | 16 | Relational database |
+| Socket.IO | 4 | WebSocket server (namespace `/ws`) |
+| Passport | — | JWT authentication strategy |
+| bcryptjs | — | Password hashing |
+| class-validator | — | DTO validation |
+
+### External APIs
+| API | Purpose | Integration |
+|-----|---------|-------------|
+| **RAWG** | Game database (800K+ titles) | Search, import, cover images, ratings |
+| **Wikipedia** | Game metadata (fallback) | When RAWG is unavailable |
+| **QR Server** | QR code generation | Trade tracking codes |
+
+---
+
+## 🏗 Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Frontend (Vite)                       │
+│  React 19 + TypeScript + SCSS                            │
+│  Port 5173 (dev) / Static (prod)                         │
+│                                                          │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐   │
+│  │  Pages   │ │Components│ │ Services │ │  Hooks   │   │
+│  │ (25)     │ │ (15+)    │ │ (API)    │ │ (custom) │   │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘   │
+└──────────────────────┬──────────────────────────────────┘
+                       │ HTTP + WebSocket
+                       ▼
+┌─────────────────────────────────────────────────────────┐
+│               Vite Proxy (vite.config.ts)                 │
+│  /games, /auth, /collections, /messages, /trade, ...     │
+│  → proxies API calls to backend, serves SPA for HTML      │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+┌─────────────────────────────────────────────────────────┐
+│                    Backend (NestJS)                       │
+│  TypeScript + Prisma ORM                                 │
+│  Port 3000                                                │
+│                                                          │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐   │
+│  │  Auth    │ │  Games   │ │  Trade   │ │  Chat    │   │
+│  │ Module   │ │  Module  │ │  Module  │ │  Module  │   │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘   │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐   │
+│  │  Social  │ │  Notifs  │ │  Admin   │ │   XP     │   │
+│  │  Module  │ │  Module  │ │  Module  │ │  Module  │   │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘   │
+│                                                          │
+│  ┌──────────┐ ┌──────────┐ ┌──────────────────┐         │
+│  │ Prisma   │ │ Socket   │ │  RAWG External   │         │
+│  │ Service  │ │ Gateway  │ │  Games Service   │         │
+│  └──────────┘ └──────────┘ └──────────────────┘         │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+                       ▼
+              ┌────────────────┐
+              │  PostgreSQL    │
+              │  Database      │
+              │  17 tables     │
+              │  7 enums       │
+              │  14 migrations │
+              └────────────────┘
+```
+
+---
+
+## ✨ Features
+
+### 🎮 Game Catalog & Discovery
+
+The Explore page integrates with the **RAWG API** (world's largest video game database with 800K+ titles):
+
+- **Search** — debounced search by title with 300ms delay
+- **A-Z filter** — quick-jump alphabet strip for browsing
+- **Pagination** — 20 games per page across 45K+ pages of RAWG data
+- **One-click import** — click any game to import it with cover art, rating, platform, genre, description
+- **Wishlist toggle** — add to wishlist directly from search results
+- **Fallback** — Wikipedia API when RAWG is unavailable
 
 ### 📦 Collection Management
-- Add games with condition (Mint → Poor), region (NTSC/PAL/NTSC-J), estimated value, personal rating
-- Edit or remove games anytime
-- Sort by title, rating, value, date added
-- Filter by platform, condition
-- Search within your collection
-- Paginated collection view
-- Export collection as CSV or JSON
+
+- **CRUD operations** — add, edit, remove games from your collection
+- **Rich metadata** — condition (Mint → Poor), region (NTSC/PAL/NTSC-J), estimated value, personal rating
+- **Sorting** — by title, rating, value, date added (ascending/descending)
+- **Filtering** — by platform, condition
+- **Search** — full-text search within your collection
+- **Pagination** — browse through pages (20 per page)
+- **Export** — download your collection as CSV or JSON
+- **Cover images** — RAWG covers when imported, SVG placeholders for seeded games
 
 ### ⭐ Reviews & Ratings
-- **RAWG Rating** — community score from the global RAWG database
-- **Community Rating** — average from all collectors who own the game
-- **Your Rating** — personal 1-5 star rating per game
-- Write reviews with title, body, and star rating
-- Like/unlike reviews
+
+Three distinct rating systems, clearly separated:
+
+| Rating | Source | Scale | Label |
+|--------|--------|-------|-------|
+| **RAWG Score** | RAWG API (external) | 0 - 5 | Purple "RAWG" badge |
+| **Community Rating** | Average of all collectors | 0 - 5 | "Community (N)" |
+| **Your Rating** | Personal (1-5 stars) | 1 - 5 | On collection cards |
+
+- Write reviews with star rating, title, and body
+- Like/unlike reviews (toggle)
 - Comment on reviews with threaded discussion
-- All ratings shown separately with clear labels
+- Review section on every game detail page
+- Verified owner context
 
 ### 🤝 Trade System
-- Propose trades from any collector's profile
-- Full shipping workflow with real carrier options: DPD, InPost, UPS, FedEx, USPS, Royal Mail, DHL, Local Pickup
-- **Two-party address exchange** — both sides submit their shipping info
-- **QR code generation** — tracking number encoded into scannable QR code
-- Status tracking: PENDING → ACCEPTED → SHIPPED → COMPLETED
-- Location badges help determine shipping feasibility
-- Demo traders: diana_gamer, retro_elena, cart_finder, nes_hunter
+
+Complete trade workflow that mirrors real collector platforms:
+
+```
+PENDING → ACCEPTED → SHIPPED → COMPLETED
+```
+
+1. **Request** — Send trade request from any collector's profile
+2. **Accept/Decline** — Receiver accepts or declines
+3. **Shipping** — Both parties submit their shipping method and address separately
+4. **Confirmation** — Once both submit, addresses are displayed to both sides
+5. **Ship** — Sender enters tracking number, **QR code** auto-generates
+6. **Complete** — Receiver confirms receipt, trade marked COMPLETED
+
+**Shipping carriers supported:** DPD, InPost, UPS, FedEx, USPS, Royal Mail, DHL, Local Pickup
+
+**QR codes** generated via `api.qrserver.com` encoding tracking data for easy scanning.
 
 ### 💬 Real-time Chat
-- Direct messaging via WebSocket
-- Floating chat widget (bottom-right corner)
-- Full Messages page at `/messages`
-- Send text messages and photos
-- Block/unblock users
-- Report users with reason selection (harassment, spam, threats, etc.)
-- Conversation list with unread counts
-- User profiles linked from chat header
+
+- **WebSocket-powered** — instant message delivery via Socket.IO
+- **Chat Widget** — floating bubble in bottom-right corner (LinkedIn-style)
+- **Full Messages page** — `/messages` with conversation sidebar
+- **Image sharing** — send photos via camera button
+- **Moderation** — block, unblock, report users
+- **Unread counts** — badge on bell icon updates in real-time
 
 ### 📊 Dashboard & Analytics
-- KPI cards: Total Games, Est. Value, Wishlist Count
-- Recently Added grid with 4 latest additions
-- Collection Value Over Time — SVG line chart (6 months)
-- Recent Reviews with star ratings
-- Platform Distribution — conic-gradient donut chart
-- Top Genres — progress bars
-- Recent Activity feed with relative timestamps
-- Wishlist Spotlight — scrollable wishlist items
-- Highlights: Most Valuable + Highest Rated games
-- Collection Progress with percentage in sidebar
 
-### 🏆 XP & Progression
-- Earn XP for every action: +10 add game, +15 write review, +5 wishlist, +20 get follower, +3 comment
-- Level progression: New Collector (0) → Avid Collector (50) → Master Collector (200) → Museum Curator (500)
-- XP bar with progress toward next level on profile
-- Leaderboard ranking collectors by total collection value
+- **KPI cards** — total games, estimated value, wishlist count, completed
+- **Recently Added** — grid of 4 most recent collection additions
+- **Collection Value Over Time** — SVG line chart (6 months) with gradient fill
+- **Recent Reviews** — up to 3 most recent with star ratings and cover images
+- **Platform Distribution** — conic-gradient donut chart with legend (top 5 + Other)
+- **Top Genres** — progress bars with gradient colors
+- **Recent Activity** — action feed with icons, relative timestamps, clickable links
+- **Wishlist Spotlight** — scrollable wishlist items with priority and estimated value
+- **Highlights** — most valuable and highest rated games
+- **Collection Progress** — percentage bar in sidebar
+
+### 🏆 XP & Progression System
+
+| Action | XP | Description |
+|--------|----|-------------|
+| Add game to collection | +10 | Every game you catalog |
+| Write a review | +15 | Share your thoughts |
+| Add to wishlist | +5 | Save for later |
+| Gain a follower | +20 | Someone follows you |
+| Write a comment | +3 | Engage with reviews |
+
+**Levels:**
+| Level | XP Required | Title |
+|-------|-------------|-------|
+| 1 | 0 | New Collector |
+| 2 | 50 | Avid Collector |
+| 3 | 200 | Master Collector |
+| 4 | 500 | Museum Curator |
 
 ### 👤 Profiles & Social
-- User profiles with avatar, bio, location (country + city selector)
-- Follow/unfollow other collectors
-- Tabs: Collection, Reviews, Followers, Following
-- Send Message button on every profile
-- Trade button on every profile
-- Activity feed of recent actions
-- Notification system with real-time WebSocket alerts
 
-### 🔔 Notifications
-- Real-time via WebSocket (`/ws` namespace)
-- Notification types: NEW_FOLLOWER, NEW_REVIEW, WISHLIST_AVAILABLE
-- Unread count badge on bell icon
-- Mark individual or all notifications as read
+- **Profile page** — avatar, display name, bio, location (country + city via dropdown with 182 countries), XP bar, collector level
+- **Follow/unfollow** — one-click follow from any profile
+- **Tabs** — Collection, Reviews, Followers, Following
+- **Actions** — Message, Trade buttons on every profile
+- **Activity feed** — `/activity` logs all your actions
+- **Notifications** — real-time via WebSocket
+
+### 🛡️ Moderation
+
+- **Block users** — prevents messaging, conversation stays visible
+- **Unblock users** — restores messaging instantly
+- **Report users** — 8 reason options (Harassment, Racism, Spam, Threats, etc.)
+- **"Other" reason** — requires custom text explanation
+- **Report success** — green toast notification
+
+### 🔔 Real-time Notifications
+
+- WebSocket events: `notification:new`, `notification:unread`
+- Types: NEW_FOLLOWER, NEW_REVIEW, WISHLIST_AVAILABLE, SYSTEM
+- Bell icon with unread badge count
+- Mark individual or all as read
 - Notification preferences (email, push, follows, reviews, wishlist)
 
-### 🛡️ Moderation & Safety
-- Block users — prevents messaging, conversation stays visible
-- Unblock users — restores messaging
-- Report users with reason (Harassment, Racism, Bullying, Spam, Threats, etc.)
-- Custom text required for "Other" report reason
-- Chat deletion separate from blocking
+---
 
-### 📱 Responsive Sidebar
-- All navigation links fit without scrolling
-- Sections: Main, Discover, Social, Settings, Admin
-- Collapsible hamburger menu on mobile
-- Collection progress bar at bottom
+## 📄 Pages
+
+| # | Page | Route | Auth | Description |
+|---|------|-------|------|-------------|
+| 1 | **Home** | `/` | ❌ | Landing page with animated stats |
+| 2 | **Login** | `/login` | ❌ | Login form + forgot password modal |
+| 3 | **Register** | `/register` | ❌ | Registration with validation |
+| 4 | **Dashboard** | `/dashboard` | ✅ | KPIs, charts, activity, highlights |
+| 5 | **Explore** | `/explore` | ❌ | RAWG catalog search + A-Z filter |
+| 6 | **Collection** | `/collection` | ✅ | Game grid, sort, filter, pagination |
+| 7 | **Wishlist** | `/wishlist` | ✅ | Priority-based wishlist with sorting |
+| 8 | **GameDetails** | `/games/:id` | ❌ | Info, ratings, reviews, comments |
+| 9 | **AddGame** | `/add-game` | ✅ | RAWG import + collection form |
+| 10 | **EditGame** | `/edit-game/:id` | ✅ | Edit metadata, cover, rating |
+| 11 | **Profile** | `/profile/:username` | ❌ | Avatar, XP, tabs, follow/message/trade |
+| 12 | **Settings** | `/settings` | ✅ | Profile, password, email, notifications |
+| 13 | **Messages** | `/messages` | ✅ | Full chat with conversations |
+| 14 | **Trade** | `/trade` | ✅ | Receive/sent, shipping, QR codes |
+| 15 | **Activity** | `/activity` | ✅ | Deduplicated action log |
+| 16 | **Notifications** | `/notifications` | ✅ | Real-time notification center |
+| 17 | **Reviews** | `/reviews` | ✅ | Your reviews with game context |
+| 18 | **Leaderboard** | `/leaderboard` | ❌ | 🥇🥈🥉 podium + ranked list |
+| 19 | **How It Works** | `/how-it-works` | ❌ | Full platform guide (13 sections) |
+| 20 | **Friends** | `/friends` | ✅ | Followers/following tabs |
+| 21 | **Admin** | `/admin` | Admin | User management, game catalog |
+| 22 | **Platforms** | `/platforms` | ❌ | All platforms grid |
+| 23 | **Genres** | `/genres` | ❌ | All genres grid |
+| 24 | **Donate** | `/donate` | ❌ | Subscription tiers + progress |
+| 25 | **NotFound** | `*` | ❌ | Styled 404 error page |
 
 ---
 
-## Pages (25 total)
+## 📡 API Reference
 
-| Page | Route | Auth | Description |
-|------|-------|------|-------------|
-| Home | `/` | No | Landing page with stats counter |
-| Login | `/login` | No | Login with forgot password |
-| Register | `/register` | No | Registration form |
-| Dashboard | `/dashboard` | Yes | Collection analytics, charts, activity |
-| Explore | `/explore` | No | RAWG game catalog search |
-| Collection | `/collection` | Yes | User's game collection |
-| Wishlist | `/wishlist` | Yes | Wishlist with priorities |
-| GameDetails | `/games/:id` | No | Game info, ratings, reviews |
-| AddGame | `/add-game` | Yes | Import RAWG games |
-| EditGame | `/edit-game/:id` | Yes | Edit collection entry |
-| Profile | `/profile/:username` | No | User profile with tabs |
-| Settings | `/settings` | Yes | Profile, password, email, notifications |
-| Messages | `/messages` | Yes | Full chat interface |
-| Trade | `/trade` | Yes | Trade requests with shipping |
-| Activity | `/activity` | Yes | User action log |
-| Notifications | `/notifications` | Yes | Notification center |
-| Reviews | `/reviews` | Yes | User's reviews |
-| Leaderboard | `/leaderboard` | No | Top 10 collectors by value |
-| How It Works | `/how-it-works` | No | Full platform guide |
-| Friends | `/friends` | Yes | Followers/following |
-| Admin | `/admin` | Admin | User & game management |
-| Platforms | `/platforms` | No | All platforms list |
-| Genres | `/genres` | No | All genres list |
-| Donate | `/donate` | No | Support page |
-| NotFound | `*` | No | 404 page |
+### Authentication (`/auth`)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/auth/register` | ❌ | Create account |
+| POST | `/auth/login` | ❌ | Login → JWT token |
+| GET | `/auth/me` | ✅ | Current user profile |
+| PUT | `/auth/me` | ✅ | Update profile (username, displayName, bio, avatarUrl, location) |
+| POST | `/auth/change-password` | ✅ | Change password |
+| POST | `/auth/change-email` | ✅ | Change email (max 3 per account) |
+| POST | `/auth/verify-email` | ✅ | Verify email with token |
+| POST | `/auth/resend-verification` | ✅ | Resend verification email |
+| POST | `/auth/forgot-password` | ❌ | Send reset email |
+| POST | `/auth/reset-password` | ❌ | Reset password with token |
+
+### Games (`/games`)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/games` | ❌ | List local games (paginated) |
+| GET | `/games/external-search?q=&page=` | ❌ | Search RAWG database |
+| POST | `/games/import` | ✅ | Import game via external source (rawg/wikipedia) |
+| GET | `/games/platforms` | ❌ | List platforms |
+| GET | `/games/genres` | ❌ | List genres |
+| GET | `/games/:id` | ❌ | Game detail with community rating |
+| POST | `/games` | Admin | Create game manually |
+| PUT | `/games/:id` | Admin | Update game |
+| DELETE | `/games/:id` | Admin | Delete game |
+
+### Collections (`/collections`)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/collections` | ✅ | User's collection (sort, filter, paginate) |
+| POST | `/collections` | ✅ | Add game to collection |
+| PUT | `/collections/:id` | ✅ | Update entry |
+| DELETE | `/collections/:id` | ✅ | Remove entry |
+| GET | `/collections/stats` | ✅ | Dashboard analytics |
+| GET | `/collections/value-history` | ✅ | 6-month value chart data |
+| GET | `/collections/export?format=csv|json` | ✅ | Export collection |
+| GET | `/collections/user/:userId` | ❌ | Public user collection |
+
+### Trade (`/trade`)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/trade/request` | ✅ | Send trade request |
+| GET | `/trade/received` | ✅ | Incoming requests |
+| GET | `/trade/sent` | ✅ | Outgoing requests |
+| POST | `/trade/:id/accept` | ✅ | Accept trade |
+| POST | `/trade/:id/decline` | ✅ | Decline trade |
+| POST | `/trade/:id/cancel` | ✅ | Cancel trade |
+| POST | `/trade/:id/shipping` | ✅ | Submit shipping details |
+| POST | `/trade/:id/ship` | ✅ | Mark as shipped (with tracking) |
+| POST | `/trade/:id/received` | ✅ | Confirm receipt |
+| GET | `/trade/unread-count` | ✅ | Pending requests count |
+
+### Chat (`/messages`)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/messages` | ✅ | Send message |
+| GET | `/messages/conversations` | ✅ | List conversations |
+| GET | `/messages/conversations/:userId` | ✅ | Get message thread |
+| GET | `/messages/unread-count` | ✅ | Unread count |
+| POST | `/messages/block/:userId` | ✅ | Block user |
+| POST | `/messages/unblock/:userId` | ✅ | Unblock user |
+| GET | `/messages/blocked` | ✅ | List blocked users |
+| POST | `/messages/report/:userId` | ✅ | Report user |
+
+### Reviews (`/reviews`)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/reviews/game/:gameId` | ❌ | Reviews for a game |
+| GET | `/reviews/user/:userId` | ❌ | Reviews by a user |
+| POST | `/reviews` | ✅ | Create review |
+| PUT | `/reviews/:id` | ✅ | Update review |
+| DELETE | `/reviews/:id` | ✅ | Delete review |
+| POST | `/reviews/:id/like` | ✅ | Toggle like |
+| POST | `/reviews/:id/comments` | ✅ | Add comment |
+| GET | `/reviews/:id/comments` | ❌ | Get comments |
+
+### Social (`/follow`, `/activity`)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/follow/:userId` | ✅ | Follow user |
+| DELETE | `/follow/:userId` | ✅ | Unfollow user |
+| GET | `/follow/:userId/status` | ✅ | Check follow status |
+| GET | `/users/:userId/followers` | ❌ | Follower list |
+| GET | `/users/:userId/following` | ❌ | Following list |
+| GET | `/activity` | ✅ | User activity feed |
+
+### Stats (`/stats`)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/stats/public` | ❌ | Public site stats |
+| GET | `/stats/leaderboard` | ❌ | Top 10 collectors |
+| GET | `/stats/donate` | ❌ | Fundraising progress |
+
+### Admin (`/admin`)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/admin/users` | Admin | List users |
+| PUT | `/admin/users/:id/role` | Admin | Change user role |
+| PUT | `/admin/users/:id/toggle-active` | Admin | Activate/deactivate |
+| GET | `/admin/games` | Admin | List games |
+
+### Upload (`/upload`)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/upload/avatar` | ✅ | Upload avatar image |
+| POST | `/upload/cover/:gameId` | ✅ | Upload game cover |
 
 ---
 
-## Getting Started
+## 🗄 Database Schema
+
+### Models (17 total)
+
+```
+User ───┬─── Collection        ── Game
+         ├─── Wishlist          ── Game
+         ├─── Review            ── Game
+         │     └── ReviewComment
+         │     └── ReviewLike
+         ├─── Follow (follower)
+         ├─── Follow (following)
+         ├─── ActivityLog
+         ├─── Notification
+         ├─── NotificationPreference
+         ├─── Message (sent)
+         ├─── Message (received)
+         ├─── Block (initiated)
+         ├─── Block (received)
+         ├─── Report (made)
+         ├─── Report (received)
+         └─── TradeRequest (sent/received)
+
+Game ───┬─── Platform
+         └─── Genre
+```
+
+### Enums (7)
+- `UserRole` — USER, ADMIN, MODERATOR
+- `Condition` — MINT, NEAR_MINT, VERY_GOOD, GOOD, ACCEPTABLE, POOR, MISSING_PARTS
+- `Region` — NTSC, PAL, NTSC_J, REGION_FREE
+- `OwnershipStatus` — OWNED, WISHLIST, FOR_SALE, TRADED
+- `ActivityType` — 10 types (ADDED_GAME, REMOVED_GAME, FOLLOWED_USER, etc.)
+- `NotificationType` — 5 types (NEW_FOLLOWER, NEW_REVIEW, etc.)
+- `TradeStatus` — PENDING, ACCEPTED, DECLINED, CANCELLED, SHIPPED, COMPLETED
+
+### Indexes
+- All foreign keys indexed
+- Composite unique constraints on `userId_gameId` for Collection, Wishlist, Review
+- Activity logs indexed by `userId + createdAt DESC` for feed queries
+- Notifications indexed by `recipientId + isRead + createdAt DESC`
+- Full-text search index on Game title
+- Trade requests indexed by status for unread counting
+
+---
+
+## ⚡ Real-time Architecture
+
+```
+┌──────────────┐     ┌─────────────────┐     ┌──────────────┐
+│   Frontend    │     │   Socket.IO     │     │   Backend    │
+│              │     │   Namespace /ws  │     │              │
+│ ┌──────────┐ │     │                 │     │ ┌──────────┐ │
+│ │ Chat     │────WebSocket─────────────│────│ │ Gateway  │ │
+│ │ Widget   │ │     │                 │     │ │ Service  │ │
+│ └──────────┘ │     │ JWT Auth:       │     │ └──────────┘ │
+│ ┌──────────┐ │     │ handshake.auth  │     │              │
+│ │ Notif    │───────.token──────────────│────│ Notifications│
+│ │ Bell     │ │     │                 │     │ Service     │
+│ └──────────┘ │     │ Rooms: userId   │     └──────────────┘
+│ ┌──────────┐ │     │                 │
+│ │ Messages │───────'notification:new'───│───▶ New notif
+│ │ Page     │ │     │                 │     │
+│ └──────────┘ │     │'notification:   │     │
+│              │───────unread'───────────│───▶ Badge count
+└──────────────┘     └─────────────────┘     └──────────────┘
+```
+
+**Events:**
+| Event | Direction | Payload | Trigger |
+|-------|-----------|---------|---------|
+| `notification:new` | Server → Client | Full notification object | New follower, review, wishlist |
+| `notification:unread` | Server → Client | `{ count }` | Any notification change |
+| `message:new` | Server → Client | Full message object | New chat message |
+
+---
+
+## 🔐 Authentication & Authorization
+
+### JWT Strategy
+- Access tokens issued on login via `POST /auth/login`
+- Tokens contain: `sub` (userId), `email`
+- Sent as `Authorization: Bearer <token>` header
+- Configurable via `JWT_SECRET` env var (default warning in dev)
+
+### Guards
+| Guard | Purpose |
+|-------|---------|
+| `JwtAuthGuard` | Requires valid JWT token |
+| `RolesGuard` | Requires specific role (USER, ADMIN, MODERATOR) |
+| `Public` decorator | Bypasses JWT auth on specific endpoints |
+| `ThrottlerGuard` | Rate limiting (configurable per endpoint) |
+
+### Protected vs Public Routes
+- **Public**: Explore, GameDetails, Profiles, Leaderboard, HowItWorks, Platforms, Genres, Home, Login, Register
+- **User**: Dashboard, Collection, Wishlist, Messages, Trade, Settings, Activity, Notifications, Reviews, Friends
+- **Admin**: Admin panel (/admin)
+
+---
+
+## 🚀 Installation
 
 ### Prerequisites
-- Node.js 20+
-- PostgreSQL
-- RAWG API key (free: https://rawg.io/apidocs)
+- **Node.js** ≥ 20.x
+- **npm** ≥ 9.x
+- **PostgreSQL** ≥ 14
+- **RAWG API Key** (free, register at https://rawg.io/apidocs)
 
-### Installation
+### Quick Start
 
 ```bash
-# Clone the repo
+# 1. Clone the repository
 git clone https://github.com/ricardocesidio/retro-collection-tracker.git
 cd retro-collection-tracker
 
-# Backend setup
+# 2. Backend setup
 cd backend
-cp .env.example .env        # Configure DATABASE_URL, JWT_SECRET, RAWG_API_KEY
 npm install
+cp .env.example .env
+# Edit .env: set DATABASE_URL, JWT_SECRET, RAWG_API_KEY
 npx prisma migrate deploy
-npx prisma db seed
-npm run start:dev           # Backend on port 3000
+npx prisma db seed        # Seeds 299 games, 5 users, reviews, follows
+npm run start:dev         # Backend starts on http://localhost:3000
 
-# Frontend setup (new terminal)
+# 3. Frontend setup (new terminal)
 cd frontend
 npm install
-npm run dev                 # Frontend on port 5173
+npm run dev               # Frontend starts on http://localhost:5173
 ```
 
-### Demo Accounts
+### Database Seeding
 
-| Username | Email | Password | Location |
-|----------|-------|----------|----------|
-| `retro_alice` | alice@example.com | password123 | São Paulo, Brazil |
-| `bob_collector` | bob@example.com | password123 | New York, USA |
-| `retro_charlie` | charlie@example.com | password123 | Tokyo, Japan |
-| `diana_gamer` | diana@example.com | password123 | London, UK |
-| `admin` | admin@example.com | password123 | Seattle, USA |
+```bash
+# The seed creates:
+# - 299 games across 12 platforms (NES, SNES, N64, Genesis, Saturn, etc.)
+# - 5 users with realistic collections
+# - Follow relationships and reviews
+npx prisma db seed
 
----
-
-## API Overview
-
-### Authentication (`/auth`)
-- `POST /auth/register` — Create account
-- `POST /auth/login` — Login, returns JWT
-- `GET /auth/me` / `PUT /auth/me` — Get/update profile
-- `POST /auth/change-password` — Change password
-- `POST /auth/change-email` — Change email (max 3 times)
-
-### Games (`/games`)
-- `GET /games` — List local games
-- `GET /games/external-search?q=` — Search RAWG database
-- `POST /games/import` — Import game from RAWG
-- `GET /games/:id` — Game details with ratings
-
-### Collections (`/collections`)
-- `GET /collections` — User's collection (with sort, filter, pagination)
-- `POST /collections` — Add game to collection
-- `PUT /collections/:id` — Update entry
-- `DELETE /collections/:id` — Remove from collection
-- `GET /collections/stats` — Dashboard analytics
-- `GET /collections/value-history` — Value chart data
-- `GET /collections/export?format=csv|json` — Export
-
-### Trade (`/trade`)
-- `POST /trade/request` — Send trade request
-- `GET /trade/received` / `GET /trade/sent` — List trades
-- `POST /trade/:id/accept` / `decline` / `cancel` — Manage requests
-- `POST /trade/:id/shipping` — Submit shipping details
-- `POST /trade/:id/ship` — Mark as shipped with tracking
-- `POST /trade/:id/received` — Confirm receipt
-
-### Chat (`/messages`)
-- `POST /messages` — Send message
-- `GET /messages/conversations` — List conversations
-- `GET /messages/conversations/:userId` — Get messages
-- `POST /messages/block/:userId` — Block user
-- `POST /messages/unblock/:userId` — Unblock
-- `POST /messages/report/:userId` — Report user
-
-### Social (`/follow`, `/activity`)
-- `POST /follow/:userId` — Follow user
-- `GET /users/:userId/followers` / `following` — Lists
-- `GET /activity` — User activity feed
-
-### Stats (`/stats`)
-- `GET /stats/public` — Public platform stats
-- `GET /stats/leaderboard` — Top 10 collectors
-- `GET /stats/donate` — Donation progress
+# Reset and re-seed:
+npx prisma migrate reset --force
+npx prisma db seed
+```
 
 ---
 
-## Database Schema (17 models)
+## 👥 Demo Accounts
 
-- **User** — accounts, XP, location, auth fields
-- **Game** — title, platform, genre, RAWG rating, cover
-- **Platform** / **Genre** — reference data
-- **Collection** — user's games with condition, rating, value
-- **Wishlist** — wanted games with priority, estimated value
-- **Review** / **ReviewComment** / **ReviewLike** — community reviews
-- **Follow** — follower relationships
-- **ActivityLog** — all user actions with polymorphic targets
-- **Notification** / **NotificationPreference** — real-time alerts
-- **Message** / **Block** / **Report** — chat & moderation
-- **TradeRequest** — trades with shipping fields, status enum
+| Username | Display Name | Email | Password | Location | Collection |
+|----------|-------------|-------|----------|----------|------------|
+| `retro_alice` | Alice | alice@example.com | password123 | São Paulo, Brazil | 12 games |
+| `bob_collector` | Bob | bob@example.com | password123 | New York, USA | 8 games |
+| `retro_charlie` | Charlie | charlie@example.com | password123 | Tokyo, Japan | 8 games |
+| `diana_gamer` | Diana | diana@example.com | password123 | London, UK | 7 games |
+| `admin` | Admin | admin@example.com | password123 | Seattle, USA | Admin access |
 
 ---
 
-## Real-time Features
+## 🔧 Environment Variables
 
-- **Socket.IO** on `/ws` namespace with JWT authentication
-- `notification:new` — new notifications pushed instantly
-- `notification:unread` — badge count updates in real-time
-- `message:new` — chat messages delivered instantly
-- WebSocket toggling on auth:logout
-
----
-
-## Environment Variables
-
+### Backend (`backend/.env`)
 ```env
-# Backend (.env)
-DATABASE_URL=postgresql://user:pass@localhost:5432/retro_db
-JWT_SECRET=your-secret-key
-RAWG_API_KEY=your-rawg-api-key
+# Database
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/retro_collection_tracker"
+
+# JWT
+JWT_SECRET="your-secure-random-string-here"
+
+# RAWG API (get free key at https://rawg.io/apidocs)
+RAWG_API_KEY="your-rawg-api-key"
+
+# Donation display values (optional)
 DONATE_RAISED=247
 DONATE_GOAL=500
 DONATE_SUPPORTERS=34
 ```
+
+---
+
+## 💻 Development Guide
+
+### Commands
+
+```bash
+# Backend
+cd backend
+npm run start:dev      # Watch mode with hot reload
+npm run build          # Production build
+npm test               # Run tests (12 tests, 3 suites)
+npx prisma studio      # Database GUI (port 5555)
+npx prisma migrate dev # Create new migration
+
+# Frontend
+cd frontend
+npm run dev            # Dev server with HMR (port 5173)
+npm run build          # Production build
+```
+
+### Proxy Configuration
+
+The frontend dev server proxies API calls to the backend via `vite.config.ts`:
+
+```typescript
+// API paths proxied to localhost:3000
+'/games', '/auth', '/collections', '/trade', '/messages',
+'/wishlist', '/reviews', '/users', '/follow', '/notifications',
+'/activity', '/stats', '/admin', '/upload'
+```
+
+The `skipHtml` bypass function ensures page navigations are served by the SPA while API calls are forwarded to the backend.
+
+### Code Style
+
+- **Backend**: NestJS modules with controllers, services, DTOs, guards
+- **Frontend**: Page components in `src/pages/`, shared UI in `src/components/ui/`, API services in `src/services/`
+- **SCSS**: Variables in `src/styles/_variables.scss`, global styles in `src/styles/global.scss`
+- **Lazy loading**: All pages except Home, Login, Register, NotFound use `React.lazy()`
+
+---
+
+## 📦 Deployment
+
+### Production Build
+
+```bash
+# Backend
+cd backend
+npm run build
+npm run start:prod     # Or use PM2 / Docker
+
+# Frontend
+cd frontend
+npm run build          # Output in frontend/dist/
+# Serve dist/ with nginx, caddy, or similar
+```
+
+### Docker (recommended)
+
+```dockerfile
+# Backend Dockerfile
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npx prisma generate
+RUN npm run build
+EXPOSE 3000
+CMD ["node", "dist/main"]
+```
+
+### Nginx Configuration (frontend SPA)
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    root /var/www/retro-collection-tracker/frontend/dist;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://localhost:3000/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+    }
+}
+```
+
+---
+
+## 📁 Project Structure
+
+```
+retro-collection-tracker/
+├── backend/
+│   ├── prisma/
+│   │   ├── schema.prisma          # Database schema (17 models)
+│   │   ├── seed.ts                # Data seeder (299 games, 5 users)
+│   │   └── migrations/            # 14 migration files
+│   ├── src/
+│   │   ├── auth/                  # JWT auth, register, login, profile
+│   │   ├── games/                 # RAWG integration, game CRUD
+│   │   ├── collections/           # Collection management, stats
+│   │   ├── trade/                 # Trade requests, shipping, QR codes
+│   │   ├── messages/              # Chat, blocking, reporting
+│   │   ├── social/                # Follow, activity, notifications
+│   │   ├── reviews/               # Reviews, likes, comments
+│   │   ├── wishlist/              # Wishlist management
+│   │   ├── users/                 # User profiles
+│   │   ├── upload/                # File uploads (avatar, covers)
+│   │   ├── admin/                 # Admin dashboard
+│   │   ├── xp/                    # XP system
+│   │   ├── config/                # Configuration module
+│   │   ├── prisma/                # Prisma service
+│   │   └── common/                # Guards, filters, decorators
+│   ├── test/                      # E2E tests
+│   └── package.json
+│
+├── frontend/
+│   ├── src/
+│   │   ├── pages/                 # 25 page components
+│   │   ├── components/
+│   │   │   ├── ui/               # Reusable UI components
+│   │   │   │   ├── Button/
+│   │   │   │   ├── Input/
+│   │   │   │   ├── ChatWidget/
+│   │   │   │   ├── ConfirmDialog/
+│   │   │   │   ├── ActivityItem/
+│   │   │   │   ├── NotificationBell/
+│   │   │   │   ├── StarRating/
+│   │   │   │   ├── StatCard/
+│   │   │   │   ├── ProgressCard/
+│   │   │   │   ├── Badge/
+│   │   │   │   ├── Alert/
+│   │   │   │   ├── LoadingSpinner/
+│   │   │   │   └── EmptyState/
+│   │   │   └── layout/           # AppLayout, Sidebar, TopBar
+│   │   ├── services/              # API clients
+│   │   ├── hooks/                 # Custom React hooks
+│   │   ├── context/               # AuthContext
+│   │   ├── styles/                # Global SCSS, variables, mixins
+│   │   ├── data/                  # Static data (countries, cities)
+│   │   └── types/                 # Shared TypeScript types
+│   ├── vite.config.ts             # Vite config with proxy rules
+│   └── package.json
+│
+└── README.md
+```
+
+---
+
+## ❓ FAQ
+
+**Q: Can I trade digital games?**
+A: No — this platform facilitates trades of physical games. The trade system helps collectors find trade partners and agree on terms. The actual exchange happens between collectors via shipping.
+
+**Q: Where do game covers come from?**
+A: Games imported from RAWG use real cover art from `media.rawg.io`. Seeded demo games use `placehold.co` placeholder images with the game title.
+
+**Q: How is the community rating calculated?**
+A: It's the average of all `personalRating` values from collection entries where users have rated the game. It updates in real-time as more users rate.
+
+**Q: Is the XP system retroactive?**
+A: Yes — when the XP system was added, existing user data was backfilled to award XP for their existing games, reviews, wishlists, and followers.
+
+**Q: How many demo users are there?**
+A: 10 accounts total: 5 seeded users (alice, bob, charlie, diana, admin) plus 5 registered demo traders (retro_elena, cart_finder, nes_hunter, game_master, pixel_queen).
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+<p align="center">
+  Built with ❤️ for retro game collectors everywhere<br>
+  <sub>Last updated: May 2026</sub>
+</p>
