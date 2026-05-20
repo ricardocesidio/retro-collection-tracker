@@ -405,6 +405,9 @@ PENDING → ACCEPTED → SHIPPED → COMPLETED
 |--------|----------|------|-------------|
 | POST | `/upload/avatar` | ✅ | Upload avatar image |
 | POST | `/upload/cover/:gameId` | ✅ | Upload game cover |
+| POST | `/upload/collection-cover/:colId` | ✅ | Upload collection entry cover |
+
+> **API documentation:** Full interactive Swagger docs available at `GET /api-docs` when the backend is running.
 
 ---
 
@@ -739,7 +742,10 @@ retro-collection-tracker/
 │   ├── prisma/
 │   │   ├── schema.prisma          # Database schema (17 models)
 │   │   ├── seed.ts                # Data seeder (299 games, 5 users)
+│   │   ├── create-demo.ts         # Demo account creator (clone of alice)
 │   │   └── migrations/            # 14 migration files
+│   ├── render.yaml                # Render IaC config
+│   ├── .env.example               # Environment template
 │   ├── src/
 │   │   ├── auth/                  # JWT auth, register, login, profile
 │   │   ├── games/                 # RAWG integration, game CRUD
@@ -767,6 +773,8 @@ retro-collection-tracker/
 │
 ├── frontend/
 │   ├── vercel.json              # SPA rewrites + uploads proxy
+│   ├── .env                     # Dev VITE_API_URL (empty → uses Vite proxy)
+│   ├── .env.production          # Production VITE_API_URL (overridden by Vercel env)
 │   ├── src/
 │   │   ├── pages/                 # 25 page components
 │   │   ├── components/
