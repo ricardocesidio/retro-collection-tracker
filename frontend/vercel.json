@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/uploads/(.*)", "destination": "https://retro-collection-tracker.onrender.com/uploads/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
