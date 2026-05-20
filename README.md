@@ -1,26 +1,8 @@
 # 🎮 Retro Collection Tracker
 
 > **A full-stack retro game collection management platform** — track your physical game collection, discover new titles via RAWG, trade with collectors worldwide, earn XP, and connect with a community of retro gaming enthusiasts.
-
-<div align="center">
-  <a href="https://retro-collection-tracker.vercel.app">
-    <img src="https://img.shields.io/badge/LIVE_DEMO-000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" />
-  </a>
-  &nbsp;
-  <a href="https://github.com/ricardocesidio/retro-collection-tracker">
-    <img src="https://img.shields.io/badge/SOURCE_CODE-181717?style=for-the-badge&logo=github&logoColor=white" alt="Source Code" />
-  </a>
-</div>
-
-<br>
-
-| Frontend | Backend | Database | Real-time | Auth |
-|----------|---------|----------|-----------|------|
-| React 19 + TypeScript + Vite | NestJS 11 + Prisma 6 | PostgreSQL 16 | Socket.IO 4 | JWT + bcryptjs |
-
-> **Demo login:** Click the **"Demo Login"** button on the sign-in page — instantly explore collections, trades, messages, and reviews as a real collector.
-
-<br>
+>
+> 
 
 [![NestJS](https://img.shields.io/badge/NestJS-11-EA2845?style=flat&logo=nestjs)](https://nestjs.com)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react)](https://react.dev)
@@ -36,6 +18,32 @@
 [![Render](https://img.shields.io/badge/Deployed_on-Render-46E3B7?logo=render&logoColor=000)](https://retro-collection-tracker.onrender.com)
 [![Neon](https://img.shields.io/badge/Neon-00E599?style=flat&logo=neon)](https://neon.tech)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE)
+
+<div align="center"><a href="https://retro-collection-tracker.vercel.app">
+    <img src="https://img.shields.io/badge/LIVE_DEMO-000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" />
+  </a>
+  
+  &nbsp;
+  <a href="https://github.com/ricardocesidio/retro-collection-tracker">
+    <img src="https://img.shields.io/badge/SOURCE_CODE-181717?style=for-the-badge&logo=github&logoColor=white" alt="Source Code" />
+  </a>
+</div>
+
+
+
+## 🎥 Full Project Walkthrough
+
+[![Watch the walkthrough](https://img.youtube.com/vi/vD2s5wrksMw/maxresdefault.jpg)](https://www.youtube.com/watch?v=vD2s5wrksMw)
+
+<br>
+
+| Frontend | Backend | Database | Real-time | Auth |
+|----------|---------|----------|-----------|------|
+| React 19 + TypeScript + Vite | NestJS 11 + Prisma 6 | PostgreSQL 16 | Socket.IO 4 | JWT + bcryptjs |
+
+> **Demo login:** Click the **"Demo Login"** button on the sign-in page — instantly explore collections, trades, messages, and reviews as a real collector.
+
+<br>
 
 ---
 
