@@ -23,6 +23,8 @@ const Login: React.FC = () => {
 
   const submit = async (e: React.FormEvent) => { e.preventDefault(); clearError(); if(!validate())return; try{await login(form.email,form.password);navigate(from,{replace:true});}catch{}};
 
+  const demoLogin = async () => { setForm({email:'demo@retro-tracker.com',password:'demo1234'}); await new Promise(r=>setTimeout(r,50)); clearError(); try{await login('demo@retro-tracker.com','demo1234');navigate(from,{replace:true});}catch{}};
+
   const forgot = async (e: React.FormEvent) => { e.preventDefault(); setForgotLoading(true); setForgotMsg(''); try{const r=await apiRequest('/auth/forgot-password',{method:'POST',body:JSON.stringify({email:forgotEmail})});setForgotMsg(r.message);}catch{setForgotMsg('If the email exists, a reset link has been sent.');}finally{setForgotLoading(false);}};
 
   return (
@@ -40,7 +42,10 @@ const Login: React.FC = () => {
           <button type="button" className="auth-card__link-btn" onClick={()=>{setForgotOpen(true);setForgotMsg('');}}>Forgot password?</button>
         </p>
         <p className="auth-card__footer">Don't have an account? <Link to="/register">Create one</Link></p>
-        <div className="auth-card__demo"><span>Demo: alice@example.com / password123</span></div>
+        <div className="auth-card__demo">
+          <Button type="button" variant="ghost" onClick={demoLogin} loading={state.loading}>Demo Login</Button>
+          <span>demo@retro-tracker.com / demo1234</span>
+        </div>
       </div>
 
       <Modal open={forgotOpen} onClose={()=>setForgotOpen(false)} title="Reset Password">

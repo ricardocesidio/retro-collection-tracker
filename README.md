@@ -548,6 +548,9 @@ npx prisma db seed
 # Reset and re-seed:
 npx prisma migrate reset --force
 npx prisma db seed
+
+# Create demo account (clone of alice's data):
+npm run demo              # email: demo@retro-tracker.com / password: demo1234
 ```
 
 ---
@@ -556,11 +559,14 @@ npx prisma db seed
 
 | Username | Display Name | Email | Password | Location | Collection |
 |----------|-------------|-------|----------|----------|------------|
+| `demo_collector` | Demo Collector | demo@retro-tracker.com | demo1234 | São Paulo, Brazil | 12 games |
 | `retro_alice` | Alice | alice@example.com | password123 | São Paulo, Brazil | 12 games |
 | `bob_collector` | Bob | bob@example.com | password123 | New York, USA | 8 games |
 | `retro_charlie` | Charlie | charlie@example.com | password123 | Tokyo, Japan | 8 games |
 | `diana_gamer` | Diana | diana@example.com | password123 | London, UK | 7 games |
 | `admin` | Admin | admin@example.com | password123 | Seattle, USA | Admin access |
+
+> **One-click demo:** The login page has a **"Demo Login"** button that auto-fills `demo@retro-tracker.com` and signs you in instantly.
 
 ---
 
@@ -628,58 +634,62 @@ The `skipHtml` bypass function ensures page navigations are served by the SPA wh
 
 ## 📦 Deployment
 
-### Production Build
+### 🚀 Step-by-step (Vercel + Render + Neon — $0)
+
+#### 1. Database — Neon ([neon.tech](https://neon.tech))
 
 ```bash
-# Backend
-cd backend
-npm run build
-npm run start:prod     # Or use PM2 / Docker
-
-# Frontend
-cd frontend
-npm run build          # Output in frontend/dist/
-# Serve dist/ with nginx, caddy, or similar
+# Create a free account → new project → copy connection string
+# Then dump your local data and restore:
+bash scripts/deploy-db.sh
+pg_restore --no-owner --no-privileges -d "postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require" /tmp/retro_collection_dump.dump
 ```
 
-### Docker (recommended)
+#### 2. Backend — Render ([render.com](https://render.com))
 
-```dockerfile
-# Backend Dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npx prisma generate
-RUN npm run build
-EXPOSE 3000
-CMD ["node", "dist/main"]
+1. **New Web Service** → connect your GitHub repo
+2. **Settings:**
+   - **Name:** `retro-tracker-backend`
+   - **Runtime:** Node
+   - **Build Command:** `npm install && npx prisma generate && npm run build`
+   - **Start Command:** `npx prisma migrate deploy && npm run start:prod`
+   - **Health Check Path:** `/`
+3. **Environment Variables:**
+   - `DATABASE_URL` → your Neon connection string
+   - `JWT_SECRET` → a secure random string
+   - `RAWG_API_KEY` → your RAWG API key
+   - `CORS_ORIGIN` → `https://retro-collection-tracker.vercel.app`
+4. Deploy. Copy your URL: `https://retro-tracker-backend.onrender.com`
+
+#### 3. Frontend — Vercel ([vercel.com](https://vercel.com))
+
+1. **New Project** → import your GitHub repo
+2. **Root Directory:** `frontend`
+3. **Framework:** Vite
+4. **Environment Variables:**
+   - `VITE_API_URL` → `https://retro-tracker-backend.onrender.com`
+5. Deploy. Your URL: `https://retro-collection-tracker.vercel.app`
+
+#### 4. Update CORS
+
+In your Render dashboard, update `CORS_ORIGIN` to include your Vercel URL.
+
+#### 5. Update uploads proxy (optional)
+
+After deploying, update `frontend/vercel.json` with your actual Render URL:
+
+```json
+{ "source": "/uploads/(.*)", "destination": "https://YOUR-ACTUAL-RENDER-URL.onrender.com/uploads/$1" }
 ```
 
-### Nginx Configuration (frontend SPA)
+> The backend sleeps after 15 min of inactivity on Render's free tier. First visit after idle takes ~30s to wake up.
 
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    root /var/www/retro-collection-tracker/frontend/dist;
+### Alternative: Docker on VPS
 
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    location /api/ {
-        proxy_pass http://localhost:3000/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-    }
-}
+```bash
+# For full control on a $5/mo VPS (Hetzner, DigitalOcean)
+# TODO: docker-compose.yml with backend + frontend + PostgreSQL
 ```
-
----
 
 ## 📁 Project Structure
 
@@ -757,7 +767,7 @@ A: It's the average of all `personalRating` values from collection entries where
 A: Yes — when the XP system was added, existing user data was backfilled to award XP for their existing games, reviews, wishlists, and followers.
 
 **Q: How many demo users are there?**
-A: 10 accounts total: 5 seeded users (alice, bob, charlie, diana, admin) plus 5 registered demo traders (retro_elena, cart_finder, nes_hunter, game_master, pixel_queen).
+A: 11 accounts total: 6 seeded users (demo_collector, alice, bob, charlie, diana, admin) plus 5 registered demo traders (retro_elena, cart_finder, nes_hunter, game_master, pixel_queen).
 
 ---
 
