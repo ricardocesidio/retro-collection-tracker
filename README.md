@@ -9,6 +9,8 @@
 [![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?style=flat&logo=prisma)](https://www.prisma.io)
 [![Socket.IO](https://img.shields.io/badge/Socket.IO-4-010101?style=flat&logo=socket.io)](https://socket.io)
 [![RAWG](https://img.shields.io/badge/RAWG-API-662D91?style=flat)](https://rawg.io/apidocs)
+[![Vercel](https://img.shields.io/badge/Vercel-000?logo=vercel)](https://retro-collection-tracker.vercel.app)
+[![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=000)](https://retro-collection-tracker.onrender.com)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE)
 
 ---
@@ -587,6 +589,16 @@ RAWG_API_KEY="your-rawg-api-key"
 DONATE_RAISED=247
 DONATE_GOAL=500
 DONATE_SUPPORTERS=34
+
+# CORS (comma-separated origins)
+CORS_ORIGIN="http://localhost:5173,http://localhost:5174"
+
+# Cloudflare R2 — optional, enables persistent file storage
+# R2_ENDPOINT="https://<account>.r2.cloudflarestorage.com"
+# R2_ACCESS_KEY="..."
+# R2_SECRET_KEY="..."
+# R2_BUCKET="retro-collection"
+# R2_PUBLIC_URL="https://pub-xxxxx.r2.dev"
 ```
 
 ---
@@ -634,6 +646,15 @@ The `skipHtml` bypass function ensures page navigations are served by the SPA wh
 
 ## 📦 Deployment
 
+### 🔗 Live URLs
+
+| Service | URL | Platform |
+|---------|-----|----------|
+| **Frontend** | https://retro-collection-tracker.vercel.app | Vercel (free) |
+| **Backend** | https://retro-collection-tracker.onrender.com | Render (free) |
+| **Database** | Neon PostgreSQL (cloud) | Neon (free) |
+| **Warm-up** | cron-job.org (pings every 15min) | Free |
+
 ### 🚀 Step-by-step (Vercel + Render + Neon — $0)
 
 #### 1. Database — Neon ([neon.tech](https://neon.tech))
@@ -647,49 +668,68 @@ pg_restore --no-owner --no-privileges -d "postgresql://user:pass@ep-xxx.us-east-
 
 #### 2. Backend — Render ([render.com](https://render.com))
 
-1. **New Web Service** → connect your GitHub repo
-2. **Settings:**
-   - **Name:** `retro-tracker-backend`
-   - **Runtime:** Node
-   - **Build Command:** `npm install && npx prisma generate && npm run build`
-   - **Start Command:** `npx prisma migrate deploy && npm run start:prod`
-   - **Health Check Path:** `/`
-3. **Environment Variables:**
-   - `DATABASE_URL` → your Neon connection string
-   - `JWT_SECRET` → a secure random string
-   - `RAWG_API_KEY` → your RAWG API key
-   - `CORS_ORIGIN` → `https://retro-collection-tracker.vercel.app`
-4. Deploy. Copy your URL: `https://retro-tracker-backend.onrender.com`
+Create a **Web Service** with these settings:
+
+| Setting | Value |
+|---------|-------|
+| **Root Directory** | `backend` |
+| **Branch** | `main` |
+| **Runtime** | Node |
+| **Build Command** | `npm install && npx prisma generate && npm run build` |
+| **Start Command** | `npm run start:prod` |
+| **Health Check Path** | `/` |
+| **Plan** | Free |
+
+Environment variables:
+
+| Key | Value |
+|-----|-------|
+| `DATABASE_URL` | Your Neon connection string |
+| `JWT_SECRET` | Secure random string |
+| `RAWG_API_KEY` | `805cd8ace47e45b4bebf8fffe343560d` |
+| `CORS_ORIGIN` | `https://retro-collection-tracker.vercel.app,https://retro-collection-tracker.onrender.com` |
 
 #### 3. Frontend — Vercel ([vercel.com](https://vercel.com))
 
-1. **New Project** → import your GitHub repo
-2. **Root Directory:** `frontend`
-3. **Framework:** Vite
-4. **Environment Variables:**
-   - `VITE_API_URL` → `https://retro-tracker-backend.onrender.com`
-5. Deploy. Your URL: `https://retro-collection-tracker.vercel.app`
+| Setting | Value |
+|---------|-------|
+| **Root Directory** | `frontend` |
+| **Framework** | Vite |
+| **Build Command** | `npm run build` |
+| **Output Directory** | `dist` |
 
-#### 4. Update CORS
+Environment variables:
 
-In your Render dashboard, update `CORS_ORIGIN` to include your Vercel URL.
+| Key | Value |
+|-----|-------|
+| `VITE_API_URL` | `https://retro-collection-tracker.onrender.com` |
 
-#### 5. Update uploads proxy (optional)
+> Vercel also proxies `/uploads/*` requests to Render via `vercel.json` for avatar/cover images stored on disk.
 
-After deploying, update `frontend/vercel.json` with your actual Render URL:
+#### 4. Prevent sleep (free)
 
-```json
-{ "source": "/uploads/(.*)", "destination": "https://YOUR-ACTUAL-RENDER-URL.onrender.com/uploads/$1" }
-```
+Create a free account at [cron-job.org](https://cron-job.org) and set up a job:
 
-> The backend sleeps after 15 min of inactivity on Render's free tier. First visit after idle takes ~30s to wake up.
+| Setting | Value |
+|---------|-------|
+| **URL** | `https://retro-collection-tracker.onrender.com` |
+| **Interval** | Every 15 minutes |
 
-### Alternative: Docker on VPS
+This keeps the Render backend awake (free tier spins down after 15min of inactivity).
 
-```bash
-# For full control on a $5/mo VPS (Hetzner, DigitalOcean)
-# TODO: docker-compose.yml with backend + frontend + PostgreSQL
-```
+### 💾 File Storage
+
+Uploaded files (avatars, game covers, collection covers) are stored on **Render's local filesystem** via multer disk storage. They persist between normal usage but are **reset on each deploy** (Render free tier has ephemeral storage).
+
+The code includes a ready-to-use **Cloudflare R2** integration (`UploadService`) — set these env vars to enable persistent S3-compatible storage:
+
+| Key | Description |
+|-----|-------------|
+| `R2_ENDPOINT` | `https://<account>.r2.cloudflarestorage.com` |
+| `R2_ACCESS_KEY` | R2 API token access key |
+| `R2_SECRET_KEY` | R2 API token secret |
+| `R2_BUCKET` | `retro-collection` |
+| `R2_PUBLIC_URL` | Your bucket's public URL |
 
 ## 📁 Project Structure
 
@@ -711,6 +751,9 @@ retro-collection-tracker/
 │   │   ├── wishlist/              # Wishlist management
 │   │   ├── users/                 # User profiles
 │   │   ├── upload/                # File uploads (avatar, covers)
+│   │   │   ├── upload.controller.ts
+│   │   │   ├── upload.service.ts   # R2-ready S3 storage with local fallback
+│   │   │   └── upload.module.ts
 │   │   ├── admin/                 # Admin dashboard
 │   │   ├── xp/                    # XP system
 │   │   ├── config/                # Configuration module
@@ -719,7 +762,11 @@ retro-collection-tracker/
 │   ├── test/                      # E2E tests
 │   └── package.json
 │
+├── scripts/
+│   └── deploy-db.sh            # Database dump/restore helper
+│
 ├── frontend/
+│   ├── vercel.json              # SPA rewrites + uploads proxy
 │   ├── src/
 │   │   ├── pages/                 # 25 page components
 │   │   ├── components/
@@ -779,5 +826,5 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 <p align="center">
   Built with ❤️ for retro game collectors everywhere<br>
-  <sub>Last updated: May 2026</sub>
+  <sub>Last updated: May 2026 — Live at <a href="https://retro-collection-tracker.vercel.app">retro-collection-tracker.vercel.app</a></sub>
 </p>
