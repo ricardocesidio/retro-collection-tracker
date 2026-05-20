@@ -258,7 +258,7 @@ const AddGame: React.FC = () => {
                           <div className="addgame-card__info">
                             <span className="addgame-card__title">
                               <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{ext.title}</span>
-                              {ext.rating && (
+                              {ext.rating > 0 && (
                                 <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
                                   {ext.rating.toFixed(1)}
                                 </span>
@@ -319,7 +319,7 @@ const AddGame: React.FC = () => {
                       <div className="addgame-card__info">
                         <span className="addgame-card__title">
                           <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{ext.title}</span>
-                          {ext.rating && (
+                          {ext.rating > 0 && (
                             <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
                               {ext.rating.toFixed(1)}
                             </span>
