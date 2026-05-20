@@ -25,12 +25,16 @@
 [![NestJS](https://img.shields.io/badge/NestJS-11-EA2845?style=flat&logo=nestjs)](https://nestjs.com)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat&logo=vite)](https://vitejs.dev)
+[![React Router](https://img.shields.io/badge/React_Router-7-CA4245?style=flat&logo=reactrouter)](https://reactrouter.com)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql)](https://www.postgresql.org)
 [![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?style=flat&logo=prisma)](https://www.prisma.io)
 [![Socket.IO](https://img.shields.io/badge/Socket.IO-4-010101?style=flat&logo=socket.io)](https://socket.io)
 [![RAWG](https://img.shields.io/badge/RAWG-API-662D91?style=flat)](https://rawg.io/apidocs)
+[![JWT](https://img.shields.io/badge/JWT-000?style=flat&logo=jsonwebtokens)](https://jwt.io)
 [![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-000?logo=vercel)](https://retro-collection-tracker.vercel.app)
 [![Render](https://img.shields.io/badge/Deployed_on-Render-46E3B7?logo=render&logoColor=000)](https://retro-collection-tracker.onrender.com)
+[![Neon](https://img.shields.io/badge/Neon-00E599?style=flat&logo=neon)](https://neon.tech)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE)
 
 ---
