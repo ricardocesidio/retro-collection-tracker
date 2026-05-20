@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: retro-tracker-backend
+    name: retro-collection-tracker
     env: node
     region: frankfurt
     buildCommand: npm install && npx prisma generate && npm run build

@@ -89,9 +89,9 @@ Retro Collection Tracker is a production-grade web application designed for retr
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Frontend (Vite)                       │
+│                    Frontend (Vite / Vercel)               │
 │  React 19 + TypeScript + SCSS                            │
-│  Port 5173 (dev) / Static (prod)                         │
+│  Port 5173 (dev) / Vercel CDN (prod)                     │
 │                                                          │
 │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐   │
 │  │  Pages   │ │Components│ │ Services │ │  Hooks   │   │
@@ -101,10 +101,9 @@ Retro Collection Tracker is a production-grade web application designed for retr
                        │ HTTP + WebSocket
                        ▼
 ┌─────────────────────────────────────────────────────────┐
-│               Vite Proxy (vite.config.ts)                 │
-│  /games, /auth, /collections, /messages, /trade, ...     │
-│  → proxies API calls to backend, serves SPA for HTML      │
-└──────────────────────┬──────────────────────────────────┘
+│            Vite Proxy (dev) / Direct API (prod)          │
+│  Dev: proxies to localhost:3000                          │
+│  Production: VITE_API_URL → Render backend               │
                        │
 ┌─────────────────────────────────────────────────────────┐
 │                    Backend (NestJS)                       │
@@ -385,6 +384,20 @@ PENDING → ACCEPTED → SHIPPED → COMPLETED
 | GET | `/users/:userId/following` | ❌ | Following list |
 | GET | `/activity` | ✅ | User activity feed |
 
+### Notifications (`/notifications`)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/notifications` | ✅ | List notifications |
+| GET | `/notifications/unread-count` | ✅ | Unread notification count |
+| POST | `/notifications/:id/read` | ✅ | Mark notification as read |
+| POST | `/notifications/read-all` | ✅ | Mark all as read |
+
+### Notification Preferences (`/notification-preferences`)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/notification-preferences` | ✅ | Get preferences |
+| PUT | `/notification-preferences` | ✅ | Update preferences |
+
 ### Stats (`/stats`)
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
@@ -580,7 +593,7 @@ npm run demo              # email: demo@retro-tracker.com / password: demo1234
 ### Backend (`backend/.env`)
 ```env
 # Database
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/retro_collection_tracker"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/retro_collection_tracker?schema=public"
 
 # JWT
 JWT_SECRET="your-secure-random-string-here"
