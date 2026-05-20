@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState/EmptyState';
 import { catalogApi } from '../../services/collections';
@@ -19,13 +20,15 @@ const Platforms: React.FC = () => {
       {platforms.length === 0 ? <EmptyState icon="🕹️" title="No platforms" /> : (
         <div className="page-grid">
           {platforms.map((p) => (
-            <div key={p.id} className="panel" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '1.25rem' }}>
-              <div style={{ fontSize: '1.5rem' }}>🕹️</div>
-              <h3 style={{ fontSize: '1.0625rem', fontWeight: 600 }}>{p.name}</h3>
-              <p style={{ fontSize: '0.8125rem', color: '#94a3b8' }}>
-                {[p.manufacturer, p.releaseYear && `Released ${p.releaseYear}`].filter(Boolean).join(' · ') || 'Classic platform'}
-              </p>
-            </div>
+            <Link key={p.id} to={`/explore?search=${encodeURIComponent(p.name)}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className="panel" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '1.25rem', cursor: 'pointer' }}>
+                <div style={{ fontSize: '1.5rem' }}>🕹️</div>
+                <h3 style={{ fontSize: '1.0625rem', fontWeight: 600 }}>{p.name}</h3>
+                <p style={{ fontSize: '0.8125rem', color: '#94a3b8' }}>
+                  {[p.manufacturer, p.releaseYear && `Released ${p.releaseYear}`].filter(Boolean).join(' · ') || 'Classic platform'}
+                </p>
+              </div>
+            </Link>
           ))}
         </div>
       )}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../../components/ui/Button/Button';
 import Input from '../../components/ui/Input/Input';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner';
@@ -34,7 +34,9 @@ interface SearchResponse {
 
 const Explore: React.FC = () => {
   const navigate = useNavigate();
-  const [search, setSearch] = useState('');
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+  const [search, setSearch] = useState(initialSearch);
   const debounce = useDebounce(search, 300);
   const [page, setPage] = useState(1);
   const [results, setResults] = useState<ExternalGameResult[]>([]);
