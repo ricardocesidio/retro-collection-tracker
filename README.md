@@ -2,6 +2,26 @@
 
 > **A full-stack retro game collection management platform** — track your physical game collection, discover new titles via RAWG, trade with collectors worldwide, earn XP, and connect with a community of retro gaming enthusiasts.
 
+<div align="center">
+  <a href="https://retro-collection-tracker.vercel.app">
+    <img src="https://img.shields.io/badge/LIVE_DEMO-000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" />
+  </a>
+  &nbsp;
+  <a href="https://github.com/ricardocesidio/retro-collection-tracker">
+    <img src="https://img.shields.io/badge/SOURCE_CODE-181717?style=for-the-badge&logo=github&logoColor=white" alt="Source Code" />
+  </a>
+</div>
+
+<br>
+
+| Frontend | Backend | Database | Real-time | Auth |
+|----------|---------|----------|-----------|------|
+| React 19 + TypeScript + Vite | NestJS 11 + Prisma 6 | PostgreSQL 16 | Socket.IO 4 | JWT + bcryptjs |
+
+> **Demo login:** Click the **"Demo Login"** button on the sign-in page — instantly explore collections, trades, messages, and reviews as a real collector.
+
+<br>
+
 [![NestJS](https://img.shields.io/badge/NestJS-11-EA2845?style=flat&logo=nestjs)](https://nestjs.com)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org)
@@ -9,9 +29,17 @@
 [![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?style=flat&logo=prisma)](https://www.prisma.io)
 [![Socket.IO](https://img.shields.io/badge/Socket.IO-4-010101?style=flat&logo=socket.io)](https://socket.io)
 [![RAWG](https://img.shields.io/badge/RAWG-API-662D91?style=flat)](https://rawg.io/apidocs)
-[![Vercel](https://img.shields.io/badge/Vercel-000?logo=vercel)](https://retro-collection-tracker.vercel.app)
-[![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=000)](https://retro-collection-tracker.onrender.com)
+[![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-000?logo=vercel)](https://retro-collection-tracker.vercel.app)
+[![Render](https://img.shields.io/badge/Deployed_on-Render-46E3B7?logo=render&logoColor=000)](https://retro-collection-tracker.onrender.com)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE)
+
+---
+
+## 📸 Showcase
+
+> Coming from a frontend-only project? This full-stack evolution adds a NestJS backend, PostgreSQL database, real-time WebSocket communication, and a complete REST API — all while maintaining the same visual polish and component architecture.
+
+**Previous work:** [Retro Gaming Marketplace](https://retro-gaming-cyan.vercel.app) — a 17-page frontend SPA built with React 18, React Router, Context API, and localStorage persistence.
 
 ---
 
