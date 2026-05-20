@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
+import compression from 'compression';
 import { json, urlencoded } from 'express';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
@@ -19,6 +20,9 @@ async function bootstrap() {
   const uploadDir = join(process.cwd(), 'uploads');
   if (!existsSync(uploadDir)) mkdirSync(uploadDir, { recursive: true });
   app.useStaticAssets(uploadDir, { prefix: '/uploads' });
+
+  // Gzip compression
+  app.use(compression());
 
   // Security headers
   app.use(helmet());
@@ -56,49 +60,53 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger documentation
-  const config = new DocumentBuilder()
-    .setTitle('Retro Collection Tracker API')
-    .setDescription(
-      'API for managing retro game collections, users, reviews, and social features',
-    )
-    .setVersion('1.0')
-    .addTag('auth', 'Authentication endpoints')
-    .addTag('users', 'User management')
-    .addTag('games', 'Game catalog')
-    .addTag('collections', 'User collections')
-    .addTag('wishlist', 'Wishlist management')
-    .addTag('reviews', 'Game reviews')
-    .addTag('social', 'Follow/unfollow functionality')
-    .addTag('notifications', 'Notification system')
-    .addTag('notification-preferences', 'Notification preferences')
-    .addTag('activity', 'User activity feed')
-    .addTag('stats', 'Collection statistics')
-    .addTag('admin', 'Admin-only endpoints')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
+  // Swagger (dev only — skip in production for faster startup)
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('Retro Collection Tracker API')
+      .setDescription(
+        'API for managing retro game collections, users, reviews, and social features',
+      )
+      .setVersion('1.0')
+      .addTag('auth', 'Authentication endpoints')
+      .addTag('users', 'User management')
+      .addTag('games', 'Game catalog')
+      .addTag('collections', 'User collections')
+      .addTag('wishlist', 'Wishlist management')
+      .addTag('reviews', 'Game reviews')
+      .addTag('social', 'Follow/unfollow functionality')
+      .addTag('notifications', 'Notification system')
+      .addTag('notification-preferences', 'Notification preferences')
+      .addTag('activity', 'User activity feed')
+      .addTag('stats', 'Collection statistics')
+      .addTag('admin', 'Admin-only endpoints')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          name: 'JWT',
+          description: 'Enter JWT token',
+          in: 'header',
+        },
+        'JWT-auth',
+      )
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api-docs', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
       },
-      'JWT-auth',
-    )
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api-docs', app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
-  });
+    });
+  }
 
   const port = configService.get<number>('PORT') ?? 3000;
   await app.listen(port);
   console.log(`Server running on http://localhost:${port}`);
-  console.log(
-    `API documentation available at http://localhost:${port}/api-docs`,
-  );
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(
+      `API documentation available at http://localhost:${port}/api-docs`,
+    );
+  }
 }
 bootstrap();
