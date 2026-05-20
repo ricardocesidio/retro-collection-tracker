@@ -104,6 +104,7 @@ Retro Collection Tracker is a production-grade web application designed for retr
 │            Vite Proxy (dev) / Direct API (prod)          │
 │  Dev: proxies to localhost:3000                          │
 │  Production: VITE_API_URL → Render backend               │
+└──────────────────────┬──────────────────────────────────┘
                        │
 ┌─────────────────────────────────────────────────────────┐
 │                    Backend (NestJS)                       │
