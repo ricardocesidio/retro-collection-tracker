@@ -35,14 +35,6 @@
 
 ---
 
-## 📸 Showcase
-
-> Coming from a frontend-only project? This full-stack evolution adds a NestJS backend, PostgreSQL database, real-time WebSocket communication, and a complete REST API — all while maintaining the same visual polish and component architecture.
-
-**Previous work:** [Retro Gaming Marketplace](https://retro-gaming-cyan.vercel.app) — a 17-page frontend SPA built with React 18, React Router, Context API, and localStorage persistence.
-
----
-
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
