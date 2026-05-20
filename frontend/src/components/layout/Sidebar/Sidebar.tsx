@@ -31,10 +31,6 @@ const Sidebar: React.FC = () => {
       { icon:'fa-solid fa-compass', label:'Explore', path:'/explore' },
       { icon:'fa-solid fa-bookmark', label:'Reviews', path:'/reviews' },
     ]},
-    { label: 'Discover', items: [
-      { icon:'fa-solid fa-gamepad', label:'Platforms', path:'/platforms' },
-      { icon:'fa-solid fa-tag', label:'Genres', path:'/genres' },
-    ]},
     { label: 'Social', items: [
       { icon:'fa-solid fa-clock', label:'Activity', path:'/activity' },
       { icon:'fa-solid fa-envelope', label:'Messages', path:'/messages' },
