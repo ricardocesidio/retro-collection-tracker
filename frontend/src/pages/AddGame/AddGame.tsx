@@ -258,10 +258,12 @@ const AddGame: React.FC = () => {
                           <div className="addgame-card__info">
                             <span className="addgame-card__title">
                               <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{ext.title}</span>
-                              {ext.rating > 0 && (
+                              {ext.rating > 0 ? (
                                 <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`}>
                                   {ext.rating.toFixed(1)}
                                 </span>
+                              ) : (
+                                <span className="ra-card__score ra-card__score--low">0.0</span>
                               )}
                             </span>
                             {ext.platform && <span className="addgame-card__meta">{ext.platform}{ext.releaseYear ? ` · ${ext.releaseYear}` : ''}</span>}

@@ -171,11 +171,9 @@ const Explore: React.FC = () => {
                 <div className="game-card-new__body">
                   <h3 className="game-card-new__title">
                     <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{ext.title}</span>
-                    {ext.rating > 0 && (
-                      <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`} title="RAWG Rating">
-                        {ext.rating.toFixed(1)}
-                      </span>
-                    )}
+                    <span className={`ra-card__score ra-card__score--${ext.rating >= 4 ? 'high' : ext.rating >= 3 ? 'mid' : 'low'}`} title="RAWG Rating">
+                      {ext.rating > 0 ? ext.rating.toFixed(1) : '0.0'}
+                    </span>
                   </h3>
                   <p className="game-card-new__meta">
                     {ext.platform || 'Multi-platform'}
