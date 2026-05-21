@@ -128,7 +128,7 @@ const Messages: React.FC = () => {
       {error && <div style={{ marginBottom: '1rem' }}><Alert variant="danger">{error}</Alert></div>}
       {success && <div style={{ marginBottom: '1rem' }}><Alert variant="success">{success}</Alert></div>}
       <div className="msg-layout">
-        <div className="msg-sidebar">
+        <div className={`msg-sidebar${activeConvo ? ' msg-sidebar--hidden' : ''}`}>
           {convos.length === 0 ? (
             <p style={{ color: '#5a6480', fontSize: '0.825rem', textAlign: 'center', padding: '2rem 0' }}>No conversations yet</p>
           ) : (
@@ -150,12 +150,14 @@ const Messages: React.FC = () => {
             ))
           )}
         </div>
-        <div className="msg-main">
+        <div className={`msg-main${!activeConvo ? ' msg-main--hidden' : ''}`}>
           {activeConvo ? (
             <>
               <div className="msg-chat-header">
-                {activeUser ? <Link to={`/profile/${activeUser.username}`} className="msg-chat-name">{activeUser?.displayName || activeUser?.username}</Link> : <span className="msg-chat-name">{activeUser?.displayName || activeUser?.username || 'Chat'}</span>}
-                <div className="msg-chat-actions">
+                <div className="msg-chat-header__left">
+                  <button className="msg-back-btn" onClick={() => setActiveConvo(null)} title="Back"><i className="fa-solid fa-arrow-left" /></button>
+                  {activeUser ? <Link to={`/profile/${activeUser.username}`} className="msg-chat-name">{activeUser?.displayName || activeUser?.username}</Link> : <span className="msg-chat-name">{activeUser?.displayName || activeUser?.username || 'Chat'}</span>}
+                </div>
                   {isBlocked ? (
                     <button className="msg-action-btn msg-action-btn--unblock" onClick={() => handleUnblock(activeConvo)} title="Unblock"><i className="fa-solid fa-check" /> Unblock</button>
                   ) : (
