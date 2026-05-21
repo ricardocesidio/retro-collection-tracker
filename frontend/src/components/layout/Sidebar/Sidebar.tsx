@@ -54,10 +54,10 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
+      {open && <div className="sidebar-overlay" onClick={() => setOpen(false)}/>}
       <button className="sidebar-hamburger" onClick={() => setOpen(!open)} aria-label="Toggle menu" aria-expanded={open}>
         <span/><span/><span/>
       </button>
-      {open && <div className="sidebar-overlay" onClick={() => setOpen(false)}/>}
       <aside className={`sidebar${open ? ' sidebar--open' : ''}`}>
         <Link to="/dashboard" className="sidebar__brand">
         </Link>
