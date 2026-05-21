@@ -406,7 +406,7 @@
 .msg-chat-header__left{display:flex;align-items:center;gap:$sp2}
 .msg-back-btn{display:none;width:32px;height:32px;border-radius:$r1;background:$s2;border:1px solid $b1;color:$t2;font-size:.85rem;@include fc;cursor:pointer;transition:all $fast}.msg-back-btn:hover{background:$s3;border-color:$a1;color:$a2}
 
-@media(max-width:768px){.msg-page{display:flex;flex-direction:column;min-height:0}.msg-layout{flex:1;min-height:0;grid-template-columns:1fr;height:auto}.msg-sidebar--hidden{display:none}.msg-main--hidden{display:none}.msg-back-btn{display:flex}.msg-chat-header__left{gap:.5rem}.msg-main{flex:1;min-height:0;display:flex;flex-direction:column;height:auto}.msg-list{flex:1;overflow-y:auto;max-height:none}}
+@media(max-width:768px){.msg-page{display:flex;flex-direction:column;padding-bottom:0}.msg-page .msg-layout{flex:1;min-height:0;grid-template-columns:1fr}.msg-sidebar--hidden{display:none}.msg-main--hidden{display:none}.msg-back-btn{display:flex}.msg-chat-header__left{gap:.5rem}.msg-page .msg-main{flex:1;min-height:0;display:flex;flex-direction:column}.msg-list{flex:1;overflow-y:auto;max-height:none}}
 @keyframes msgFade {
   from { opacity: 0; }
   to { opacity: 1; }
