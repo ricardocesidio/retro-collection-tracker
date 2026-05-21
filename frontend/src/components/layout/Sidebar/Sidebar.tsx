@@ -54,13 +54,14 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      {open && <div className="sidebar-overlay" onClick={() => setOpen(false)}/>}
+      {open && <div className="sidebar-overlay" />}
       <button className="sidebar-hamburger" onClick={() => setOpen(!open)} aria-label="Toggle menu" aria-expanded={open}>
         <span/><span/><span/>
       </button>
       <aside className={`sidebar${open ? ' sidebar--open' : ''}`}>
         <Link to="/dashboard" className="sidebar__brand">
         </Link>
+        <button className="sidebar__close" onClick={() => setOpen(false)} aria-label="Close menu"><i className="fa-solid fa-xmark" /></button>
         <nav className="sidebar__nav">
           {sections.map((s) => (
             <div key={s.label} className="sidebar__section">
