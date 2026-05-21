@@ -291,4 +291,4 @@
   from { opacity: 0; transform: translateY(12px) scale(.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
-@media(max-width:768px){.chat-widget{bottom:80px}}
+@media(max-width:768px){.chat-widget{bottom:80px;right:12px}.chat-widget__toggle{width:42px;height:42px;font-size:.85rem}.chat-widget__box{width:300px;right:0}.chat-widget__input{font-size:.75rem}}
