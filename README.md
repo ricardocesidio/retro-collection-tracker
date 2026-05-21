@@ -107,6 +107,15 @@ Retro Collection Tracker is a production-grade web application designed for retr
 | Passport | — | JWT authentication strategy |
 | bcryptjs | — | Password hashing |
 | class-validator | — | DTO validation |
+| compression | — | Gzip response compression |
+
+### Infrastructure
+| Platform | Purpose | Cost |
+|----------|---------|------|
+| **Vercel** | Frontend hosting (SPA) | Free |
+| **Render** | Backend hosting (NestJS) | Free |
+| **Neon** | PostgreSQL database | Free |
+| **cron-job.org** | Backend warm-up (prevents sleep) | Free |
 
 ### External APIs
 | API | Purpose | Integration |
@@ -232,8 +241,9 @@ PENDING → ACCEPTED → SHIPPED → COMPLETED
 ### 💬 Real-time Chat
 
 - **WebSocket-powered** — instant message delivery via Socket.IO
-- **Chat Widget** — floating bubble in bottom-right corner (LinkedIn-style)
+- **Chat Widget** — floating bubble in bottom-right corner (LinkedIn-style), only visible when logged in
 - **Full Messages page** — `/messages` with conversation sidebar
+- **Mobile responsive** — full-width chat with back navigation on mobile
 - **Image sharing** — send photos via camera button
 - **Moderation** — block, unblock, report users
 - **Unread counts** — badge on bell icon updates in real-time
@@ -294,9 +304,26 @@ PENDING → ACCEPTED → SHIPPED → COMPLETED
 - Mark individual or all as read
 - Notification preferences (email, push, follows, reviews, wishlist)
 
----
+### 📱 Mobile Responsive Design
 
-## 📄 Pages
+- **Bottom navigation bar** — action icons (messages, wishlist, add, notifications, trade) in a fixed bottom bar on mobile
+- **Collapsible sidebar** — hamburger menu with overlay, slides in from the left
+- **Responsive grids** — 2-column layouts on mobile for collections, wishlist, explore
+- **Compact cards** — smaller images, badges, and buttons on mobile
+- **Adaptive topbar** — search bar moves below profile on mobile
+- **Touch-friendly** — scrollable horizontal wishlist, swipe-friendly layouts
+- **Messages page** — conversation list/chat view switches based on selection
+- **All pages mobile-tested** — dashboard, profile, settings, leaderboard, trade, and more
+
+### ⚡ Performance Optimizations
+
+- **Gzip compression** — all API responses compressed via middleware
+- **Swagger disabled in production** — faster cold starts on Render
+- **Cache headers** — JS/CSS/fonts cached for 1 year on Vercel (immutable)
+- **Lazy loading** — all pages code-split with React.lazy
+- **Monorepo workspaces** — npm workspaces for coordinated builds
+
+---
 
 | # | Page | Route | Auth | Description |
 |---|------|-------|------|-------------|
@@ -679,13 +706,14 @@ npm run build             # Production build
 
 ### Proxy Configuration
 
-The frontend dev server proxies API calls to the backend via `vite.config.ts`:
+The frontend dev server proxies API calls and WebSocket connections to the backend via `vite.config.ts`:
 
 ```typescript
-// API paths proxied to localhost:3000
+// API and WebSocket paths proxied to localhost:3000
 '/games', '/auth', '/collections', '/trade', '/messages',
 '/wishlist', '/reviews', '/users', '/follow', '/notifications',
-'/activity', '/stats', '/admin', '/upload'
+'/activity', '/stats', '/admin', '/upload',
+'/ws', '/socket.io'  // WebSocket
 ```
 
 The `skipHtml` bypass function ensures page navigations are served by the SPA while API calls are forwarded to the backend.
@@ -825,9 +853,10 @@ retro-collection-tracker/
 │   └── deploy-db.sh            # Database dump/restore helper
 │
 ├── frontend/
-│   ├── vercel.json              # SPA rewrites + uploads proxy
+│   ├── vercel.json              # SPA rewrites + uploads proxy + cache headers
 │   ├── .env                     # Dev VITE_API_URL (empty → uses Vite proxy)
 │   ├── .env.production          # Production VITE_API_URL (overridden by Vercel env)
+│   ├── vite.config.ts           # Vite config with proxy rules + WebSocket support
 │   ├── src/
 │   │   ├── pages/                 # 25 page components
 │   │   ├── components/
@@ -845,7 +874,7 @@ retro-collection-tracker/
 │   │   │   │   ├── Alert/
 │   │   │   │   ├── LoadingSpinner/
 │   │   │   │   └── EmptyState/
-│   │   │   └── layout/           # AppLayout, Sidebar, TopBar
+│   │   │   └── layout/           # AppLayout, Sidebar, TopBar, MobileBottomNav
 │   │   ├── services/              # API clients
 │   │   ├── hooks/                 # Custom React hooks
 │   │   ├── context/               # AuthContext
