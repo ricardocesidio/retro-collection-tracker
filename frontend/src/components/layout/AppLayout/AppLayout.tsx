@@ -3,9 +3,11 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import TopBar from '../TopBar/TopBar';
 import ChatWidget from '../../ui/ChatWidget/ChatWidget';
+import { useAuth } from '../../../context/AuthContext';
 import './AppLayout.scss';
 
 const AppLayout: React.FC = () => {
+  const { state } = useAuth();
   const [visible, setVisible] = useState(false);
   useEffect(() => { requestAnimationFrame(() => setVisible(true)); }, []);
 
@@ -16,7 +18,7 @@ const AppLayout: React.FC = () => {
       <main className={`app-layout__content${visible ? ' app-layout__content--visible' : ''}`}>
         <Outlet />
       </main>
-      <ChatWidget />
+      {state.user && <ChatWidget />}
     </div>
   );
 };
