@@ -22,7 +22,7 @@ const Wishlist: React.FC = () => {
   const remove =async(id:string)=>{setRemoving(id);try{await wishlistApi.remove(id);setItems((p)=>p.filter((i)=>i.id!==id));}catch(e:any){setError(e.message);}finally{setRemoving(null);}};
 
   return (
-    <div className="page-shell">
+    <div className="page-shell page-shell--wishlist">
       <div className="page-shell-header">
         <div><h1 className="page-title">Wishlist</h1><p className="page-sub">{items.length} games you want to collect</p></div>
         <div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
