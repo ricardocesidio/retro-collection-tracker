@@ -112,7 +112,7 @@ const Explore: React.FC = () => {
   const totalPages = Math.ceil(total / 20);
 
   return (
-    <div className="page-shell">
+    <div className="page-shell page-shell--explore">
       {error && <div style={{ marginBottom: '1rem' }}><Alert variant="danger">{error}</Alert></div>}
       <section className="explore-hero">
         <h1 className="explore-hero__title">Explore the Catalog</h1>
