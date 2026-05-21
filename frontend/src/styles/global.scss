@@ -1,6 +1,6 @@
 @use 'variables' as *;@use 'mixins' as *;
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:17px;zoom:.8}
+html{font-size:17px}
 body{font-family:$font;font-size:$tbs;font-weight:$w4;line-height:1.6;color:$t1;background:#000;min-height:100vh;-webkit-font-smoothing:antialiased;@include scr}
 #root{min-height:100vh;background:#000}
 a{color:$a2;text-decoration:none}a:hover{color:$a1}
