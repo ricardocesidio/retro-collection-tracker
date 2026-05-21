@@ -231,9 +231,8 @@ const Messages: React.FC = () => {
             <div className="msg-modal__actions">
               <Button variant="ghost" onClick={() => { setShowReport(false); setReportReason(''); setReportText(''); }}>Cancel</Button>
               <Button variant="danger" onClick={handleReport} disabled={!reportReason || (reportReason === 'Other' && !reportText.trim())}>Submit Report</Button>
-            </div>
-          </div>
-        </div>
+                </div>
+              </div>
       )}
 
       <ConfirmDialog
