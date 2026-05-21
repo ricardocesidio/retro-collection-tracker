@@ -29,15 +29,15 @@ const MobileBottomNav: React.FC = () => {
       <Link to="/wishlist" className="mobile-bottom-nav__btn" title="Wishlist">
         <i className="fa-solid fa-star" />
       </Link>
-      <Link to="/trade" className="mobile-bottom-nav__btn" title="Trade Requests">
-        <i className="fa-solid fa-handshake" />
+      <Link to="/add-game" className="mobile-bottom-nav__btn" title="Add to Collection">
+        <i className="fa-solid fa-plus" />
       </Link>
       <Link to="/notifications" className="mobile-bottom-nav__btn" title="Notifications">
         <i className="fa-solid fa-bell" />
         {count > 0 && <span className="mobile-bottom-nav__badge">{count > 99 ? '99+' : count}</span>}
       </Link>
-      <Link to="/add-game" className="mobile-bottom-nav__btn" title="Add to Collection">
-        <i className="fa-solid fa-plus" />
+      <Link to="/trade" className="mobile-bottom-nav__btn" title="Trade Requests">
+        <i className="fa-solid fa-handshake" />
       </Link>
     </nav>
   );
