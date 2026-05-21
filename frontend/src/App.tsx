@@ -41,10 +41,10 @@ const App: React.FC = () => {
     <ErrorBoundary>
       <AuthProvider>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
           <Route element={<AppLayout />}>
             <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<ProtectedRoute><LazyRoute><Dashboard /></LazyRoute></ProtectedRoute>} />
             <Route path="/collection" element={<ProtectedRoute><LazyRoute><Collection /></LazyRoute></ProtectedRoute>} />
             <Route path="/wishlist" element={<ProtectedRoute><LazyRoute><Wishlist /></LazyRoute></ProtectedRoute>} />
