@@ -158,13 +158,13 @@ const Messages: React.FC = () => {
                   <button className="msg-back-btn" onClick={() => setActiveConvo(null)} title="Back"><i className="fa-solid fa-arrow-left" /></button>
                   {activeUser ? <Link to={`/profile/${activeUser.username}`} className="msg-chat-name">{activeUser?.displayName || activeUser?.username}</Link> : <span className="msg-chat-name">{activeUser?.displayName || activeUser?.username || 'Chat'}</span>}
                 </div>
-                  {isBlocked ? (
+                   {isBlocked ? (
                     <button className="msg-action-btn msg-action-btn--unblock" onClick={() => handleUnblock(activeConvo)} title="Unblock"><i className="fa-solid fa-check" /> Unblock</button>
                   ) : (
-                    <>
+                    <div className="msg-chat-actions">
                       <button className="msg-action-btn msg-action-btn--block" onClick={() => setBlockTarget(activeConvo)} title="Block"><i className="fa-solid fa-ban" /></button>
                       <button className="msg-action-btn msg-action-btn--report" onClick={() => setShowReport(true)} title="Report"><i className="fa-solid fa-flag" /></button>
-                    </>
+                    </div>
                   )}
                 </div>
               {isBlocked && <div className="msg-blocked-banner"><i className="fa-solid fa-lock" /> You blocked {activeUser?.displayName || activeUser?.username}. <button onClick={() => handleUnblock(activeConvo)}>Unblock</button> to message again.</div>}
