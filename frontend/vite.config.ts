@@ -15,6 +15,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
+      '/ws': { target: 'http://localhost:3000', ws: true },
+      '/socket.io': { target: 'http://localhost:3000', ws: true },
       '/uploads': { target: 'http://localhost:3000', bypass: skipHtml },
       '/upload': { target: 'http://localhost:3000', bypass: skipHtml },
       '/games': { target: 'http://localhost:3000', bypass: skipHtml },
