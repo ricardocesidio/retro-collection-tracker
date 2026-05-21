@@ -52,10 +52,6 @@ const Messages: React.FC = () => {
     return () => { socket.off('message:new', handler); };
   }, []);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
   const send = async (imageUrl?: string) => {
     if ((!input.trim() && !imageUrl) || !activeConvo || sending) return;
     if (blockedUsers.includes(activeConvo)) { setError('You cannot message a blocked user.'); return; }
