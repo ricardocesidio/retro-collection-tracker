@@ -176,4 +176,34 @@
       margin-top: 0 !important;
     }
   }
+
+  .lb-rest {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $sp2;
+
+    .lb-row {
+      flex-direction: column;
+      text-align: center;
+      padding: $sp2;
+      gap: $sp1;
+    }
+
+    .lb-row__name {
+      flex: none;
+      font-size: .75rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+    }
+
+    .lb-row__games, .lb-row__value {
+      font-size: .65rem;
+    }
+
+    .lb-row__rank {
+      width: auto;
+    }
+  }
 }
