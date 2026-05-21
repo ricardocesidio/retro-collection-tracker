@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import TopBar from '../TopBar/TopBar';
+import MobileBottomNav from '../MobileBottomNav/MobileBottomNav';
 import ChatWidget from '../../ui/ChatWidget/ChatWidget';
 import { useAuth } from '../../../context/AuthContext';
 import './AppLayout.scss';
@@ -19,6 +20,7 @@ const AppLayout: React.FC = () => {
         <Outlet />
       </main>
       {state.user && <ChatWidget />}
+      <MobileBottomNav />
     </div>
   );
 };
