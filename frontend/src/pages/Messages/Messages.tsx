@@ -162,8 +162,8 @@ const Messages: React.FC = () => {
                     <button className="msg-action-btn msg-action-btn--unblock" onClick={() => handleUnblock(activeConvo)} title="Unblock"><i className="fa-solid fa-check" /> Unblock</button>
                   ) : (
                     <>
-                      <button className="msg-action-btn msg-action-btn--report" onClick={() => setShowReport(true)} title="Report"><i className="fa-solid fa-flag" /></button>
                       <button className="msg-action-btn msg-action-btn--block" onClick={() => setBlockTarget(activeConvo)} title="Block"><i className="fa-solid fa-ban" /></button>
+                      <button className="msg-action-btn msg-action-btn--report" onClick={() => setShowReport(true)} title="Report"><i className="fa-solid fa-flag" /></button>
                     </>
                   )}
                 </div>
