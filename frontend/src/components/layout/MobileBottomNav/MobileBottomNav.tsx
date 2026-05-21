@@ -10,9 +10,9 @@ const MobileBottomNav: React.FC = () => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    notificationsApi.getUnreadCount().then((r: any) => setCount(r.count || 0)).catch(() => {});
     const token = localStorage.getItem('token');
     if (!token) return;
+    notificationsApi.getUnreadCount().then((r: any) => setCount(r.count || 0)).catch(() => {});
     const socket = connectSocket(token);
     const handler = (data: { count: number }) => setCount(data.count);
     socket.on('notification:unread', handler);
