@@ -96,6 +96,7 @@ const Collection: React.FC = () => {
                 <div className="game-card-new__img">
                   <img src={item.game.coverImageUrl||`https://placehold.co/400x300/181c28/f1f5f9?text=${encodeURIComponent(item.game.title.slice(0,6))}`} alt="" loading="lazy"/>
                   <span className="game-card-new__condition">{item.condition.replace('_',' ')}</span>
+                  <button className="game-card-new__delete-btn" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmRemove(item.id); }} title="Remove from collection"><i className="fa-solid fa-trash-can" /></button>
                 </div>
                 <div className="game-card-new__body">
                   <h3 className="game-card-new__title">
@@ -104,9 +105,6 @@ const Collection: React.FC = () => {
                   {!item.personalRating && item.game.rawgRating ? <span className={`ra-card__score ra-card__score--${item.game.rawgRating >= 4 ? 'high' : item.game.rawgRating >= 3 ? 'mid' : 'low'}`} title="RAWG Rating">{item.game.rawgRating.toFixed(1)}</span> : null}
                   </h3>
                   <p className="game-card-new__meta">{item.game.platform.name} · {item.game.genre.name}</p>
-                </div>
-                <div className="game-card-new__actions" onClick={(e) => e.preventDefault()}>
-                  <Button variant="ghost" size="sm" onClick={() => setConfirmRemove(item.id)}>Remove</Button>
                 </div>
               </div>
             </Link>
