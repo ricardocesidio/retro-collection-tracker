@@ -24,4 +24,4 @@ h1{font-size:$t3x;font-weight:$w8;line-height:1.1;letter-spacing:-.02em}h2{font-
 @keyframes amb{0%{opacity:.7}100%{opacity:1}}
 @keyframes blb{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(80px,-40px) scale(1.15)}66%{transform:translate(-50px,50px) scale(.85)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:0s!important}}
-@media(max-width:768px){.page-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.page-shell{padding:$sp6 $sp3}}
+@media(max-width:768px){.page-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.page-shell{padding:$sp6 $sp3}.game-card-new__condition{font-size:.6rem;padding:2px 8px;top:6px;left:6px}.game-card-new__actions{padding:.5rem .75rem;gap:.375rem}.game-card-new__title{font-size:.75rem}.game-card-new__meta{font-size:.6rem}.game-card-new__body{padding:.5rem .625rem}}@media(max-width:480px){.game-card-new__title{font-size:.65rem}.game-card-new__meta{font-size:.55rem}}
