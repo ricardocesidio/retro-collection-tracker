@@ -6,11 +6,11 @@
 }
 
 .lb-podium {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
   gap: $sp4;
   margin-bottom: $sp6;
-  align-items: end;
 
   &__card {
     display: flex;
@@ -26,6 +26,8 @@
     transition: all $fast;
     position: relative;
     overflow: hidden;
+    flex: 1;
+    max-width: 220px;
 
     &::before {
       content: '';
@@ -41,9 +43,21 @@
       transform: translateY(-2px);
     }
 
-    &:nth-child(2) { margin-top: $sp6; }
-    &:nth-child(1) { margin-top: 0; }
-    &:nth-child(3) { margin-top: $sp6; }
+    &:nth-child(1) {
+      order: 2;
+      margin-top: 0;
+      padding-top: $sp8;
+    }
+
+    &:nth-child(2) {
+      order: 1;
+      margin-top: 40px;
+    }
+
+    &:nth-child(3) {
+      order: 3;
+      margin-top: 70px;
+    }
   }
 
   &__medal {
@@ -170,10 +184,28 @@
 
 @media (max-width: 640px) {
   .lb-podium {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: center;
 
     &__card {
-      margin-top: 0 !important;
+      max-width: 100%;
+      width: 100%;
+    }
+
+    &__card:nth-child(1) {
+      order: 1;
+      margin-top: 0;
+      padding-top: $sp5;
+    }
+
+    &__card:nth-child(2) {
+      order: 2;
+      margin-top: 0;
+    }
+
+    &__card:nth-child(3) {
+      order: 3;
+      margin-top: 0;
     }
   }
 
