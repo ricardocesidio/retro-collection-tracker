@@ -407,6 +407,7 @@
 .msg-back-btn{display:none;width:32px;height:32px;border-radius:$r1;background:$s2;border:1px solid $b1;color:$t2;font-size:.85rem;@include fc;cursor:pointer;transition:all $fast}.msg-back-btn:hover{background:$s3;border-color:$a1;color:$a2}
 
 @media(max-width:768px){.msg-layout{grid-template-columns:1fr;height:calc(100vh - 280px)}.msg-sidebar--hidden{display:none}.msg-main--hidden{display:none}.msg-back-btn{display:flex}.msg-chat-header__left{gap:.5rem}}
+@keyframes msgFade {
   from { opacity: 0; }
   to { opacity: 1; }
 }

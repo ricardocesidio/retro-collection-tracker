@@ -167,7 +167,6 @@ const Messages: React.FC = () => {
                     </>
                   )}
                 </div>
-              </div>
               {isBlocked && <div className="msg-blocked-banner"><i className="fa-solid fa-lock" /> You blocked {activeUser?.displayName || activeUser?.username}. <button onClick={() => handleUnblock(activeConvo)}>Unblock</button> to message again.</div>}
               <div className="msg-list">
                 {messages.map((m) => {
@@ -233,7 +232,8 @@ const Messages: React.FC = () => {
               <Button variant="danger" onClick={handleReport} disabled={!reportReason || (reportReason === 'Other' && !reportText.trim())}>Submit Report</Button>
                 </div>
               </div>
-      )}
+            </div>
+          )}
 
       <ConfirmDialog
         open={blockTarget !== null}
