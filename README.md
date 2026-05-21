@@ -568,23 +568,22 @@ Game ───┬─── Platform
 ### Quick Start
 
 ```bash
-# 1. Clone the repository
+# 1. Clone and install all dependencies
 git clone https://github.com/ricardocesidio/retro-collection-tracker.git
 cd retro-collection-tracker
+npm install    # Installs both backend and frontend
 
-# 2. Backend setup
-cd backend
-npm install
-cp .env.example .env
-# Edit .env: set DATABASE_URL, JWT_SECRET, RAWG_API_KEY
-npx prisma migrate deploy
-npx prisma db seed        # Seeds 299 games, 5 users, reviews, follows
-npm run start:dev         # Backend starts on http://localhost:3000
+# 2. Database setup
+cp backend/.env.example backend/.env
+# Edit backend/.env: set DATABASE_URL, JWT_SECRET, RAWG_API_KEY
+npm run db:seed          # Seeds 299 games, 5 users, reviews, follows
 
-# 3. Frontend setup (new terminal)
-cd frontend
-npm install
-npm run dev               # Frontend starts on http://localhost:5173
+# 3. Start both backend + frontend
+npm run dev               # Starts backend (port 3000) + frontend (port 5173)
+
+# Or run them individually:
+npm run dev:backend       # Backend only
+npm run dev:frontend      # Frontend only
 ```
 
 ### Database Seeding
@@ -594,11 +593,11 @@ npm run dev               # Frontend starts on http://localhost:5173
 # - 299 games across 12 platforms (NES, SNES, N64, Genesis, Saturn, etc.)
 # - 5 users with realistic collections
 # - Follow relationships and reviews
-npx prisma db seed
+npm run db:seed
 
 # Reset and re-seed:
 npx prisma migrate reset --force
-npx prisma db seed
+npm run db:seed
 
 # Create demo account (clone of alice's data):
 npm run demo              # email: demo@retro-tracker.com / password: demo1234
@@ -657,18 +656,25 @@ CORS_ORIGIN="http://localhost:5173,http://localhost:5174"
 ### Commands
 
 ```bash
-# Backend
-cd backend
-npm run start:dev      # Watch mode with hot reload
-npm run build          # Production build
-npm test               # Run tests (12 tests, 3 suites)
-npx prisma studio      # Database GUI (port 5555)
-npx prisma migrate dev # Create new migration
+# Root (workspace) — run from repo root
+npm run dev               # Frontend + backend simultaneously
+npm run dev:frontend      # Frontend only
+npm run dev:backend       # Backend only
+npm run build             # Build both
+npm run db:seed           # Seed database
+npm run db:studio         # Prisma Studio GUI
+npm run demo              # Create demo account
 
-# Frontend
+# Workspace-specific — run from backend/ or frontend/
+cd backend
+npm run start:dev         # Backend watch mode
+npm run build             # Production build
+npm test                  # Run tests (12 tests, 3 suites)
+npx prisma migrate dev    # Create new migration
+
 cd frontend
-npm run dev            # Dev server with HMR (port 5173)
-npm run build          # Production build
+npm run dev               # Frontend dev server
+npm run build             # Production build
 ```
 
 ### Proxy Configuration
@@ -784,6 +790,7 @@ The code includes a ready-to-use **Cloudflare R2** integration (`UploadService`)
 
 ```
 retro-collection-tracker/
+├── package.json               # Workspace root (npm workspaces)
 ├── backend/
 │   ├── prisma/
 │   │   ├── schema.prisma          # Database schema (17 models)
