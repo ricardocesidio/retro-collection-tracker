@@ -10,9 +10,6 @@ jobs:
   backend:
     name: Backend — Lint, Test, Build
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
 
     services:
       postgres:
@@ -31,38 +28,28 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: package-lock.json
-
       - run: npm ci
-
-      - name: Lint
-        run: npm run lint || true
-        working-directory: backend
-
+      - run: npx eslint "backend/src/**/*.ts" || true
       - name: Generate Prisma Client
         run: npx prisma generate
         working-directory: backend
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/retro_test
-
       - name: Run Migrations
         run: npx prisma migrate deploy
         working-directory: backend
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/retro_test
-
       - name: Test
         run: npm test -- --passWithNoTests
         working-directory: backend
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/retro_test
           JWT_SECRET: ci-test-secret-key
-
       - name: Build
         run: npm run build
         working-directory: backend
@@ -70,23 +57,17 @@ jobs:
   frontend:
     name: Frontend — Test, Build
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: package-lock.json
-
       - run: npm ci
-
       - name: Test
         run: npm test -- --run
-
+        working-directory: frontend
       - name: Build
         run: npm run build
+        working-directory: frontend
