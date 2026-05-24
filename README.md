@@ -64,6 +64,7 @@
 - [Development Guide](#-development-guide)
 - [Deployment](#-deployment)
 - [Project Structure](#-project-structure)
+- [Concepts & Architecture](#-concepts--architecture)
 - [FAQ](#-faq)
 - [License](#-license)
 
@@ -886,6 +887,23 @@ retro-collection-tracker/
 │
 └── README.md
 ```
+
+---
+
+## 🧠 Concepts & Architecture
+
+For a deep dive into the project's architecture, design patterns, data flows, and technical decisions, see **[CONCEPTS.md](./CONCEPTS.md)**.
+
+Topics covered:
+- Full-stack architecture diagram
+- Authentication & JWT flow
+- Real-time WebSocket communication
+- Database schema & relationships
+- Responsive design system & breakpoints
+- File upload system (R2 + local disk)
+- Deployment infrastructure (Vercel + Render + Neon)
+- Data flow examples (adding a game, trade request, chat)
+- Design decisions (why NestJS, Prisma, Socket.IO, etc.)
 
 ---
 
