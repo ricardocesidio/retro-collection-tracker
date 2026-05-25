@@ -65,7 +65,12 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm install 2>&1
-      - run: npm install @rolldown/binding-linux-x64-gnu --no-save 2>&1 || true
+      - name: Install native bindings
+        run: |
+          npm install --no-save \
+            @rolldown/binding-linux-x64-gnu \
+            lightningcss-linux-x64-gnu \
+            2>&1 || true
       - name: Test
         run: cd frontend && npx vitest run 2>&1
       - name: Build
