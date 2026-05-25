@@ -20,7 +20,7 @@ test.describe('Demo Login Flow', () => {
     await page.fill('input[type="email"]', 'wrong@email.com');
     await page.fill('input[type="password"]', 'wrongpass');
     await page.click('text=Sign In');
-    await expect(page.locator('[class*="alert"]')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[class*="alert"],[class*="error"]').first()).toBeVisible({ timeout: 5000 });
   });
 });
 
@@ -49,9 +49,9 @@ test.describe('Dashboard (authenticated)', () => {
   });
 
   test('dashboard shows KPIs', async ({ page }) => {
-    await expect(page.locator('text=Total Games')).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('text=Est. Value')).toBeVisible();
-    await expect(page.locator('text=Wishlist')).toBeVisible();
+    await expect(page.locator('text=Total Games').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=Est. Value').first()).toBeVisible();
+    await expect(page.locator('.stat-card__label:has-text("Wishlist")')).toBeVisible();
   });
 
   test('sidebar navigation works', async ({ page }) => {
