@@ -64,8 +64,8 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      - run: npm install --include=workspaces --workspaces 2>&1
       - name: Test
-        run: npm run test --workspace=frontend
+        run: npm run test --workspace=frontend 2>&1
       - name: Build
-        run: npm run build --workspace=frontend
+        run: npm run build --workspace=frontend 2>&1
