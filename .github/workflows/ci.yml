@@ -65,8 +65,9 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - run: ls frontend/node_modules/.vitest 2>/dev/null || echo "vitest not in frontend node_modules"
       - name: Test
-        run: npm test 2>&1
+        run: npx vitest run 2>&1 || npx --yes vitest run 2>&1
         working-directory: frontend
       - name: Build
         run: npm run build
