@@ -41,8 +41,8 @@ export class ExternalGamesService {
 
     if (this.rawgKey) {
       try {
-        const result = await this.searchRawg(query, page);
-        result.source = 'rawg';
+        const raw = await this.searchRawg(query, page);
+        const result = { ...raw, source: 'rawg' as const };
         this.cache.set(cacheKey, result);
         return result;
       } catch (err) {
@@ -57,20 +57,6 @@ export class ExternalGamesService {
       const result = { results, total: results.length, source: 'wikipedia' as const };
       this.cache.set(cacheKey, result);
       return result;
-    } catch (err) {
-      this.logger.error(`Wikipedia search also failed: ${err}`);
-      return { results: [], total: 0, source: 'none' };
-    }
-  }
-    }
-
-    if (!query || query.trim().length < 2) {
-      return { results: [], total: 0, source: 'none' };
-    }
-
-    try {
-      const results = await this.searchWikipedia(query);
-      return { results, total: results.length, source: 'wikipedia' };
     } catch (err) {
       this.logger.error(`Wikipedia search also failed: ${err}`);
       return { results: [], total: 0, source: 'none' };
