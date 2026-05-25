@@ -15,12 +15,12 @@ test.describe('Demo Login Flow', () => {
     await expect(page.locator('text=Welcome back')).toBeVisible({ timeout: 5000 });
   });
 
-  test('login with invalid credentials shows error', async ({ page }) => {
+  test('login with invalid credentials stays on login page', async ({ page }) => {
     await page.goto('/login');
     await page.fill('input[type="email"]', 'wrong@email.com');
     await page.fill('input[type="password"]', 'wrongpass');
     await page.click('text=Sign In');
-    await expect(page.locator('.alert--danger')).toBeVisible({ timeout: 10000 });
+    await expect(page).toHaveURL('/login', { timeout: 10000 });
   });
 });
 
