@@ -16,11 +16,17 @@ export class ErrorBoundary extends React.Component<
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    if (error.message?.includes("Failed to execute 'removeChild'")) {
+      return { hasError: false, error: null };
+    }
     return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    if (error.message?.includes("Failed to execute 'removeChild'")) return;
+    if (error.message?.includes("Failed to execute 'removeChild'")) {
+      console.warn('React internal removeChild error (harmless):', error.message);
+      return;
+    }
     console.error('ErrorBoundary caught:', error, info);
   }
 
