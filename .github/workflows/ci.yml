@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      - run: npm install 2>&1
       - run: npx eslint "backend/src/**/*.ts" || true
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -64,8 +64,8 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci 2>&1
-      - run: npm install @rolldown/binding-linux-x64-gnu --no-save --workspace=frontend 2>&1 || true
+      - run: npm install 2>&1
+      - run: npm install @rolldown/binding-linux-x64-gnu --no-save 2>&1 || true
       - name: Test
         run: cd frontend && npx vitest run 2>&1
       - name: Build
