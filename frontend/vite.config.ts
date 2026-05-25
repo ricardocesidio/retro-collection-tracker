@@ -17,7 +17,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'favicon-32x32.png', 'favicon-192x192.png', 'favicon-512x512.png', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.svg', 'favicon-32x32.png', 'android-chrome-192x192.png', 'android-chrome-512x512.png', 'apple-touch-icon.png'],
       manifest: {
         name: 'Retro Collection Tracker',
         short_name: 'Retro Tracker',
@@ -29,8 +29,8 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         icons: [
-          { src: '/favicon-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/favicon-512x512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
           { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' },
         ],
       },
