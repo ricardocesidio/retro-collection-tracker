@@ -1,4 +1,4 @@
-# 🧠 Retro Collection Tracker — Concepts & Architecture
+# 🧠 Retro Collection Tracker — Architecture & Concepts
 
 A deep dive into the technical concepts, design decisions, and architecture of the Retro Collection Tracker full-stack application.
 

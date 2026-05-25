@@ -905,7 +905,7 @@ retro-collection-tracker/
 
 ## 🧠 Concepts & Architecture
 
-For a deep dive into the project's architecture, design patterns, data flows, and technical decisions, see **[CONCEPTS.md](./CONCEPTS.md)**.
+For a deep dive into the project's architecture, design patterns, data flows, and technical decisions, see **[ARCHITECTURE.md](./ARCHITECTURE.md)**.
 
 Topics covered:
 - Full-stack architecture diagram
