@@ -67,10 +67,9 @@ jobs:
       - run: npm install 2>&1
       - name: Install native bindings
         run: |
-          npm install --no-save \
-            @rolldown/binding-linux-x64-gnu \
-            lightningcss-linux-x64-gnu \
-            2>&1 || true
+          npm install --no-save @rolldown/binding-linux-x64-gnu@1.0.0 lightningcss-linux-x64-gnu@1.32.0 2>&1
+          ls node_modules/@rolldown/binding-linux-x64-gnu 2>/dev/null && echo "rolldown OK" || echo "rolldown MISSING"
+          ls node_modules/lightningcss-linux-x64-gnu 2>/dev/null && echo "lightningcss OK" || echo "lightningcss MISSING"
       - name: Test
         run: cd frontend && npx vitest run 2>&1
       - name: Build
