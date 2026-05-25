@@ -43,7 +43,7 @@ const Login: React.FC = () => {
         </p>
         <p className="auth-card__footer">Don't have an account? <Link to="/register">Create one</Link></p>
         <div className="auth-card__demo">
-          <Button type="button" variant="primary" onClick={demoLogin} loading={state.loading} size="lg">🚀 Demo Login</Button>
+          <Button type="button" variant="primary" onClick={demoLogin} loading={state.loading} size="lg">Demo Login</Button>
           <span>demo@retro-tracker.com / demo1234</span>
         </div>
       </div>
