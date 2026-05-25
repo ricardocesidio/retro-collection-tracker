@@ -292,6 +292,46 @@ Game ───┬─── Platform
 - Full-text search index on Game title
 - Trade status index for unread counting
 
+### Prisma ORM Patterns
+
+- **Soft deletes**: User model has `deletedAt` field for account deactivation instead of hard deletion
+- **Field-level encryption**: Passwords hashed with bcryptjs (12 rounds), never stored in plaintext
+- **Enums**: 7 Prisma enums for status/type fields (TradeStatus, UserRole, Condition, etc.)
+- **Cascade vs Restrict**: User deletes cascade to related data; Game deletes are restricted when referenced
+
+---
+
+## API Design
+
+### RESTful Conventions
+
+- **Resource-based URLs**: `/collections`, `/trade/request`, `/users/:username`
+- **HTTP methods**: GET (read), POST (create), PUT (update), DELETE (delete)
+- **Status codes**: 200 (OK), 201 (Created), 401 (Unauthorized), 403 (Forbidden), 404 (Not Found), 409 (Conflict)
+- **Pagination**: `GET /games?page=1&limit=20` with response metadata
+- **Filtering**: `GET /collections?platform=nes&condition=MINT`
+- **Sorting**: `GET /collections?sort=title_asc`
+
+### Error Handling
+
+- **Global exception filter**: Catches all unhandled exceptions and returns consistent JSON
+- **Validation pipe**: `class-validator` DTOs reject invalid input before reaching controllers
+- **Business logic errors**: Custom `NotFoundException`, `ConflictException`, `ForbiddenException`
+- **Network errors**: Frontend `api-client.ts` catches `TypeError: Failed to fetch` and shows user-friendly messages
+- **Graceful degradation**: Wikipedia API fallback when RAWG is unavailable
+
+### Rate Limiting
+
+- **ThrottlerGuard**: Global rate limiting configured via `@nestjs/throttler`
+- Prevents brute-force attacks on auth endpoints
+- Configurable per endpoint
+
+### API Documentation
+
+- **Swagger/OpenAPI**: Auto-generated via `@nestjs/swagger`
+- Available at `GET /api-docs` (enabled in dev, disabled in production for faster startup)
+- All endpoints documented with request/response schemas
+
 ---
 
 ## Authentication Flow
@@ -566,6 +606,69 @@ async upload(file: Express.Multer.File): Promise<string> {
 
 ---
 
+## Testing Strategy
+
+### Backend Testing (Jest)
+
+| Test Type | Count | What it covers |
+|-----------|-------|----------------|
+| Unit tests | 12 tests / 3 suites | Auth service (login, register, validation) |
+
+The backend uses **Jest** with a test database (PostgreSQL). Tests are located in `*.spec.ts` files co-located with source files. The CI runs tests against a fresh PostgreSQL instance with `prisma migrate deploy` before test execution.
+
+### Frontend Testing (Vitest)
+
+| Test Type | Count | What it covers |
+|-----------|-------|----------------|
+| Component tests | 11 tests / 3 files | Button component, ErrorBoundary, Auth flow |
+
+The frontend uses **Vitest** with `jsdom` environment for DOM simulation. Tests are in `src/__tests__/`. The CI runs tests with `vitest run` before the production build.
+
+### What's Not Tested
+
+- **Integration tests**: No end-to-end API tests (would require a running backend)
+- **E2E tests**: No browser automation (Cypress/Playwright)
+- **Snapshot tests**: Not used (preference for behavior-based assertions)
+
+---
+
+## CI/CD Pipeline
+
+### GitHub Actions Workflow
+
+On every push to `main`, the CI pipeline runs two jobs in parallel:
+
+**Backend job:**
+1. `npm install` — install all workspace dependencies
+2. `ESLint` — static analysis (warnings don't fail build)
+3. `prisma generate` — compile Prisma client
+4. `prisma migrate deploy` — apply pending migrations to test DB
+5. `npm test` — run Jest unit tests
+6. `npm run build` — compile NestJS production build
+
+**Frontend job:**
+1. `npm install` — install all workspace dependencies
+2. Install native bindings (`@rolldown/binding-linux-x64-gnu`, `lightningcss-linux-x64-gnu`) for Linux CI
+3. `npx vitest run` — run Vitest component tests
+4. `npx vite build` — production build with code splitting
+
+### Deployment (CD)
+
+After CI passes:
+- **Vercel** auto-deploys the frontend from `main` branch (build: `vite build`)
+- **Render** auto-deploys the backend from `main` branch (build: `nest build`, start: `node dist/src/main.js`)
+
+### CI Challenges Solved
+
+| Challenge | Solution |
+|-----------|----------|
+| npm workspaces + native bindings | `npm install` (not `npm ci`) to resolve platform-specific optional deps |
+| `@rolldown/binding-linux-x64-gnu` | Explicit `npm install --no-save` for Linux bindings in CI |
+| `lightningcss-linux-x64-gnu` | Same approach — explicit install of Linux CSS minifier binary |
+| Lockfile sync across platforms | `npm install` at root to regenerate lockfile with all optional deps |
+
+---
+
 ## Deployment Strategy
 
 ### Infrastructure (All Free)
@@ -661,6 +764,30 @@ Render's free tier spins down after 15 minutes of inactivity. A free cron-job.or
 7. User B (if online) receives event → message appears in real-time
 8. Both users' notification badges update via notification:unread event
 ```
+
+---
+
+## Security Considerations
+
+### Authentication & Authorization
+- **JWT tokens**: 7-day expiration, signed with configurable secret
+- **Password hashing**: bcryptjs with 12 salt rounds
+- **Role-based access**: `USER`, `MODERATOR`, `ADMIN` roles via `RolesGuard`
+- **Route protection**: JWT required globally by default, `@Public()` decorator for opt-out
+
+### API Security
+- **Input validation**: `class-validator` DTOs whitelist known fields, reject unknown
+- **Rate limiting**: `ThrottlerGuard` prevents brute-force attacks
+- **CORS**: Whitelist-based origin configuration via `CORS_ORIGIN` env var
+- **Helmet**: Security headers (X-Content-Type-Options, X-Frame-Options, etc.) via `helmet` middleware
+- **Body size limits**: 1MB max request body via `express.json({ limit: '1mb' })`
+- **File upload restrictions**: Only jpg, png, webp, gif — max 5MB
+
+### Data Protection
+- **SQL injection**: Prevented by Prisma's parameterized queries
+- **XSS**: Mitigated by React's automatic HTML escaping and CSP headers from Helmet
+- **No secrets in code**: All credentials via environment variables (`.env` is gitignored)
+- **Session management**: Token stored in `localStorage` (trade-off: XSS vulnerability mitigated by CSP)
 
 ---
 
