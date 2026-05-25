@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
 import type { IncomingMessage, ServerResponse } from 'http'
 
@@ -12,7 +13,40 @@ function skipHtml(req: IncomingMessage, res: ServerResponse): string | void | nu
 }
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg'],
+      manifest: {
+        name: 'Retro Collection Tracker',
+        short_name: 'Retro Tracker',
+        description: 'Track your retro game collection, trade with collectors, and earn XP',
+        theme_color: '#020617',
+        background_color: '#020617',
+        display: 'standalone',
+        orientation: 'portrait',
+        start_url: '/',
+        scope: '/',
+        icons: [
+          { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' },
+        ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,svg,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https?:\/\/retro-collection-tracker\.onrender\.com\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 },
+            },
+          },
+        ],
+      },
+    }),
+  ],
   server: {
     proxy: {
       '/ws': { target: 'http://localhost:3000', ws: true },
