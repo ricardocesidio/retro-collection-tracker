@@ -14,10 +14,12 @@
 [![Socket.IO](https://img.shields.io/badge/Socket.IO-4-010101?style=flat&logo=socket.io)](https://socket.io)
 [![RAWG](https://img.shields.io/badge/RAWG-API-662D91?style=flat)](https://rawg.io/apidocs)
 [![JWT](https://img.shields.io/badge/JWT-000?style=flat&logo=jsonwebtokens)](https://jwt.io)
+[![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?style=flat&logo=storybook)](https://storybook.js.org)
+[![Playwright](https://img.shields.io/badge/Playwright-E2E-45ba4b?style=flat&logo=playwright)](https://playwright.dev)
 [![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-000?logo=vercel)](https://retro-collection-tracker.vercel.app)
 [![Render](https://img.shields.io/badge/Deployed_on-Render-46E3B7?logo=render&logoColor=000)](https://retro-collection-tracker.onrender.com)
 [![Neon](https://img.shields.io/badge/Neon-00E599?style=flat&logo=neon)](https://neon.tech)
-[![CI](https://img.shields.io/github/actions/workflow/status/ricardocesidio/retro-collection-tracker/ci.yml?branch=main&label=CI&logo=github)](https://github.com/ricardocesidio/retro-collection-tracker/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/ricardocesidio/retro-collection-tracker/ci.yml?branch=main&label=CI&logo=github&color=green)](https://github.com/ricardocesidio/retro-collection-tracker/actions)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE)
 
 <div align="center"><a href="https://retro-collection-tracker.vercel.app">
@@ -97,8 +99,9 @@ Retro Collection Tracker is a production-grade web application designed for retr
 | React Router | 7 | Client-side routing with lazy loading |
 | SCSS | — | Custom theming with CSS variables |
 | Socket.IO Client | 4 | Real-time WebSocket communication |
-| Storybook | 10 | Component library documentation |
-| Vite PWA | — | Progressive Web App support |
+| Storybook | 10 | Component library documentation & visual testing |
+| Playwright | — | End-to-end browser testing (9 tests) |
+| Vite PWA | — | Progressive Web App (installable, offline, iOS) |
 
 ### Backend
 | Technology | Version | Purpose |
@@ -112,6 +115,7 @@ Retro Collection Tracker is a production-grade web application designed for retr
 | bcryptjs | — | Password hashing |
 | class-validator | — | DTO validation |
 | compression | — | Gzip response compression |
+| node-cache | — | In-memory API response caching (5min TTL) |
 
 ### Infrastructure
 | Platform | Purpose | Cost |
@@ -283,6 +287,13 @@ PENDING → ACCEPTED → SHIPPED → COMPLETED
 | 3 | 200 | Master Collector |
 | 4 | 500 | Museum Curator |
 
+### 📊 Leaderboard
+
+- **Top 10 collectors** ranked by collection value
+- **Podium layout** — 1st center (tallest), 2nd left, 3rd right (real podium design)
+- **Search/filter** — real-time filtering by collector name
+- **Responsive** — 3-column grid on mobile for rest rankings
+
 ### 👤 Profiles & Social
 
 - **Profile page** — avatar, display name, bio, location (country + city via dropdown with 182 countries), XP bar, collector level
@@ -342,6 +353,7 @@ PENDING → ACCEPTED → SHIPPED → COMPLETED
 ### ⚡ Performance Optimizations
 
 - **Gzip compression** — all API responses compressed via middleware
+- **RAWG API caching** — in-memory cache with 5-minute TTL (2nd visit loads instantly)
 - **Swagger disabled in production** — faster cold starts on Render
 - **Cache headers** — JS/CSS/fonts cached for 1 year on Vercel (immutable)
 - **Lazy loading** — all pages code-split with React.lazy
@@ -712,10 +724,12 @@ npm run dev               # Frontend + backend simultaneously
 npm run dev:frontend      # Frontend only
 npm run dev:backend       # Backend only
 npm run build             # Build both
+npm run test              # Run all unit tests (backend + frontend)
+npm run test:e2e          # Run Playwright E2E tests (9 tests)
 npm run db:seed           # Seed database
 npm run db:studio         # Prisma Studio GUI
 npm run demo              # Create demo account
-docker-compose up         # Full stack via Docker (PostgreSQL + backend + frontend)
+docker-compose up         # Full stack via Docker
 
 # Workspace-specific — run from backend/ or frontend/
 cd backend
@@ -730,18 +744,47 @@ npm run build             # Production build
 npm test                  # Run tests (11 tests, 3 suites)
 npm run storybook         # Storybook dev server (port 6006)
 npm run build-storybook   # Build static Storybook
-npm run test:e2e          # Playwright E2E tests
+npm run test:e2e          # Run Playwright E2E tests locally
 npm run preview           # Preview production build
 ```
 
+### E2E Testing with Playwright
+
+The project uses **Playwright** for browser-based end-to-end testing:
+
+| Test Suite | Tests | What it covers |
+|-----------|-------|----------------|
+| Demo Login Flow | 3 | Login page renders, demo login redirects to dashboard, invalid credentials stay on login |
+| Navigation | 3 | Home page loads, protected routes redirect to login, public pages accessible |
+| Dashboard (authenticated) | 3 | KPIs visible, sidebar navigation works, logout redirects |
+
+Run all E2E tests:
+```bash
+npm run test:e2e
+```
+
+Playwright configuration is in `frontend/playwright.config.ts` — Chromium only, runs against `localhost:5173` with the dev server expected to be running.
+
+### Unit Testing
+
+| Layer | Framework | Tests | Location |
+|-------|-----------|-------|----------|
+| Backend | Jest | 12 tests, 3 suites | `*.spec.ts` in source |
+| Frontend | Vitest | 11 tests, 3 suites | `src/__tests__/` |
+
 ### Continuous Integration
 
-The project uses **GitHub Actions** for CI. On every push to `main`:
+**GitHub Actions** runs on every push to `main`:
 
-| Job | What it runs |
-|-----|-------------|
-| **Backend** | ESLint → Prisma generate/migrate → Tests → Build |
-| **Frontend** | Vitest tests → Vite production build |
+| Job | Steps | Status |
+|-----|-------|--------|
+| **Backend** | ESLint → Prisma generate + migrate → Jest tests → NestJS build | ✅ |
+| **Frontend** | Vitest unit tests → Vite production build | ✅ |
+| **E2E** | (Coming soon) Playwright tests against deployed preview | 🚧 |
+
+After CI passes:
+- **Vercel** auto-deploys the frontend
+- **Render** auto-deploys the backend
 
 CI status: [![CI](https://img.shields.io/github/actions/workflow/status/ricardocesidio/retro-collection-tracker/ci.yml?branch=main&label=CI&logo=github)](https://github.com/ricardocesidio/retro-collection-tracker/actions)
 
@@ -859,12 +902,16 @@ The code includes a ready-to-use **Cloudflare R2** integration (`UploadService`)
 
 ```
 retro-collection-tracker/
-├── docker-compose.yml         # One-command Docker setup
+├── docker-compose.yml         # One-command Docker setup (PostgreSQL + backend + Nginx)
 ├── package.json               # Workspace root (npm workspaces)
-├── ARCHITECTURE.md             # Architecture & design decisions
+├── ARCHITECTURE.md             # Architecture & design decisions (726 lines)
+├── .github/
+│   └── workflows/
+│       └── ci.yml              # GitHub Actions CI pipeline
 ├── backend/
+│   ├── Dockerfile              # Multi-stage production build
 │   ├── prisma/
-│   │   ├── schema.prisma          # Database schema (17 models)
+│   │   ├── schema.prisma          # Database schema (17 models, 7 enums)
 │   │   ├── seed.ts                # Data seeder (299 games, 5 users)
 │   │   ├── create-demo.ts         # Demo account creator (clone of alice)
 │   │   └── migrations/            # 14 migration files
@@ -872,14 +919,14 @@ retro-collection-tracker/
 │   ├── .env.example               # Environment template
 │   ├── src/
 │   │   ├── auth/                  # JWT auth, register, login, profile
-│   │   ├── games/                 # RAWG integration, game CRUD
-│   │   ├── collections/           # Collection management, stats
+│   │   ├── games/                 # RAWG integration, game CRUD, Wikipedia fallback
+│   │   ├── collections/           # Collection CRUD, stats, value history
 │   │   ├── trade/                 # Trade requests, shipping, QR codes
 │   │   ├── messages/              # Chat, blocking, reporting
-│   │   ├── social/                # Follow, activity, notifications
+│   │   ├── social/                # Follow, activity feed, notifications
 │   │   ├── reviews/               # Reviews, likes, comments
-│   │   ├── wishlist/              # Wishlist management
-│   │   ├── users/                 # User profiles
+│   │   ├── wishlist/              # Wishlist CRUD
+│   │   ├── users/                 # User profiles by username
 │   │   ├── upload/                # File uploads (avatar, covers)
 │   │   │   ├── upload.controller.ts
 │   │   │   ├── upload.service.ts   # R2-ready S3 storage with local fallback
@@ -888,7 +935,8 @@ retro-collection-tracker/
 │   │   ├── xp/                    # XP system
 │   │   ├── config/                # Configuration module
 │   │   ├── prisma/                # Prisma service
-│   │   └── common/                # Guards, filters, decorators
+│   │   └── common/
+│   │       └── cache.service.ts    # In-memory cache (5min TTL for RAWG API)
 │   ├── test/                      # E2E tests
 │   └── package.json
 │
@@ -896,16 +944,37 @@ retro-collection-tracker/
 │   └── deploy-db.sh            # Database dump/restore helper
 │
 ├── frontend/
+│   ├── Dockerfile              # Multi-stage build → Nginx
+│   ├── nginx.conf              # Nginx config (SPA + API proxy)
 │   ├── vercel.json              # SPA rewrites + uploads proxy + cache headers
 │   ├── .env                     # Dev VITE_API_URL (empty → uses Vite proxy)
 │   ├── .env.production          # Production VITE_API_URL (overridden by Vercel env)
-│   ├── vite.config.ts           # Vite config with proxy rules + WebSocket support
+│   ├── .npmrc                   # npm config (include optional deps)
+│   ├── vite.config.ts           # Vite config with proxy rules + WebSocket + PWA
+│   ├── playwright.config.ts     # Playwright E2E test configuration
+│   ├── .storybook/
+│   │   ├── main.ts              # Storybook config (react-vite, addon-docs, addon-a11y)
+│   │   └── preview.tsx          # Storybook preview config
+│   ├── public/
+│   │   ├── favicon.svg           # SVG favicon (purple controller icon)
+│   │   ├── favicon.ico           # Legacy ICO favicon (16x16 + 32x32)
+│   │   ├── favicon-16x16.png     # PNG favicon 16x16
+│   │   ├── favicon-32x32.png     # PNG favicon 32x32
+│   │   ├── android-chrome-192x192.png  # PWA icon 192x192
+│   │   ├── android-chrome-512x512.png  # PWA icon 512x512
+│   │   └── apple-touch-icon.png        # iOS home screen icon 180x180
 │   ├── src/
 │   │   ├── pages/                 # 25 page components
 │   │   ├── components/
+│   │   │   ├── auth/
+│   │   │   │   └── ErrorBoundary.tsx   # Global error boundary (catches React errors)
 │   │   │   ├── ui/               # Reusable UI components
-│   │   │   │   ├── Button/
-│   │   │   │   ├── Input/
+│   │   │   │   ├── Button/       # 6 stories in Storybook
+│   │   │   │   ├── Input/        # 6 stories in Storybook
+│   │   │   │   ├── Badge/        # 7 stories in Storybook
+│   │   │   │   ├── Alert/        # 4 stories in Storybook
+│   │   │   │   ├── LoadingSpinner/ # 3 stories in Storybook
+│   │   │   │   ├── EmptyState/   # 4 stories in Storybook
 │   │   │   │   ├── ChatWidget/
 │   │   │   │   ├── ConfirmDialog/
 │   │   │   │   ├── ActivityItem/
@@ -913,10 +982,8 @@ retro-collection-tracker/
 │   │   │   │   ├── StarRating/
 │   │   │   │   ├── StatCard/
 │   │   │   │   ├── ProgressCard/
-│   │   │   │   ├── Badge/
-│   │   │   │   ├── Alert/
-│   │   │   │   ├── LoadingSpinner/
-│   │   │   │   └── EmptyState/
+│   │   │   │   ├── ProfileChip/
+│   │   │   │   └── DropdownMenu/
 │   │   │   └── layout/           # AppLayout, Sidebar, TopBar, MobileBottomNav
 │   │   ├── services/              # API clients
 │   │   ├── hooks/                 # Custom React hooks
@@ -924,7 +991,8 @@ retro-collection-tracker/
 │   │   ├── styles/                # Global SCSS, variables, mixins
 │   │   ├── data/                  # Static data (countries, cities)
 │   │   └── types/                 # Shared TypeScript types
-│   ├── vite.config.ts             # Vite config with proxy rules
+│   ├── e2e/                       # Playwright E2E tests
+│   │   └── app.spec.ts            # 9 tests (login, navigation, dashboard)
 │   └── package.json
 │
 └── README.md
