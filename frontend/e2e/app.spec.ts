@@ -20,7 +20,7 @@ test.describe('Demo Login Flow', () => {
     await page.fill('input[type="email"]', 'wrong@email.com');
     await page.fill('input[type="password"]', 'wrongpass');
     await page.click('text=Sign In');
-    await expect(page.locator('[class*="alert"],[class*="error"]').first()).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('.alert--danger')).toBeVisible({ timeout: 10000 });
   });
 });
 
