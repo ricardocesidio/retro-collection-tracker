@@ -12,6 +12,7 @@
     "typecheck": "npm run typecheck --workspace=frontend && npm run build --workspace=backend",
     "lint": "npm run lint --workspace=frontend",
     "test": "npm run test --workspace=backend && npm run test --workspace=frontend",
+    "test:e2e": "npx playwright test --config=frontend/playwright.config.ts",
     "db:seed": "npm run db:seed --workspace=backend",
     "db:studio": "npm run db:studio --workspace=backend",
     "demo": "npm run demo --workspace=backend"
