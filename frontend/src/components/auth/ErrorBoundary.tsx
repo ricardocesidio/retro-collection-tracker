@@ -20,6 +20,7 @@ export class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
+    if (error.message?.includes("Failed to execute 'removeChild'")) return;
     console.error('ErrorBoundary caught:', error, info);
   }
 
