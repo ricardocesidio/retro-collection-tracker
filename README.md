@@ -97,6 +97,8 @@ Retro Collection Tracker is a production-grade web application designed for retr
 | React Router | 7 | Client-side routing with lazy loading |
 | SCSS | — | Custom theming with CSS variables |
 | Socket.IO Client | 4 | Real-time WebSocket communication |
+| Storybook | 10 | Component library documentation |
+| Vite PWA | — | Progressive Web App support |
 
 ### Backend
 | Technology | Version | Purpose |
@@ -316,6 +318,26 @@ PENDING → ACCEPTED → SHIPPED → COMPLETED
 - **Touch-friendly** — scrollable horizontal wishlist, swipe-friendly layouts
 - **Messages page** — conversation list/chat view switches based on selection
 - **All pages mobile-tested** — dashboard, profile, settings, leaderboard, trade, and more
+
+### 📦 PWA (Progressive Web App)
+
+- **Installable** — add to home screen on mobile devices
+- **Offline support** — service worker caches assets for repeat visits
+- **Auto-update** — registers new service worker on deploy
+- **Standalone mode** — full-screen experience without browser chrome
+
+### 📚 Storybook Component Library
+
+- **6 component stories** — Button, Badge, Alert, Input, LoadingSpinner, EmptyState
+- **Interactive docs** — play with props, see live changes
+- **Run locally**: `npm run storybook` (port 6006)
+- **Build**: `npm run build-storybook` (output: `storybook-static/`)
+
+### 🐳 Docker Support
+
+- **One-command setup**: `docker-compose up` starts PostgreSQL + backend + frontend
+- **Nginx reverse proxy** — serves frontend SPA and proxies API/WebSocket to backend
+- **Persistent database** — PostgreSQL data stored in Docker volume
 
 ### ⚡ Performance Optimizations
 
@@ -693,6 +715,7 @@ npm run build             # Build both
 npm run db:seed           # Seed database
 npm run db:studio         # Prisma Studio GUI
 npm run demo              # Create demo account
+docker-compose up         # Full stack via Docker (PostgreSQL + backend + frontend)
 
 # Workspace-specific — run from backend/ or frontend/
 cd backend
@@ -705,6 +728,9 @@ cd frontend
 npm run dev               # Frontend dev server
 npm run build             # Production build
 npm test                  # Run tests (11 tests, 3 suites)
+npm run storybook         # Storybook dev server (port 6006)
+npm run build-storybook   # Build static Storybook
+npm run preview           # Preview production build
 ```
 
 ### Continuous Integration
@@ -832,7 +858,9 @@ The code includes a ready-to-use **Cloudflare R2** integration (`UploadService`)
 
 ```
 retro-collection-tracker/
+├── docker-compose.yml         # One-command Docker setup
 ├── package.json               # Workspace root (npm workspaces)
+├── ARCHITECTURE.md             # Architecture & design decisions
 ├── backend/
 │   ├── prisma/
 │   │   ├── schema.prisma          # Database schema (17 models)
