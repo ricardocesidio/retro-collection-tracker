@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { collectionApi } from '../../../services/collections';
 import './Sidebar.scss';
@@ -7,6 +7,7 @@ import './Sidebar.scss';
 const Sidebar: React.FC = () => {
   const { state } = useAuth();
   const { user } = state;
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState<{ total: number; pct: number; hint: string } | null>(null);
 
@@ -55,7 +56,7 @@ const Sidebar: React.FC = () => {
   return (
     <>
       {open && <div className="sidebar-overlay" />}
-      <button className="sidebar-hamburger" onClick={() => setOpen(!open)} aria-label="Toggle menu" aria-expanded={open}>
+      <button className="sidebar-hamburger" onClick={() => { if (!user) { navigate('/login'); return; } setOpen(!open); }} aria-label="Toggle menu" aria-expanded={open}>
         <span/><span/><span/>
       </button>
       <aside className={`sidebar${open ? ' sidebar--open' : ''}`}>
