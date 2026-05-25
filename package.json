@@ -15,5 +15,8 @@
     "db:seed": "npm run db:seed --workspace=backend",
     "db:studio": "npm run db:studio --workspace=backend",
     "demo": "npm run demo --workspace=backend"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
   }
 }
