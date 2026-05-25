@@ -730,6 +730,7 @@ npm run build             # Production build
 npm test                  # Run tests (11 tests, 3 suites)
 npm run storybook         # Storybook dev server (port 6006)
 npm run build-storybook   # Build static Storybook
+npm run test:e2e          # Playwright E2E tests
 npm run preview           # Preview production build
 ```
 
