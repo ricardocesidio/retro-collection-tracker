@@ -14,18 +14,4 @@ export default defineConfig({
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
   ],
-  webServer: [
-    {
-      command: 'npm run dev:backend',
-      url: 'http://localhost:3000',
-      reuseExistingServer: !process.env.CI,
-      cwd: '../..',
-    },
-    {
-      command: 'npm run dev:frontend',
-      url: 'http://localhost:5173',
-      reuseExistingServer: !process.env.CI,
-      cwd: '../..',
-    },
-  ],
 });
