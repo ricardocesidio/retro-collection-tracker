@@ -64,7 +64,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm install 2>&1
+      - run: npm ci --include=optional 2>&1
       - name: Test
         run: cd frontend && npx vitest run 2>&1
       - name: Build
