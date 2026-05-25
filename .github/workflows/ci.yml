@@ -71,6 +71,6 @@ jobs:
           ls node_modules/@rolldown/binding-linux-x64-gnu 2>/dev/null && echo "rolldown OK" || echo "rolldown MISSING"
           ls node_modules/lightningcss-linux-x64-gnu 2>/dev/null && echo "lightningcss OK" || echo "lightningcss MISSING"
       - name: Test
-        run: cd frontend && npx vitest run 2>&1
+        run: npm run test --workspace=frontend 2>&1
       - name: Build
-        run: cd frontend && npx vite build 2>&1
+        run: npm run build --workspace=frontend 2>&1
