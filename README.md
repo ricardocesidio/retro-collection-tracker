@@ -17,6 +17,7 @@
 [![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-000?logo=vercel)](https://retro-collection-tracker.vercel.app)
 [![Render](https://img.shields.io/badge/Deployed_on-Render-46E3B7?logo=render&logoColor=000)](https://retro-collection-tracker.onrender.com)
 [![Neon](https://img.shields.io/badge/Neon-00E599?style=flat&logo=neon)](https://neon.tech)
+[![CI](https://img.shields.io/github/actions/workflow/status/ricardocesidio/retro-collection-tracker/ci.yml?branch=main&label=CI&logo=github)](https://github.com/ricardocesidio/retro-collection-tracker/actions)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE)
 
 <div align="center"><a href="https://retro-collection-tracker.vercel.app">
@@ -703,7 +704,19 @@ npx prisma migrate dev    # Create new migration
 cd frontend
 npm run dev               # Frontend dev server
 npm run build             # Production build
+npm test                  # Run tests (11 tests, 3 suites)
 ```
+
+### Continuous Integration
+
+The project uses **GitHub Actions** for CI. On every push to `main`:
+
+| Job | What it runs |
+|-----|-------------|
+| **Backend** | ESLint → Prisma generate/migrate → Tests → Build |
+| **Frontend** | Vitest tests → Vite production build |
+
+CI status: [![CI](https://img.shields.io/github/actions/workflow/status/ricardocesidio/retro-collection-tracker/ci.yml?branch=main&label=CI&logo=github)](https://github.com/ricardocesidio/retro-collection-tracker/actions)
 
 ### Proxy Configuration
 
