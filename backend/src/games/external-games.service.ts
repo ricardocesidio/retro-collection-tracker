@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import { CacheService } from '../common/cache.service';
 
 export interface ExternalGameResult {
   source: 'rawg' | 'wikipedia';
@@ -25,23 +26,42 @@ export class ExternalGamesService {
   constructor(
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
+    private readonly cache: CacheService,
   ) {
     this.rawgKey = this.config.get<string>('RAWG_API_KEY') || '';
   }
 
   async search(
     query: string,
-    page = 1,
+    page: number,
   ): Promise<{ results: ExternalGameResult[]; total: number; source: string }> {
+    const cacheKey = `rawg:search:${query}:${page}`;
+    const cached = this.cache.get<{ results: ExternalGameResult[]; total: number; source: string }>(cacheKey);
+    if (cached) return cached;
+
     if (this.rawgKey) {
       try {
-        const { results, total } = await this.searchRawg(query, page);
-        return { results, total, source: 'rawg' };
+        const result = await this.searchRawg(query, page);
+        result.source = 'rawg';
+        this.cache.set(cacheKey, result);
+        return result;
       } catch (err) {
         this.logger.warn(
           `RAWG search failed, falling back to Wikipedia: ${err}`,
         );
       }
+    }
+
+    try {
+      const results = await this.searchWikipedia(query);
+      const result = { results, total: results.length, source: 'wikipedia' as const };
+      this.cache.set(cacheKey, result);
+      return result;
+    } catch (err) {
+      this.logger.error(`Wikipedia search also failed: ${err}`);
+      return { results: [], total: 0, source: 'none' };
+    }
+  }
     }
 
     if (!query || query.trim().length < 2) {
